@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Draft Packet - ClearMyRecord</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <header class="topbar no-print">
+    <div class="topbar-inner">
+      <div class="logo">ClearMyRecord</div>
+      <nav class="nav">
+        <a href="index.html">Home</a>
+        <a href="results.html">Back to Result</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page">
+    <section class="card wide-card">
+      <div class="packet-header no-print">
+        <h1>Draft filing packet</h1>
+        <p class="supporting-text">
+          Review this draft, then print or save as PDF.
+        </p>
+
+        <div class="packet-actions">
+          <button class="primary-btn packet-btn" onclick="window.print()">Print / Save as PDF</button>
+          <button class="secondary-btn packet-btn" onclick="downloadPacketJson()">Download Data</button>
+        </div>
+      </div>
+
+      <div id="packet-content" class="packet-content"></div>
+    </section>
+  </main>
+
+  <script src="js/rules.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
