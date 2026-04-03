@@ -97,4 +97,16 @@ const chargeLibrary = [
     tags: ["sex_offense"],
     defaultLevel: "F2"
   }
-];
+
+function getChargeById(id) {
+  return chargeLibrary.find(c => c.id === id) || null;
+}
+
+function getChargesByCategory(category) {
+  return chargeLibrary.filter(c => c.category === category);
+}
+
+function hasTag(offense, tag) {
+  const charge = getChargeById(offense.chargeId);
+  return charge?.tags?.includes(tag);
+}];
