@@ -1,58 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Record Details - ClearMyRecord</title>
+  <title>Record Details</title>
 
   <script src="js/sealing-rules.js"></script>
   <script src="js/eligibility.js"></script>
   <script src="js/app.js" defer></script>
 
   <style>
-    body {
-      font-family: Arial;
-      background: #f3f7fc;
-      padding: 20px;
-    }
-
-    .card {
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
-      max-width: 600px;
-      margin: auto;
-    }
-
-    .form-field {
-      margin-bottom: 15px;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 5px;
-    }
-
-    select, input {
-      width: 100%;
-      padding: 10px;
-    }
-
-    button {
-      padding: 12px;
-      width: 100%;
-      background: #123d8f;
-      color: white;
-      border: none;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    .result {
-      margin-top: 20px;
-      padding: 15px;
-      background: #eef4ff;
-    }
+    body { font-family: Arial; background: #f3f7fc; padding: 20px; }
+    .card { background: white; padding: 20px; border-radius: 10px; max-width: 700px; margin: auto; }
+    .offense { border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 8px; }
+    .form-field { margin-bottom: 10px; }
+    button { padding: 10px; margin-top: 10px; }
   </style>
 </head>
 
@@ -61,51 +21,13 @@
 <div class="card">
   <h2>Record Details</h2>
 
-  <div class="form-field">
-    <label>State</label>
-    <select id="state">
-      <option value="ohio">Ohio</option>
-    </select>
-  </div>
+  <button onclick="addOffense()">+ Add Offense</button>
 
-  <div class="form-field">
-    <label>Offense Category</label>
-    <select id="offenseCategory">
-      <option value="">Select</option>
-      <option value="misdemeanor">Misdemeanor</option>
-      <option value="felony">Felony</option>
-    </select>
-  </div>
+  <div id="offenses"></div>
 
-  <div class="form-field">
-    <label>Offense Level</label>
-    <select id="offenseLevel"></select>
-  </div>
+  <button onclick="checkAllEligibility()">Check Eligibility</button>
 
-  <div class="form-field">
-    <label>Final Disposition Date</label>
-    <input type="date" id="finalDate"/>
-  </div>
-
-  <div class="form-field">
-    <label>Fines Paid?</label>
-    <select id="finesPaid">
-      <option value="true">Yes</option>
-      <option value="false">No</option>
-    </select>
-  </div>
-
-  <div class="form-field">
-    <label>Any Open Cases?</label>
-    <select id="openCases">
-      <option value="false">No</option>
-      <option value="true">Yes</option>
-    </select>
-  </div>
-
-  <button onclick="checkEligibility()">Check Eligibility</button>
-
-  <div id="result" class="result"></div>
+  <div id="result"></div>
 </div>
 
 </body>
