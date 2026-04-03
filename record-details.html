@@ -10,6 +10,53 @@
   <script src="js/app.js" defer></script>
 
   <style>
+    .confidence-box {
+  margin-top: 14px;
+  padding: 14px;
+  background: #ffffff;
+  border: 1px solid #d9e2ec;
+  border-radius: 10px;
+}
+
+.confidence-badge {
+  display: inline-block;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.confidence-badge.green {
+  background: #e8f7ee;
+  color: #1f7a3e;
+  border: 1px solid #b7e4c7;
+}
+
+.confidence-badge.yellow {
+  background: #fff8e1;
+  color: #8a6d1f;
+  border: 1px solid #f0d98a;
+}
+
+.confidence-badge.red {
+  background: #fdecec;
+  color: #a12626;
+  border: 1px solid #efc2c2;
+}
+
+.confidence-score {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.confidence-note {
+  margin-top: 8px;
+  font-size: 13px;
+  color: #5b6b7f;
+  line-height: 1.5;
+}
     * {
       box-sizing: border-box;
     }
