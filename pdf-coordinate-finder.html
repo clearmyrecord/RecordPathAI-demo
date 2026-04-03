@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PDF Coordinate Finder - ClearMyRecord</title>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f3f7fc;
+      color: #1b2430;
+    }
+
+    .wrap {
+      width: min(1200px, 96%);
+      margin: 24px auto 40px;
+    }
+
+    .card {
+      background: #fff;
+      border: 1px solid #d9e2ec;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: 38px;
+      color: #123d8f;
+    }
+
+    .subtext {
+      margin: 0 0 20px;
+      color: #526277;
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    input[type="file"],
+    input[type="number"] {
+      padding: 10px 12px;
+      border: 1px solid #cfd8e3;
+      border-radius: 10px;
+      font-size: 15px;
+      background: #fff;
+    }
+
+    button {
+      appearance: none;
+      border: none;
+      background: #123d8f;
+      color: #fff;
+      padding: 11px 16px;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #0f3277;
+    }
+
+    .status {
+      margin: 0 0 16px;
+      padding: 12px 14px;
+      background: #f8fbff;
+      border: 1px solid #d9e2ec;
+      border-radius: 10px;
+      color: #42546a;
+      font-size: 14px;
+    }
+
+    .viewer-shell {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 20px;
+      align-items: start;
+    }
+
+    .canvas-wrap {
+      background: #eef3f9;
+      border: 1px solid #d9e2ec;
+      border-radius: 14px;
+      padding: 14px;
+      overflow: auto;
+      min-height: 500px;
+    }
+
+    canvas {
+      display: block;
+      max-width: 100%;
+      height: auto;
+      cursor: crosshair;
+      background: #fff;
+      border: 1px solid #d9e2ec;
+    }
+
+    .panel {
+      background: #f8fbff;
+      border: 1px solid #d9e2ec;
+      border-radius: 14px;
+      padding: 18px;
+    }
+
+    .panel h2 {
+      margin-top: 0;
+      font-size: 20px;
+      color: #123d8f;
+    }
+
+    .readout {
+      background: #fff;
+      border: 1px solid #d9e2ec;
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 14px;
+      font-size: 14px;
+      line-height: 1.6;
+      word-break: break-word;
+    }
+
+    .readout strong {
+      color: #1b2430;
+    }
+
+    .field-row {
+      margin-bottom: 12px;
+    }
+
+    .field-row label {
+      display: block;
+      font-size: 13px;
+      margin-bottom: 6px;
+      color: #526277;
+    }
+
+    .field-row input {
+      width: 100%;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 180px;
+      border: 1px solid #cfd8e3;
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 14px;
+      font-family: monospace;
+      resize: vertical;
+    }
+
+    .click-list {
+      margin-top: 12px;
+      max-height: 220px;
+      overflow: auto;
+      background: #fff;
+      border: 1px solid #d9e2ec;
+      border-radius: 10px;
+      padding: 10px;
+      font-size: 13px;
+    }
+
+    .click-item {
+      padding: 6px 0;
+      border-bottom: 1px solid #eef2f7;
+    }
+
+    .click-item:last-child {
+      border-bottom: none;
+    }
+
+    @media (max-width: 960px) {
+      .viewer-shell {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>PDF Coordinate Finder</h1>
+      <p class="subtext">
+        Upload a court PDF, click anywhere on the page, and get the exact PDF coordinates for text placement.
+      </p>
+
+      <div class="controls">
+        <input type="file" id="pdfUpload" accept="application/pdf" />
+        <label for="pageNum">Page:</label>
+        <input type="number" id="pageNum" min="1" value="1" style="width: 90px;" />
+        <button type="button" id="loadBtn">Load PDF</button>
+        <button type="button" id="renderBtn">Go To Page</button>
+        <button type="button" id="clearBtn">Clear Clicks</button>
+      </div>
+
+      <div class="status" id="status">Choose a PDF and click Load PDF.</div>
+
+      <div class="viewer-shell">
+        <div class="canvas-wrap">
+          <canvas id="pdfCanvas"></canvas>
+        </div>
+
+        <div class="panel">
+          <h2>Coordinate Readout</h2>
+
+          <div class="readout" id="readout">
+            <strong>PDF X:</strong> -<br>
+            <strong>PDF Y:</strong> -<br>
+            <strong>Canvas X:</strong> -<br>
+            <strong>Canvas Y:</strong> -<br>
+            <strong>Page:</strong> -<br>
+            <strong>PDF Size:</strong> -
+          </div>
+
+          <div class="field-row">
+            <label for="fieldName">Field name</label>
+            <input type="text" id="fieldName" placeholder="Example: fullName" />
+          </div>
+
+          <div class="field-row">
+            <label for="fieldValue">Sample value</label>
+            <input type="text" id="fieldValue" placeholder="Example: Matt Tunstall" />
+          </div>
+
+          <button type="button" id="copySnippetBtn">Copy drawText Snippet</button>
+
+          <div class="field-row" style="margin-top: 14px;">
+            <label for="snippetBox">Generated code</label>
+            <textarea id="snippetBox" readonly></textarea>
+          </div>
+
+          <div>
+            <strong>Click history</strong>
+            <div class="click-list" id="clickList"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+      "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
+    const pdfUpload = document.getElementById("pdfUpload");
+    const loadBtn = document.getElementById("loadBtn");
+    const renderBtn = document.getElementById("renderBtn");
+    const clearBtn = document.getElementById("clearBtn");
+    const pageNumInput = document.getElementById("pageNum");
+    const canvas = document.getElementById("pdfCanvas");
+    const ctx = canvas.getContext("2d");
+    const statusBox = document.getElementById("status");
+    const readout = document.getElementById("readout");
+    const fieldNameInput = document.getElementById("fieldName");
+    const fieldValueInput = document.getElementById("fieldValue");
+    const copySnippetBtn = document.getElementById("copySnippetBtn");
+    const snippetBox = document.getElementById("snippetBox");
+    const clickList = document.getElementById("clickList");
+
+    let pdfDoc = null;
+    let currentPage = null;
+    let currentViewport = null;
+    let currentScale = 1.5;
+    let clickHistory = [];
+
+    loadBtn.addEventListener("click", loadPdfFromFile);
+    renderBtn.addEventListener("click", renderSelectedPage);
+    clearBtn.addEventListener("click", clearClicks);
+    copySnippetBtn.addEventListener("click", copySnippet);
+    canvas.addEventListener("click", handleCanvasClick);
+
+    async function loadPdfFromFile() {
+      try {
+        if (!pdfUpload.files || !pdfUpload.files.length) {
+          setStatus("Choose a PDF first.");
+          return;
+        }
+
+        const file = pdfUpload.files[0];
+        const bytes = await file.arrayBuffer();
+
+        setStatus("Loading PDF...");
+        pdfDoc = await pdfjsLib.getDocument({ data: bytes }).promise;
+
+        setStatus(`Loaded PDF with ${pdfDoc.numPages} page(s).`);
+        pageNumInput.max = pdfDoc.numPages;
+        pageNumInput.value = 1;
+
+        await renderPage(1);
+      } catch (error) {
+        console.error(error);
+        setStatus(`Error loading PDF: ${error.message}`);
+      }
+    }
+
+    async function renderSelectedPage() {
+      if (!pdfDoc) {
+        setStatus("Load a PDF first.");
+        return;
+      }
+
+      let pageNum = parseInt(pageNumInput.value, 10);
+
+      if (!pageNum || pageNum < 1) {
+        pageNum = 1;
+      }
+
+      if (pageNum > pdfDoc.numPages) {
+        pageNum = pdfDoc.numPages;
+      }
+
+      pageNumInput.value = pageNum;
+      await renderPage(pageNum);
+    }
+
+    async function renderPage(pageNum) {
+      currentPage = await pdfDoc.getPage(pageNum);
+
+      const unscaledViewport = currentPage.getViewport({ scale: 1 });
+      const maxDisplayWidth = 820;
+      currentScale = Math.min(2, maxDisplayWidth / unscaledViewport.width);
+      currentViewport = currentPage.getViewport({ scale: currentScale });
+
+      canvas.width = currentViewport.width;
+      canvas.height = currentViewport.height;
+
+      await currentPage.render({
+        canvasContext: ctx,
+        viewport: currentViewport
+      }).promise;
+
+      setStatus(`Rendered page ${pageNum}. Click anywhere on the PDF.`);
+      drawMarkers();
+      updateReadout(null);
+    }
+
+    function handleCanvasClick(event) {
+      if (!currentPage || !currentViewport) {
+        return;
+      }
+
+      const rect = canvas.getBoundingClientRect();
+      const canvasX = event.clientX - rect.left;
+      const canvasY = event.clientY - rect.top;
+
+      const pdfX = canvasX / currentScale;
+      const pdfY = (canvas.height - canvasY) / currentScale;
+
+      const clickData = {
+        page: parseInt(pageNumInput.value, 10),
+        canvasX: round(canvasX),
+        canvasY: round(canvasY),
+        pdfX: round(pdfX),
+        pdfY: round(pdfY),
+        pageWidth: round(currentPage.view[2]),
+        pageHeight: round(currentPage.view[3])
+      };
+
+      clickHistory.unshift(clickData);
+      if (clickHistory.length > 25) {
+        clickHistory.pop();
+      }
+
+      updateReadout(clickData);
+      updateSnippet(clickData);
+      renderClickList();
+      drawMarkers();
+    }
+
+    function updateReadout(data) {
+      if (!currentPage) {
+        readout.innerHTML = `
+          <strong>PDF X:</strong> -<br>
+          <strong>PDF Y:</strong> -<br>
+          <strong>Canvas X:</strong> -<br>
+          <strong>Canvas Y:</strong> -<br>
+          <strong>Page:</strong> -<br>
+          <strong>PDF Size:</strong> -
+        `;
+        return;
+      }
+
+      const pageWidth = round(currentPage.view[2]);
+      const pageHeight = round(currentPage.view[3]);
+
+      if (!data) {
+        readout.innerHTML = `
+          <strong>PDF X:</strong> -<br>
+          <strong>PDF Y:</strong> -<br>
+          <strong>Canvas X:</strong> -<br>
+          <strong>Canvas Y:</strong> -<br>
+          <strong>Page:</strong> ${pageNumInput.value}<br>
+          <strong>PDF Size:</strong> ${pageWidth} × ${pageHeight}
+        `;
+        return;
+      }
+
+      readout.innerHTML = `
+        <strong>PDF X:</strong> ${data.pdfX}<br>
+        <strong>PDF Y:</strong> ${data.pdfY}<br>
+        <strong>Canvas X:</strong> ${data.canvasX}<br>
+        <strong>Canvas Y:</strong> ${data.canvasY}<br>
+        <strong>Page:</strong> ${data.page}<br>
+        <strong>PDF Size:</strong> ${data.pageWidth} × ${data.pageHeight}
+      `;
+    }
+
+    function updateSnippet(data) {
+      if (!data) {
+        snippetBox.value = "";
+        return;
+      }
+
+      const fieldName = fieldNameInput.value.trim() || "fullName";
+      const fieldValue = fieldValueInput.value.trim() || "Matt Tunstall";
+
+      snippetBox.value =
+`page.drawText(data.${fieldName}, {
+  x: ${data.pdfX},
+  y: ${data.pdfY},
+  size: 12
+});` + `
+
+/* sample value: "${fieldValue}" */
+/* page: ${data.page} */
+`;
+    }
+
+    async function copySnippet() {
+      if (!snippetBox.value.trim()) {
+        return;
+      }
+
+      try {
+        await navigator.clipboard.writeText(snippetBox.value);
+        setStatus("Snippet copied.");
+      } catch (error) {
+        setStatus("Could not copy automatically. Copy it manually from the box.");
+      }
+    }
+
+    function renderClickList() {
+      if (!clickHistory.length) {
+        clickList.innerHTML = "";
+        return;
+      }
+
+      clickList.innerHTML = clickHistory.map((item, index) => {
+        return `
+          <div class="click-item">
+            <strong>#${index + 1}</strong>
+            — page ${item.page}
+            — x: ${item.pdfX}, y: ${item.pdfY}
+          </div>
+        `;
+      }).join("");
+    }
+
+    function clearClicks() {
+      clickHistory = [];
+      clickList.innerHTML = "";
+      snippetBox.value = "";
+      drawMarkers();
+      updateReadout(null);
+      setStatus("Click history cleared.");
+    }
+
+    async function drawMarkers() {
+      if (!currentPage || !currentViewport) {
+        return;
+      }
+
+      await currentPage.render({
+        canvasContext: ctx,
+        viewport: currentViewport
+      }).promise;
+
+      const currentPageNum = parseInt(pageNumInput.value, 10);
+
+      clickHistory
+        .filter(item => item.page === currentPageNum)
+        .forEach(item => {
+          const canvasX = item.pdfX * currentScale;
+          const canvasY = canvas.height - (item.pdfY * currentScale);
+
+          ctx.beginPath();
+          ctx.arc(canvasX, canvasY, 5, 0, Math.PI * 2);
+          ctx.fillStyle = "red";
+          ctx.fill();
+
+          ctx.font = "12px Arial";
+          ctx.fillStyle = "red";
+          ctx.fillText(`(${item.pdfX}, ${item.pdfY})`, canvasX + 8, canvasY - 8);
+        });
+    }
+
+    function setStatus(message) {
+      statusBox.textContent = message;
+    }
+
+    function round(value) {
+      return Math.round(value * 100) / 100;
+    }
+  </script>
+</body>
+</html>
