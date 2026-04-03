@@ -1,22 +1,33 @@
 body{
-font-family: Arial;
-background:#eef3f9;
+font-family:Arial;
+background:#f1f5fb;
 margin:0;
+}
+
+.topbar{
+background:#1e3a8a;
+color:white;
+padding:15px;
+text-align:center;
+font-weight:bold;
+}
+
+.hero{
+text-align:center;
+margin-top:120px;
 }
 
 .page{
 display:flex;
 flex-direction:column;
 align-items:center;
-margin-top:60px;
+margin-top:80px;
 }
 
-.progress-bar{
-width:400px;
+.progress{
 background:#dfe6f2;
-padding:10px;
+padding:10px 20px;
 border-radius:20px;
-text-align:center;
 margin-bottom:20px;
 }
 
@@ -24,43 +35,58 @@ margin-bottom:20px;
 background:white;
 width:420px;
 padding:30px;
-border-radius:12px;
-box-shadow:0 5px 20px rgba(0,0,0,0.1);
-text-align:center;
+border-radius:10px;
+box-shadow:0 10px 25px rgba(0,0,0,0.08);
 }
 
-.actions{
-margin-top:20px;
+label{
+display:block;
+margin-top:15px;
+}
+
+select,input{
+width:100%;
+padding:10px;
+margin-top:5px;
 }
 
 .primary-btn{
-background:#4a7cff;
+background:#3b82f6;
 color:white;
 padding:12px;
-width:100%;
 border:none;
+width:100%;
 border-radius:6px;
-margin-top:10px;
+margin-top:20px;
 }
 
 .secondary-btn{
-background:#aaa;
+background:#888;
 color:white;
 padding:10px;
-width:100%;
 border:none;
+width:100%;
 border-radius:6px;
-margin-top:10px;
+margin-top:15px;
+}
+
+.result{
+padding:20px;
+border-radius:8px;
+margin-top:20px;
 }
 
 .eligible{
-color:#28a745;
-}
-
-.not-eligible{
-color:#dc3545;
+background:#e7f8ed;
+color:#15803d;
 }
 
 .warning{
-color:#ff9800;
+background:#fff6e5;
+color:#b45309;
+}
+
+.not-eligible{
+background:#fdeaea;
+color:#b91c1c;
 }
