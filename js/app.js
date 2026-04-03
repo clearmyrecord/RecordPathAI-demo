@@ -214,6 +214,7 @@ function renderPacketPage() {
     fullName: localStorage.getItem("fullName") || "",
     email: localStorage.getItem("email") || "",
     state: capitalize(localStorage.getItem("state") || ""),
+    stateRaw: localStorage.getItem("state") || "",
     offense: formatOffense(localStorage.getItem("offense") || ""),
     county: localStorage.getItem("county") || "",
     felony: localStorage.getItem("felony") || "",
@@ -224,34 +225,38 @@ function renderPacketPage() {
     convictions: localStorage.getItem("convictions") || ""
   };
 
+  const court = getCourtConfig(data.stateRaw, data.county);
+
   packet.innerHTML = `
     <div class="packet-section">
-      <h2>Draft packet summary</h2>
+      <h2>${escapeHtml(court.filingType)}</h2>
       <p class="packet-note">
-        This is a draft preparation packet generated from user inputs. It should be reviewed before filing.
+        This draft packet is jurisdiction-aware and based on the state and county entered by the user.
       </p>
     </div>
 
     <div class="packet-section">
-      <h3>Applicant information</h3>
+      <h3>Court details</h3>
       <table class="packet-table">
-        <tr><th>Full name</th><td>${escapeHtml(data.fullName)}</td></tr>
-        <tr><th>Email</th><td>${escapeHtml(data.email)}</td></tr>
-        <tr><th>State</th><td>${escapeHtml(data.state)}</td></tr>
-        <tr><th>County</th><td>${escapeHtml(data.county || "Not provided")}</td></tr>
+        <tr><th>Court</th><td>${escapeHtml(court.courtName)}</td></tr>
+        <tr><th>Address / Location</th><td>${escapeHtml(court.courtAddress)}</td></tr>
+        <tr><th>Estimated fee note</th><td>${escapeHtml(court.filingFee)}</td></tr>
+        <tr><th>County entered</th><td>${escapeHtml(data.county || "Not provided")}</td></tr>
+        <tr><th>State</th><td>${escapeHtml(data.state || "Not provided")}</td></tr>
       </table>
     </div>
 
     <div class="packet-section">
-      <h3>Record details</h3>
+      <h3>Auto-filled application draft</h3>
       <table class="packet-table">
-        <tr><th>Offense type</th><td>${escapeHtml(data.offense)}</td></tr>
-        <tr><th>Offense level</th><td>${escapeHtml(formatFelony(data.felony))}</td></tr>
-        <tr><th>Violent offense</th><td>${escapeHtml(formatYesNo(data.violent))}</td></tr>
-        <tr><th>Years since final discharge / disposition</th><td>${escapeHtml(data.years)}</td></tr>
-        <tr><th>Fines paid</th><td>${escapeHtml(formatYesNo(data.fines))}</td></tr>
-        <tr><th>Open cases</th><td>${escapeHtml(formatYesNo(data.openCases))}</td></tr>
-        <tr><th>Convictions involved</th><td>${escapeHtml(data.convictions)}</td></tr>
+        <tr><th>Document title</th><td>${escapeHtml(court.applicationTemplate.title)}</td></tr>
+        <tr><th>Applicant Name</th><td>${escapeHtml(data.fullName)}</td></tr>
+        <tr><th>Current Address</th><td>[User to complete]</td></tr>
+        <tr><th>Case Number</th><td>[User to complete]</td></tr>
+        <tr><th>Offense</th><td>${escapeHtml(data.offense)}</td></tr>
+        <tr><th>Date of Final Discharge</th><td>[User to complete]</td></tr>
+        <tr><th>Court Name</th><td>${escapeHtml(court.courtName)}</td></tr>
+        <tr><th>County</th><td>${escapeHtml(data.county || "Not provided")}</td></tr>
       </table>
     </div>
 
@@ -259,18 +264,13 @@ function renderPacketPage() {
       <h3>Eligibility estimate</h3>
       <div class="packet-status ${escapeHtml(result.status)}">${escapeHtml(result.title)}</div>
       <p>${escapeHtml(result.message)}</p>
-      <p><strong>Next step:</strong> ${escapeHtml(result.nextStep)}</p>
-      ${result.courtHint ? `<p><strong>Filing note:</strong> ${escapeHtml(result.courtHint)}</p>` : ""}
+      <p><strong>Suggested next step:</strong> ${escapeHtml(result.nextStep)}</p>
     </div>
 
     <div class="packet-section">
-      <h3>Filing checklist</h3>
+      <h3>Court-specific filing instructions</h3>
       <ul class="packet-list">
-        <li>Confirm the exact court where the case was handled.</li>
-        <li>Gather the case number and disposition details.</li>
-        <li>Confirm all fines, fees, and sanctions are resolved.</li>
-        <li>Review the record for any open or disqualifying matters.</li>
-        <li>Print this packet and prepare the application form for the court.</li>
+        ${court.instructions.map(item => `<li>${escapeHtml(item)}</li>`).join("")}
       </ul>
     </div>
 
@@ -279,18 +279,21 @@ function renderPacketPage() {
       <div class="letter-block">
         <p>To the Honorable Court,</p>
 
+        <p>${escapeHtml(court.letterIntro)}</p>
+
         <p>
-          I respectfully submit this letter in support of my request to seal the record at issue.
-          Based on my understanding, the matter occurred in ${escapeHtml(data.county || "[County]")}, ${escapeHtml(data.state || "[State]")}.
+          I respectfully request review of my application for relief related to the record described in this packet.
+          I understand that the Court will determine whether statutory relief is appropriate.
         </p>
 
         <p>
-          I take responsibility for my past actions and respectfully ask the Court to consider the time that has passed,
-          the progress made since that time, and my interest in moving forward productively.
+          The information in this packet is based on the following location details:
+          ${escapeHtml(data.county || "[County]")}, ${escapeHtml(data.state || "[State]")}.
         </p>
 
         <p>
-          I respectfully request that the Court review my application and grant relief if appropriate.
+          I take responsibility for my past actions and respectfully ask the Court to consider my application,
+          the time that has passed, and the progress made since the matter occurred.
         </p>
 
         <p>Thank you for your time and consideration.</p>
@@ -303,8 +306,19 @@ function renderPacketPage() {
     </div>
 
     <div class="packet-section">
+      <h3>Filing checklist</h3>
+      <ul class="packet-list">
+        <li>Insert exact case number.</li>
+        <li>Insert current mailing address.</li>
+        <li>Confirm final discharge or disposition date.</li>
+        <li>Verify court and clerk filing location.</li>
+        <li>Print and sign before filing.</li>
+      </ul>
+    </div>
+
+    <div class="packet-section">
       <h3>Internal data snapshot</h3>
-      <pre class="packet-json">${escapeHtml(JSON.stringify({ data, result }, null, 2))}</pre>
+      <pre class="packet-json">${escapeHtml(JSON.stringify({ data, result, court }, null, 2))}</pre>
     </div>
   `;
 }
@@ -328,7 +342,11 @@ function downloadPacketJson() {
     fines: localStorage.getItem("fines") || "",
     openCases: localStorage.getItem("openCases") || "",
     convictions: localStorage.getItem("convictions") || "",
-    result: JSON.parse(raw)
+    result: JSON.parse(raw),
+    court: getCourtConfig(
+      localStorage.getItem("state") || "",
+      localStorage.getItem("county") || ""
+    )
   };
 
   const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" });
@@ -336,7 +354,7 @@ function downloadPacketJson() {
 
   const a = document.createElement("a");
   a.href = url;
-  a.download = "clearmyrecord-packet-data.json";
+  a.download = "clearmyrecord-court-packet-data.json";
   a.click();
 
   URL.revokeObjectURL(url);
@@ -352,11 +370,6 @@ function formatOffense(value) {
   if (value === "theft") return "Theft";
   if (value === "other") return "Other non-violent offense";
   return value || "Not provided";
-}
-
-function formatFelony(value) {
-  if (!value) return "Not provided";
-  return `${value}rd/nd/th Degree Felony`.replace("3rd", "3rd").replace("4rd", "4th").replace("5rd", "5th");
 }
 
 function formatYesNo(value) {
