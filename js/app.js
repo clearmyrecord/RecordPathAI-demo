@@ -1,8 +1,8 @@
 function goToDetails() {
-  const fullName = document.getElementById("fullName").value.trim();
-  const email = document.getElementById("email").value.trim();
-  const state = document.getElementById("state").value;
-  const offense = document.getElementById("offense").value;
+  const fullName = document.getElementById("fullName")?.value.trim() || "";
+  const email = document.getElementById("email")?.value.trim() || "";
+  const state = document.getElementById("state")?.value || "";
+  const offense = document.getElementById("offense")?.value || "";
 
   if (!fullName || !email || !state || !offense) {
     alert("Please complete all fields before continuing.");
@@ -18,16 +18,16 @@ function goToDetails() {
 }
 
 function checkEligibility() {
-  const county = document.getElementById("county").value.trim();
-  const felony = document.getElementById("felony").value;
-  const violent = document.getElementById("violent").value;
-  const years = Number(document.getElementById("years").value);
-  const fines = document.getElementById("fines").value;
-  const openCases = document.getElementById("openCases").value;
-  const convictions = Number(document.getElementById("convictions").value);
-  const state = localStorage.getItem("state");
+  const county = document.getElementById("county")?.value.trim() || "";
+  const felony = document.getElementById("felony")?.value || "";
+  const violent = document.getElementById("violent")?.value || "";
+  const years = Number(document.getElementById("years")?.value);
+  const fines = document.getElementById("fines")?.value || "";
+  const openCases = document.getElementById("openCases")?.value || "";
+  const convictions = Number(document.getElementById("convictions")?.value);
+  const state = localStorage.getItem("state") || "";
 
-  if (!felony || !violent || Number.isNaN(years) || !fines || !openCases || !convictions) {
+  if (!felony || !violent || Number.isNaN(years) || !fines || !openCases || Number.isNaN(convictions)) {
     alert("Please complete all required fields before continuing.");
     return;
   }
@@ -57,7 +57,7 @@ function checkEligibility() {
 }
 
 function evaluateEligibility(data) {
-  const stateRules = sealingRules[data.state];
+  const stateRules = typeof sealingRules !== "undefined" ? sealingRules[data.state] : null;
 
   if (!stateRules) {
     return {
@@ -92,7 +92,7 @@ function evaluateEligibility(data) {
       title: "Not Eligible Yet",
       message: "Violent offenses are not eligible under this simplified MVP rule set.",
       nextStep: "You may need a more detailed legal review.",
-      courtHint: rule.courtHint,
+      courtHint: rule.courtHint || "",
       yearsRemaining: null,
       estimatedEligibleDate: null
     };
@@ -104,7 +104,7 @@ function evaluateEligibility(data) {
       title: "Needs More Information",
       message: "Open criminal cases may block sealing until resolved.",
       nextStep: "Resolve any open cases first, then recheck eligibility.",
-      courtHint: rule.courtHint,
+      courtHint: rule.courtHint || "",
       yearsRemaining: null,
       estimatedEligibleDate: null
     };
@@ -116,7 +116,7 @@ function evaluateEligibility(data) {
       title: "Needs More Information",
       message: "Outstanding fines may prevent record sealing until they are paid.",
       nextStep: "Pay any required fines, then recheck eligibility.",
-      courtHint: rule.courtHint,
+      courtHint: rule.courtHint || "",
       yearsRemaining: null,
       estimatedEligibleDate: null
     };
@@ -128,7 +128,7 @@ function evaluateEligibility(data) {
       title: "Needs More Information",
       message: "This simplified MVP supports only limited conviction scenarios.",
       nextStep: "A manual review may be needed for multiple convictions.",
-      courtHint: rule.courtHint,
+      courtHint: rule.courtHint || "",
       yearsRemaining: null,
       estimatedEligibleDate: null
     };
@@ -138,23 +138,23 @@ function evaluateEligibility(data) {
     return {
       status: "eligible",
       title: "You May Be Eligible",
-      message: rule.messageEligible,
+      message: rule.messageEligible || "You may be eligible based on the current rule set.",
       nextStep: "Next, gather your case number, court name, and filing documents.",
-      courtHint: rule.courtHint,
+      courtHint: rule.courtHint || "",
       yearsRemaining: 0,
       estimatedEligibleDate: new Date().toISOString().split("T")[0]
     };
   }
 
-  const yearsRemaining = rule.waitingPeriodYears - data.years;
+  const yearsRemaining = Number(rule.waitingPeriodYears) - Number(data.years);
   const estimatedEligibleDate = calculateFutureDate(yearsRemaining);
 
   return {
     status: "not-eligible",
     title: "Not Eligible Yet",
-    message: `${rule.messageWait} Estimated time remaining: ${yearsRemaining} year(s).`,
+    message: `${rule.messageWait || "The waiting period has not passed yet."} Estimated time remaining: ${yearsRemaining} year(s).`,
     nextStep: "Set a reminder and come back when the waiting period has passed.",
-    courtHint: rule.courtHint,
+    courtHint: rule.courtHint || "",
     yearsRemaining,
     estimatedEligibleDate
   };
@@ -173,16 +173,17 @@ function goToPacket() {
     alert("Please complete the eligibility check first.");
     return;
   }
+
   window.location.href = "packet.html";
 }
 
 window.onload = function () {
   renderResultPage();
+  renderCourtFinder();
   renderReminderBox();
   renderChecklist("checklist-box");
   renderPacketPage();
   renderChecklist("packet-checklist-box");
-  renderCourtFinder();
 };
 
 function renderResultPage() {
@@ -207,7 +208,7 @@ function renderResultPage() {
   const county = localStorage.getItem("county") || "";
 
   resultBox.innerHTML = `
-    <div class="result-card ${result.status}">
+    <div class="result-card ${escapeHtml(result.status)}">
       <div class="result-status">${escapeHtml(result.title)}</div>
       <h3>Hello, ${escapeHtml(fullName)}</h3>
       <p>${escapeHtml(result.message)}</p>
@@ -228,7 +229,7 @@ function renderCourtFinder() {
 
   const stateRaw = localStorage.getItem("state") || "";
   const county = localStorage.getItem("county") || "";
-  const court = getCourtConfig(stateRaw, county);
+  const court = getSafeCourtConfig(stateRaw, county);
 
   box.innerHTML = `
     <div class="finder-card">
@@ -265,7 +266,7 @@ function renderCourtFinder() {
       <div class="finder-checklist">
         <h4>How to find your case number</h4>
         <ul>
-          ${court.lookupInstructions.map(item => `<li>${escapeHtml(item)}</li>`).join("")}
+          ${(court.lookupInstructions || []).map(item => `<li>${escapeHtml(item)}</li>`).join("")}
         </ul>
       </div>
 
@@ -277,7 +278,7 @@ function renderCourtFinder() {
         <input id="dispositionDate" type="text" placeholder="MM/DD/YYYY or YYYY-MM-DD" value="${escapeHtml(localStorage.getItem("dispositionDate") || "")}" />
 
         <div class="finder-actions">
-          <button class="primary-btn" onclick="saveCaseLookupData()">Save Lookup Info</button>
+          <button class="primary-btn" type="button" onclick="saveCaseLookupData()">Save Lookup Info</button>
         </div>
 
         <div id="finder-success"></div>
@@ -293,6 +294,8 @@ function saveCaseLookupData() {
 
   localStorage.setItem("caseNumber", caseNumber);
   localStorage.setItem("dispositionDate", dispositionDate);
+
+  renderPacketPage();
 
   if (success) {
     success.innerHTML = `
@@ -330,8 +333,8 @@ function renderReminderBox() {
       <input id="reminderEmail" type="email" value="${escapeHtml(email)}" placeholder="you@example.com" />
 
       <div class="reminder-actions">
-        <button class="primary-btn" onclick="saveReminder()">Save Reminder</button>
-        <button class="secondary-btn" onclick="downloadReminder()">Download Reminder Data</button>
+        <button class="primary-btn" type="button" onclick="saveReminder()">Save Reminder</button>
+        <button class="secondary-btn" type="button" onclick="downloadReminder()">Download Reminder Data</button>
       </div>
 
       <div id="reminder-success"></div>
@@ -403,7 +406,9 @@ function downloadReminder() {
   const a = document.createElement("a");
   a.href = url;
   a.download = "clearmyrecord-reminder.json";
+  document.body.appendChild(a);
   a.click();
+  a.remove();
   URL.revokeObjectURL(url);
 }
 
@@ -412,7 +417,7 @@ function initializeChecklist() {
   const county = localStorage.getItem("county") || "";
   const resultRaw = localStorage.getItem("eligibilityResult");
   const result = resultRaw ? JSON.parse(resultRaw) : null;
-  const court = getCourtConfig(stateRaw, county);
+  const court = getSafeCourtConfig(stateRaw, county);
 
   const checklistItems = [
     `Confirm the exact court${court.courtName ? `: ${court.courtName}` : ""}`,
@@ -437,6 +442,13 @@ function initializeChecklist() {
   if (!existing) {
     const initialState = checklistItems.map(() => false);
     localStorage.setItem("filingChecklistState", JSON.stringify(initialState));
+    return;
+  }
+
+  let currentState = JSON.parse(existing);
+  if (!Array.isArray(currentState) || currentState.length !== checklistItems.length) {
+    currentState = checklistItems.map((_, index) => Boolean(currentState[index]));
+    localStorage.setItem("filingChecklistState", JSON.stringify(currentState));
   }
 }
 
@@ -485,7 +497,7 @@ function renderChecklist(containerId) {
       </div>
 
       <div class="checklist-footer">
-        <button class="secondary-btn" onclick="resetChecklist()">Reset Checklist</button>
+        <button class="secondary-btn" type="button" onclick="resetChecklist()">Reset Checklist</button>
       </div>
     </div>
   `;
@@ -541,20 +553,7 @@ function renderPacketPage() {
     dispositionDate: localStorage.getItem("dispositionDate") || ""
   };
 
-  const court = typeof getCourtConfig === "function"
-    ? getCourtConfig(data.stateRaw, data.county)
-    : {
-        courtName: "Court not yet mapped in MVP",
-        courtAddress: "Please confirm the exact court manually.",
-        filingFee: "Check with the clerk for current fees",
-        lookupLabel: "Court website",
-        lookupUrl: "",
-        lookupInstructions: [
-          "Search by your name",
-          "Search by case number",
-          "Confirm the final disposition date"
-        ]
-      };
+  const court = getSafeCourtConfig(data.stateRaw, data.county);
 
   const form = typeof getOfficialFormConfig === "function"
     ? getOfficialFormConfig(data.stateRaw, data.county)
@@ -609,13 +608,13 @@ function renderPacketPage() {
 
       <div class="finder-fields">
         <label for="caseNumber">Case Number</label>
-        <input id="caseNumber" type="text" placeholder="Enter case number if found" value="${escapeHtml(localStorage.getItem("caseNumber") || "")}" />
+        <input id="caseNumber" type="text" placeholder="Enter case number if found" value="${escapeHtml(data.caseNumber)}" />
 
         <label for="dispositionDate">Disposition / Final Discharge Date</label>
-        <input id="dispositionDate" type="text" placeholder="MM/DD/YYYY or YYYY-MM-DD" value="${escapeHtml(localStorage.getItem("dispositionDate") || "")}" />
+        <input id="dispositionDate" type="text" placeholder="MM/DD/YYYY or YYYY-MM-DD" value="${escapeHtml(data.dispositionDate)}" />
 
         <div class="finder-actions">
-          <button class="primary-btn" onclick="saveCaseLookupData()">Save Lookup Info</button>
+          <button class="primary-btn" type="button" onclick="saveCaseLookupData()">Save Lookup Info</button>
         </div>
 
         <div id="finder-success"></div>
@@ -706,9 +705,85 @@ function renderPacketPage() {
   `;
 }
 
+function downloadPacketJson() {
+  const raw = localStorage.getItem("eligibilityResult");
+  if (!raw) {
+    alert("No packet data found.");
+    return;
+  }
+
+  const result = JSON.parse(raw);
+
+  const payload = {
+    fullName: localStorage.getItem("fullName") || "",
+    email: localStorage.getItem("email") || "",
+    state: localStorage.getItem("state") || "",
+    county: localStorage.getItem("county") || "",
+    offense: localStorage.getItem("offense") || "",
+    felony: localStorage.getItem("felony") || "",
+    violent: localStorage.getItem("violent") || "",
+    years: localStorage.getItem("years") || "",
+    fines: localStorage.getItem("fines") || "",
+    openCases: localStorage.getItem("openCases") || "",
+    convictions: localStorage.getItem("convictions") || "",
+    caseNumber: localStorage.getItem("caseNumber") || "",
+    dispositionDate: localStorage.getItem("dispositionDate") || "",
+    eligibilityResult: result,
+    exportedAt: new Date().toISOString()
+  };
+
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {
+    type: "application/json"
+  });
+
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "clearmyrecord-packet-data.json";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+function getSafeCourtConfig(stateRaw, county) {
+  if (typeof getCourtConfig === "function") {
+    const config = getCourtConfig(stateRaw, county);
+    if (config) {
+      return {
+        courtName: config.courtName || "Court not yet mapped in MVP",
+        courtAddress: config.courtAddress || "Please confirm the exact court manually.",
+        filingFee: config.filingFee || "Check with the clerk for current fees",
+        lookupLabel: config.lookupLabel || "Court website",
+        lookupUrl: config.lookupUrl || "",
+        lookupInstructions: Array.isArray(config.lookupInstructions) && config.lookupInstructions.length
+          ? config.lookupInstructions
+          : [
+              "Search by your name",
+              "Search by case number",
+              "Confirm the final disposition date"
+            ]
+      };
+    }
+  }
+
+  return {
+    courtName: "Court not yet mapped in MVP",
+    courtAddress: "Please confirm the exact court manually.",
+    filingFee: "Check with the clerk for current fees",
+    lookupLabel: "Court website",
+    lookupUrl: "",
+    lookupInstructions: [
+      "Search by your name",
+      "Search by case number",
+      "Confirm the final disposition date"
+    ]
+  };
+}
+
 function formatDisplayDate(dateString) {
   if (!dateString) return "";
-  const date = new Date(dateString + "T00:00:00");
+  const date = new Date(`${dateString}T00:00:00`);
   return date.toLocaleDateString();
 }
 
