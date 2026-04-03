@@ -5,10 +5,7 @@ const chargeLibrary = [
     category: "misdemeanor",
     tags: ["non_violent"],
     defaultLevel: "M1",
-    ohio: {
-      excludedForSealing: false,
-      excludedForExpungement: false
-    }
+    ohio: { excludedForSealing: false, excludedForExpungement: false }
   },
   {
     id: "shoplifting",
@@ -16,10 +13,7 @@ const chargeLibrary = [
     category: "misdemeanor",
     tags: ["non_violent"],
     defaultLevel: "M1",
-    ohio: {
-      excludedForSealing: false,
-      excludedForExpungement: false
-    }
+    ohio: { excludedForSealing: false, excludedForExpungement: false }
   },
   {
     id: "criminal_trespass",
@@ -27,10 +21,7 @@ const chargeLibrary = [
     category: "misdemeanor",
     tags: ["non_violent"],
     defaultLevel: "M4",
-    ohio: {
-      excludedForSealing: false,
-      excludedForExpungement: false
-    }
+    ohio: { excludedForSealing: false, excludedForExpungement: false }
   },
   {
     id: "drug_possession_minor",
@@ -38,10 +29,7 @@ const chargeLibrary = [
     category: "misdemeanor",
     tags: ["drug", "non_violent"],
     defaultLevel: "M1",
-    ohio: {
-      excludedForSealing: false,
-      excludedForExpungement: false
-    }
+    ohio: { excludedForSealing: false, excludedForExpungement: false }
   },
   {
     id: "drug_possession_felony",
@@ -49,10 +37,7 @@ const chargeLibrary = [
     category: "felony",
     tags: ["drug"],
     defaultLevel: "F5",
-    ohio: {
-      excludedForSealing: false,
-      excludedForExpungement: false
-    }
+    ohio: { excludedForSealing: false, excludedForExpungement: false }
   },
   {
     id: "traffic_conviction",
@@ -216,10 +201,7 @@ const chargeLibrary = [
     category: "misdemeanor",
     tags: [],
     defaultLevel: "M1",
-    ohio: {
-      excludedForSealing: false,
-      excludedForExpungement: false
-    }
+    ohio: { excludedForSealing: false, excludedForExpungement: false }
   }
 ];
 
