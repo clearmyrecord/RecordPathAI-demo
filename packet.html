@@ -4,45 +4,238 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Official Form Packet - ClearMyRecord</title>
-  <link rel="stylesheet" href="css/styles.css" />
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f3f7fc;
+      color: #1b2430;
+    }
+
+    /* HEADER (hidden in export) */
+    .topbar {
+      background: #123d8f;
+      color: white;
+      padding: 16px;
+    }
+
+    .logo {
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .nav a {
+      color: white;
+      text-decoration: none;
+      margin-right: 16px;
+    }
+
+    /* LAYOUT */
+    .container {
+      width: min(900px, 92%);
+      margin: 30px auto;
+    }
+
+    .card {
+      background: white;
+      border-radius: 14px;
+      padding: 24px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      margin-top: 0;
+    }
+
+    .badge {
+      display: inline-block;
+      background: #e6f4ea;
+      color: #1e7e34;
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+
+    .info-box {
+      background: #f1f5f9;
+      padding: 16px;
+      border-radius: 10px;
+      margin-top: 18px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: left;
+    }
+
+    th {
+      background: #f8fafc;
+    }
+
+    ul {
+      margin-top: 10px;
+    }
+
+    .actions {
+      margin-top: 20px;
+    }
+
+    button {
+      padding: 12px 18px;
+      border: none;
+      border-radius: 8px;
+      background: #123d8f;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* EXPORT SYSTEM */
+    .no-export {
+      display: block;
+    }
+
+    @media print {
+      @page {
+        margin: 0.6in;
+      }
+
+      body {
+        background: white !important;
+        color: black !important;
+      }
+
+      .no-export {
+        display: none !important;
+      }
+
+      .card {
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        padding: 0 !important;
+      }
+
+      .container {
+        width: 100% !important;
+        margin: 0 !important;
+      }
+
+      h1, h2 {
+        page-break-after: avoid;
+      }
+
+      table {
+        font-size: 11pt;
+      }
+
+      .page-break {
+        page-break-before: always;
+      }
+    }
+  </style>
 </head>
+
 <body>
-  <header class="topbar no-print">
-    <div class="topbar-inner">
-      <div class="logo">ClearMyRecord</div>
-      <nav class="nav">
-        <a href="index.html">Home</a>
-        <a href="results.html">Back to Result</a>
-      </nav>
+
+  <!-- HEADER (UI ONLY) -->
+  <div class="topbar no-export">
+    <div class="logo">ClearMyRecord</div>
+    <div class="nav">
+      <a href="#">Home</a>
+      <a href="#">How It Works</a>
     </div>
-  </header>
+  </div>
 
-  <main class="page">
-    <section class="card wide-card">
-      <div class="packet-header no-print">
-        <h1>Official-form mode</h1>
-        <p class="supporting-text">
-          This version renders a court-style packet and includes the court finder and case lookup helper.
-        </p>
+  <div class="container">
 
-        <div class="packet-actions">
-          <button class="primary-btn packet-btn" type="button" onclick="window.print()">
-            Print / Save as PDF
-          </button>
-          <button class="secondary-btn packet-btn" type="button" onclick="downloadPacketJson()">
-            Download Data
-          </button>
-        </div>
+    <!-- RESULT -->
+    <div class="card">
+      <h1>Eligibility Result</h1>
+
+      <div class="badge">You May Be Eligible</div>
+
+      <p><strong>Hello, Matt Tunstall</strong></p>
+
+      <p>
+        Based on this simplified Ohio rule set, you may be eligible to seal this third-degree felony now.
+      </p>
+
+      <p><strong>County entered:</strong> Wood County</p>
+      <p><strong>State:</strong> Ohio</p>
+      <p><strong>Where to file:</strong> File in the court where the case was handled.</p>
+
+      <!-- THIS WILL NOT EXPORT -->
+      <div class="info-box no-export">
+        <strong>Suggested next step:</strong>
+        <p>Next, gather your case number, court name, and filing documents.</p>
       </div>
+    </div>
 
-      <div id="packet-content" class="packet-content"></div>
-      <div id="packet-checklist-box" class="no-print"></div>
-    </section>
-  </main>
+    <!-- CASE SUMMARY -->
+    <div class="card">
+      <h2>Case Summary</h2>
 
-  <script src="js/rules.js"></script>
-  <script src="js/courts.js"></script>
-  <script src="js/forms.js"></script>
-  <script src="js/app.js?v=2"></script>
+      <table>
+        <tr><th>Offense Type</th><td>Drug possession</td></tr>
+        <tr><th>Offense Level</th><td>3rd Degree Felony</td></tr>
+        <tr><th>Violent Offense</th><td>No</td></tr>
+        <tr><th>Years Since Final Discharge</th><td>13</td></tr>
+        <tr><th>Fines Paid</th><td>Yes</td></tr>
+        <tr><th>Open Cases</th><td>No</td></tr>
+        <tr><th>Convictions</th><td>1</td></tr>
+        <tr><th>Case Number</th><td>2006CR0387</td></tr>
+        <tr><th>Date of Final Discharge</th><td>12/10/2010</td></tr>
+      </table>
+    </div>
+
+    <!-- COURT NOTES -->
+    <div class="card">
+      <h2>Court Filing Information</h2>
+
+      <table>
+        <tr><th>Court</th><td>Wood County Court of Common Pleas</td></tr>
+        <tr><th>Address</th><td>One Courthouse Square, Bowling Green, OH 43402</td></tr>
+        <tr><th>Filing Fee</th><td>$100 (may vary)</td></tr>
+        <tr><th>Lookup Source</th><td>Wood County Clerk of Courts</td></tr>
+      </table>
+    </div>
+
+    <!-- CHECKLIST -->
+    <div class="card">
+      <h2>Filing Checklist</h2>
+
+      <ul>
+        <li>Confirm exact case number</li>
+        <li>Insert final discharge date</li>
+        <li>Complete mailing address</li>
+        <li>Review all statements before signing</li>
+        <li>File with Clerk of Courts</li>
+      </ul>
+    </div>
+
+    <!-- SIGNATURE -->
+    <div class="card">
+      <h2>Applicant Signature</h2>
+      <p>Signature: ____________________________</p>
+      <p>Date: _________________________________</p>
+    </div>
+
+    <!-- BUTTON -->
+    <div class="actions no-export">
+      <button onclick="window.print()">Download / Print Packet</button>
+    </div>
+
+  </div>
+
 </body>
 </html>
