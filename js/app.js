@@ -64,7 +64,9 @@ function evaluateEligibility(data) {
       title: "Needs More Information",
       message: "This MVP does not yet support that state.",
       nextStep: "Please contact support or check back later for expanded state coverage.",
-      courtHint: ""
+      courtHint: "",
+      yearsRemaining: null,
+      estimatedEligibleDate: null
     };
   }
 
@@ -77,7 +79,9 @@ function evaluateEligibility(data) {
       title: "Needs More Information",
       message: "This MVP does not yet support that offense level.",
       nextStep: "A manual review may be needed.",
-      courtHint: ""
+      courtHint: "",
+      yearsRemaining: null,
+      estimatedEligibleDate: null
     };
   }
 
@@ -87,7 +91,9 @@ function evaluateEligibility(data) {
       title: "Not Eligible Yet",
       message: "Violent offenses are not eligible under this simplified MVP rule set.",
       nextStep: "You may need a more detailed legal review.",
-      courtHint: rule.courtHint
+      courtHint: rule.courtHint,
+      yearsRemaining: null,
+      estimatedEligibleDate: null
     };
   }
 
@@ -97,7 +103,9 @@ function evaluateEligibility(data) {
       title: "Needs More Information",
       message: "Open criminal cases may block sealing until resolved.",
       nextStep: "Resolve any open cases first, then recheck eligibility.",
-      courtHint: rule.courtHint
+      courtHint: rule.courtHint,
+      yearsRemaining: null,
+      estimatedEligibleDate: null
     };
   }
 
@@ -107,7 +115,9 @@ function evaluateEligibility(data) {
       title: "Needs More Information",
       message: "Outstanding fines may prevent record sealing until they are paid.",
       nextStep: "Pay any required fines, then recheck eligibility.",
-      courtHint: rule.courtHint
+      courtHint: rule.courtHint,
+      yearsRemaining: null,
+      estimatedEligibleDate: null
     };
   }
 
@@ -117,7 +127,9 @@ function evaluateEligibility(data) {
       title: "Needs More Information",
       message: "This simplified MVP supports only limited conviction scenarios.",
       nextStep: "A manual review may be needed for multiple convictions.",
-      courtHint: rule.courtHint
+      courtHint: rule.courtHint,
+      yearsRemaining: null,
+      estimatedEligibleDate: null
     };
   }
 
@@ -127,19 +139,31 @@ function evaluateEligibility(data) {
       title: "You May Be Eligible",
       message: rule.messageEligible,
       nextStep: "Next, gather your case number, court name, and filing documents.",
-      courtHint: rule.courtHint
+      courtHint: rule.courtHint,
+      yearsRemaining: 0,
+      estimatedEligibleDate: new Date().toISOString().split("T")[0]
     };
   }
 
   const yearsRemaining = rule.waitingPeriodYears - data.years;
+  const estimatedEligibleDate = calculateFutureDate(yearsRemaining);
 
   return {
     status: "not-eligible",
     title: "Not Eligible Yet",
     message: `${rule.messageWait} Estimated time remaining: ${yearsRemaining} year(s).`,
     nextStep: "Set a reminder and come back when the waiting period has passed.",
-    courtHint: rule.courtHint
+    courtHint: rule.courtHint,
+    yearsRemaining,
+    estimatedEligibleDate
   };
+}
+
+function calculateFutureDate(yearsRemaining) {
+  const today = new Date();
+  const future = new Date(today);
+  future.setFullYear(today.getFullYear() + Number(yearsRemaining));
+  return future.toISOString().split("T")[0];
 }
 
 function goToPacket() {
@@ -153,6 +177,7 @@ function goToPacket() {
 
 window.onload = function () {
   renderResultPage();
+  renderReminderBox();
   renderPacketPage();
 };
 
@@ -193,6 +218,113 @@ function renderResultPage() {
   `;
 }
 
+function renderReminderBox() {
+  const reminderBox = document.getElementById("reminder-box");
+  if (!reminderBox) return;
+
+  const raw = localStorage.getItem("eligibilityResult");
+  if (!raw) return;
+
+  const result = JSON.parse(raw);
+  const email = localStorage.getItem("email") || "";
+  const fullName = localStorage.getItem("fullName") || "";
+
+  if (result.status !== "not-eligible" || !result.estimatedEligibleDate) {
+    reminderBox.innerHTML = "";
+    return;
+  }
+
+  reminderBox.innerHTML = `
+    <div class="reminder-card">
+      <h3>Want a reminder when you may be eligible?</h3>
+      <p>
+        Estimated eligibility date:
+        <strong>${escapeHtml(formatDisplayDate(result.estimatedEligibleDate))}</strong>
+      </p>
+
+      <label for="reminderEmail">Email</label>
+      <input id="reminderEmail" type="email" value="${escapeHtml(email)}" placeholder="you@example.com" />
+
+      <div class="reminder-actions">
+        <button class="primary-btn" onclick="saveReminder()">Save Reminder</button>
+        <button class="secondary-btn" onclick="downloadReminder()">Download Reminder Data</button>
+      </div>
+
+      <div id="reminder-success"></div>
+    </div>
+  `;
+
+  localStorage.setItem("reminderName", fullName);
+}
+
+function saveReminder() {
+  const emailField = document.getElementById("reminderEmail");
+  const successBox = document.getElementById("reminder-success");
+  const raw = localStorage.getItem("eligibilityResult");
+
+  if (!emailField || !raw || !successBox) return;
+
+  const email = emailField.value.trim();
+  if (!email) {
+    alert("Please enter an email address.");
+    return;
+  }
+
+  const result = JSON.parse(raw);
+
+  const reminder = {
+    fullName: localStorage.getItem("fullName") || "",
+    email,
+    state: localStorage.getItem("state") || "",
+    county: localStorage.getItem("county") || "",
+    offense: localStorage.getItem("offense") || "",
+    estimatedEligibleDate: result.estimatedEligibleDate,
+    yearsRemaining: result.yearsRemaining,
+    createdAt: new Date().toISOString()
+  };
+
+  localStorage.setItem("eligibilityReminder", JSON.stringify(reminder));
+
+  successBox.innerHTML = `
+    <div class="reminder-success">
+      Reminder saved for <strong>${escapeHtml(email)}</strong>.<br />
+      Estimated reminder date: <strong>${escapeHtml(formatDisplayDate(result.estimatedEligibleDate))}</strong>
+    </div>
+  `;
+}
+
+function downloadReminder() {
+  const raw = localStorage.getItem("eligibilityResult");
+  if (!raw) {
+    alert("No reminder data found.");
+    return;
+  }
+
+  const result = JSON.parse(raw);
+
+  const reminder = {
+    fullName: localStorage.getItem("fullName") || "",
+    email: document.getElementById("reminderEmail")?.value.trim() || localStorage.getItem("email") || "",
+    state: localStorage.getItem("state") || "",
+    county: localStorage.getItem("county") || "",
+    offense: localStorage.getItem("offense") || "",
+    estimatedEligibleDate: result.estimatedEligibleDate,
+    yearsRemaining: result.yearsRemaining,
+    createdAt: new Date().toISOString()
+  };
+
+  const blob = new Blob([JSON.stringify(reminder, null, 2)], {
+    type: "application/json"
+  });
+
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "clearmyrecord-reminder.json";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 function renderPacketPage() {
   const packet = document.getElementById("packet-content");
   if (!packet) return;
@@ -225,8 +357,24 @@ function renderPacketPage() {
     convictions: localStorage.getItem("convictions") || ""
   };
 
-  const court = getCourtConfig(data.stateRaw, data.county);
-  const form = getOfficialFormConfig(data.stateRaw, data.county);
+  const court = typeof getCourtConfig === "function"
+    ? getCourtConfig(data.stateRaw, data.county)
+    : {
+        courtName: "Court not yet mapped in MVP",
+        courtAddress: "Please confirm the exact court manually.",
+        filingFee: "Check with the clerk for current fees"
+      };
+
+  const form = typeof getOfficialFormConfig === "function"
+    ? getOfficialFormConfig(data.stateRaw, data.county)
+    : {
+        courtCaption: "IN THE APPROPRIATE COURT",
+        applicantLabel: "Applicant",
+        caseLabel: "Case No.",
+        packetTitle: "Draft Record Sealing Application",
+        introText: "The applicant respectfully submits this draft application for review and completion.",
+        checklist: ["Confirm the correct court.", "Complete all blank fields."]
+      };
 
   packet.innerHTML = `
     <div class="official-form">
@@ -305,84 +453,17 @@ function renderPacketPage() {
 
       <div class="official-signature-block">
         <div class="signature-line">____________________________________</div>
-        <div>${escapeHtml(form.signatureLabel)}</div>
+        <div>${escapeHtml(form.signatureLabel || "Signature")}</div>
         <div class="signature-date">Date: ____________________</div>
       </div>
-    </div>
-
-    <div class="packet-section page-break">
-      <h3>Attachment A - Supporting Letter</h3>
-      <div class="letter-block">
-        <p>To the Honorable Court,</p>
-
-        <p>
-          I respectfully submit this draft application for review concerning the matter described above.
-        </p>
-
-        <p>
-          The case information in this packet is associated with ${escapeHtml(data.county || "[County]")},
-          ${escapeHtml(data.state || "[State]")}, and is intended to help prepare a formal filing draft.
-        </p>
-
-        <p>
-          I respectfully ask the Court to consider the application and any supporting materials submitted with it.
-        </p>
-
-        <p>Thank you for your time and consideration.</p>
-
-        <p>
-          Respectfully submitted,<br><br>
-          ${escapeHtml(data.fullName || "[Your Name]")}
-        </p>
-      </div>
-    </div>
-
-    <div class="packet-section">
-      <h3>Internal Data Snapshot</h3>
-      <pre class="packet-json">${escapeHtml(JSON.stringify({ data, result, court, form }, null, 2))}</pre>
     </div>
   `;
 }
 
-function downloadPacketJson() {
-  const raw = localStorage.getItem("eligibilityResult");
-  if (!raw) {
-    alert("No packet data found.");
-    return;
-  }
-
-  const exportData = {
-    fullName: localStorage.getItem("fullName") || "",
-    email: localStorage.getItem("email") || "",
-    state: localStorage.getItem("state") || "",
-    offense: localStorage.getItem("offense") || "",
-    county: localStorage.getItem("county") || "",
-    felony: localStorage.getItem("felony") || "",
-    violent: localStorage.getItem("violent") || "",
-    years: localStorage.getItem("years") || "",
-    fines: localStorage.getItem("fines") || "",
-    openCases: localStorage.getItem("openCases") || "",
-    convictions: localStorage.getItem("convictions") || "",
-    result: JSON.parse(raw),
-    court: getCourtConfig(
-      localStorage.getItem("state") || "",
-      localStorage.getItem("county") || ""
-    ),
-    form: getOfficialFormConfig(
-      localStorage.getItem("state") || "",
-      localStorage.getItem("county") || ""
-    )
-  };
-
-  const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
-
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "clearmyrecord-official-form-data.json";
-  a.click();
-
-  URL.revokeObjectURL(url);
+function formatDisplayDate(dateString) {
+  if (!dateString) return "";
+  const date = new Date(dateString + "T00:00:00");
+  return date.toLocaleDateString();
 }
 
 function capitalize(value) {
