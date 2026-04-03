@@ -1,2 +1,3 @@
-# clearmyrecord-mvp
-AI-powered criminal record sealing eligibility checker
+## Product Wireframes
+![Homepage](mockups/homepage-wireframe.png)
+![Eligibility](mockups/eligibility-wireframe.png)
