@@ -731,3 +731,136 @@ button {
   }
 }
 }
+/* Home page hero */
+
+.hero-wrap {
+  width: min(1100px, 92%);
+  margin: 36px auto 60px;
+}
+
+.hero-card {
+  background: linear-gradient(135deg, #123d8f 0%, #1f56ba 100%);
+  color: #ffffff;
+  border-radius: 22px;
+  padding: 44px 38px;
+  box-shadow: 0 16px 40px rgba(16, 35, 70, 0.18);
+}
+
+.hero-card-large {
+  min-height: 420px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.hero-badge {
+  display: inline-block;
+  align-self: flex-start;
+  margin-bottom: 18px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+
+.hero-card h1 {
+  margin: 0 0 14px;
+  font-size: 46px;
+  line-height: 1.08;
+  letter-spacing: -0.6px;
+}
+
+.hero-subtext {
+  margin: 0;
+  max-width: 680px;
+  font-size: 19px;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 26px;
+}
+
+.primary-btn-link,
+.secondary-btn-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  padding: 12px 18px;
+  border-radius: 10px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: transform 0.08s ease, box-shadow 0.08s ease, opacity 0.08s ease;
+}
+
+.primary-btn-link:hover,
+.secondary-btn-link:hover {
+  transform: translateY(-1px);
+  text-decoration: none;
+}
+
+.primary-btn-link {
+  background: #ffffff;
+  color: #123d8f;
+  box-shadow: 0 8px 18px rgba(12, 30, 61, 0.14);
+}
+
+.secondary-btn-link {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.26);
+}
+
+.hero-features {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.feature-pill {
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+@media (max-width: 700px) {
+  .hero-wrap {
+    width: min(94%, 1100px);
+    margin-top: 20px;
+  }
+
+  .hero-card {
+    padding: 28px 22px;
+    border-radius: 18px;
+  }
+
+  .hero-card h1 {
+    font-size: 34px;
+  }
+
+  .hero-subtext {
+    font-size: 17px;
+  }
+
+  .hero-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .primary-btn-link,
+  .secondary-btn-link {
+    width: 100%;
+  }
+}
