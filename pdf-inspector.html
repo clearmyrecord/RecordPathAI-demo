@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>PDF Field Inspector</title>
+  <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+</head>
+<body style="font-family: Arial; padding: 20px;">
+
+  <h1>PDF Field Inspector</h1>
+
+  <input type="file" id="pdfUpload" accept="application/pdf" />
+  <button onclick="inspectPdfFields()">Inspect Fields</button>
+
+  <pre id="output" style="margin-top:20px; background:#f4f4f4; padding:10px;"></pre>
+
+  <script>
+    async function inspectPdfFields() {
+      const fileInput = document.getElementById("pdfUpload");
+      const output = document.getElementById("output");
+
+      if (!fileInput.files.length) {
+        output.textContent = "Upload a PDF first.";
+        return;
+      }
+
+      const file = fileInput.files[0];
+      const bytes = await file.arrayBuffer();
+
+      const pdfDoc = await PDFLib.PDFDocument.load(bytes);
+      const form = pdfDoc.getForm();
+      const fields = form.getFields();
+
+      const names = fields.map(f => {
+        return f.constructor.name + ": " + f.getName();
+      });
+
+      output.textContent = names.join("\n");
+    }
+  </script>
+
+</body>
+</html>
