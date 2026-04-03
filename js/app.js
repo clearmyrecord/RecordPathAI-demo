@@ -125,16 +125,10 @@ function toggleConvictionFields(id) {
   const outcome = document.getElementById(`outcome-${id}`)?.value;
   const finesWrap = document.getElementById(`fines-wrap-${id}`);
   const openWrap = document.getElementById(`open-wrap-${id}`);
-
   const isConviction = outcome === "conviction";
 
-  if (finesWrap) {
-    finesWrap.style.display = isConviction ? "block" : "none";
-  }
-
-  if (openWrap) {
-    openWrap.style.display = isConviction ? "block" : "none";
-  }
+  if (finesWrap) finesWrap.style.display = isConviction ? "block" : "none";
+  if (openWrap) openWrap.style.display = isConviction ? "block" : "none";
 }
 
 function collectOffenses() {
@@ -168,6 +162,35 @@ function collectOffenses() {
   return offenses;
 }
 
+function renderSummary(summary) {
+  if (!summary) return "";
+
+  return `
+    <div style="margin-top:12px;">
+      <strong>Record summary</strong><br>
+      Total conviction count: ${summary.totalConvictions}<br>
+      Misdemeanor convictions: ${summary.misdemeanorConvictions}<br>
+      Felony convictions: ${summary.felonyConvictions}<br>
+      Highest felony level: ${summary.highestFelonyLevel || "None"}
+    </div>
+  `;
+}
+
+function renderOffenseSummary(offenseResults) {
+  if (!offenseResults.length) return "";
+
+  const items = offenseResults.map((offense, index) => `
+    <li>
+      <strong>Offense ${index + 1}:</strong>
+      ${offense.label} —
+      eligibility date: ${offense.eligibilityDate} —
+      ${offense.eligibleNow ? "eligible now" : "not yet eligible"}
+    </li>
+  `).join("");
+
+  return `<ul class="offense-summary">${items}</ul>`;
+}
+
 function checkAllEligibility() {
   const resultBox = document.getElementById("result");
   const offenses = collectOffenses();
@@ -178,6 +201,7 @@ function checkAllEligibility() {
     resultBox.innerHTML = `
       <strong>Not Eligible</strong><br>
       ${result.reason || "The record is not currently eligible."}
+      ${renderSummary(result.summary)}
       ${renderOffenseSummary(result.offenseResults || [])}
     `;
     return;
@@ -191,27 +215,9 @@ function checkAllEligibility() {
   resultBox.innerHTML = `
     <strong>${isNowEligible ? "Eligible" : "Not Yet Eligible"}</strong><br>
     Overall eligibility date: ${result.eligibilityDate}
+    ${renderSummary(result.summary)}
     ${renderOffenseSummary(result.offenseResults || [])}
   `;
-}
-
-function renderOffenseSummary(offenseResults) {
-  if (!offenseResults.length) {
-    return "";
-  }
-
-  const items = offenseResults.map((offense, index) => {
-    return `
-      <li>
-        <strong>Offense ${index + 1}:</strong>
-        ${offense.label} —
-        eligibility date: ${offense.eligibilityDate} —
-        ${offense.eligibleNow ? "eligible now" : "not yet eligible"}
-      </li>
-    `;
-  }).join("");
-
-  return `<ul class="offense-summary">${items}</ul>`;
 }
 
 document.addEventListener("DOMContentLoaded", () => {
