@@ -5,7 +5,10 @@ window.chargeLibrary = [
     category: "misdemeanor",
     tags: ["non_violent"],
     defaultLevel: "M1",
-    ohio: { excludedForSealing: false, excludedForExpungement: false }
+    ohio: {
+      excludedForSealing: false,
+      excludedForExpungement: false
+    }
   },
   {
     id: "shoplifting",
@@ -13,7 +16,10 @@ window.chargeLibrary = [
     category: "misdemeanor",
     tags: ["non_violent"],
     defaultLevel: "M1",
-    ohio: { excludedForSealing: false, excludedForExpungement: false }
+    ohio: {
+      excludedForSealing: false,
+      excludedForExpungement: false
+    }
   },
   {
     id: "criminal_trespass",
@@ -21,7 +27,10 @@ window.chargeLibrary = [
     category: "misdemeanor",
     tags: ["non_violent"],
     defaultLevel: "M4",
-    ohio: { excludedForSealing: false, excludedForExpungement: false }
+    ohio: {
+      excludedForSealing: false,
+      excludedForExpungement: false
+    }
   },
   {
     id: "drug_possession_minor",
@@ -29,7 +38,10 @@ window.chargeLibrary = [
     category: "misdemeanor",
     tags: ["drug", "non_violent"],
     defaultLevel: "M1",
-    ohio: { excludedForSealing: false, excludedForExpungement: false }
+    ohio: {
+      excludedForSealing: false,
+      excludedForExpungement: false
+    }
   },
   {
     id: "drug_possession_felony",
@@ -37,7 +49,10 @@ window.chargeLibrary = [
     category: "felony",
     tags: ["drug"],
     defaultLevel: "F5",
-    ohio: { excludedForSealing: false, excludedForExpungement: false }
+    ohio: {
+      excludedForSealing: false,
+      excludedForExpungement: false
+    }
   },
   {
     id: "traffic_conviction",
@@ -201,21 +216,34 @@ window.chargeLibrary = [
     category: "misdemeanor",
     tags: [],
     defaultLevel: "M1",
-    ohio: { excludedForSealing: false, excludedForExpungement: false }
+    ohio: {
+      excludedForSealing: false,
+      excludedForExpungement: false
+    }
   }
 ];
 
 window.getChargeById = function (id) {
-  return window.chargeLibrary.find((charge) => charge.id === id) || null;
+  var i;
+  for (i = 0; i < window.chargeLibrary.length; i++) {
+    if (window.chargeLibrary[i].id === id) {
+      return window.chargeLibrary[i];
+    }
+  }
+  return null;
 };
 
 window.chargeHasTag = function (chargeId, tag) {
-  const charge = window.getChargeById(chargeId);
-  return Boolean(charge && charge.tags && charge.tags.includes(tag));
+  var charge = window.getChargeById(chargeId);
+  if (!charge || !charge.tags) {
+    return false;
+  }
+  return charge.tags.indexOf(tag) !== -1;
 };
 
 window.isOhioChargeExcluded = function (chargeId, remedyType, offenseLevel) {
-  const charge = window.getChargeById(chargeId);
+  var charge = window.getChargeById(chargeId);
+
   if (!charge || !charge.ohio) {
     return { excluded: false, reason: "" };
   }
@@ -224,6 +252,7 @@ window.isOhioChargeExcluded = function (chargeId, remedyType, offenseLevel) {
     if (remedyType === "sealing" && (offenseLevel === "M3" || offenseLevel === "M4")) {
       return { excluded: false, reason: "" };
     }
+
     return {
       excluded: true,
       reason: charge.ohio.exclusionReason || "Domestic violence is excluded for this remedy."
