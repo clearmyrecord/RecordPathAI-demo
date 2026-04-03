@@ -178,11 +178,11 @@ function goToPacket() {
 
 window.onload = function () {
   renderResultPage();
-  renderCourtFinder();
   renderReminderBox();
   renderChecklist("checklist-box");
   renderPacketPage();
   renderChecklist("packet-checklist-box");
+  renderCourtFinder();
 };
 
 function renderResultPage() {
@@ -546,7 +546,14 @@ function renderPacketPage() {
     : {
         courtName: "Court not yet mapped in MVP",
         courtAddress: "Please confirm the exact court manually.",
-        filingFee: "Check with the clerk for current fees"
+        filingFee: "Check with the clerk for current fees",
+        lookupLabel: "Court website",
+        lookupUrl: "",
+        lookupInstructions: [
+          "Search by your name",
+          "Search by case number",
+          "Confirm the final disposition date"
+        ]
       };
 
   const form = typeof getOfficialFormConfig === "function"
@@ -557,10 +564,64 @@ function renderPacketPage() {
         caseLabel: "Case No.",
         packetTitle: "Draft Record Sealing Application",
         introText: "The applicant respectfully submits this draft application for review and completion.",
-        checklist: ["Confirm the correct court.", "Complete all blank fields."]
+        checklist: ["Confirm the correct court.", "Complete all blank fields."],
+        signatureLabel: "Signature"
       };
 
   packet.innerHTML = `
+    <div class="finder-card no-print">
+      <h3>Court Finder + Case Lookup Helper</h3>
+      <p class="finder-subtext">
+        Based on your state and county, this is the best starting point for locating your case.
+      </p>
+
+      <table class="finder-table">
+        <tr>
+          <th>Likely Court</th>
+          <td>${escapeHtml(court.courtName)}</td>
+        </tr>
+        <tr>
+          <th>Address / Location</th>
+          <td>${escapeHtml(court.courtAddress)}</td>
+        </tr>
+        <tr>
+          <th>Lookup Source</th>
+          <td>${escapeHtml(court.lookupLabel || "Not yet mapped")}</td>
+        </tr>
+        <tr>
+          <th>Website</th>
+          <td>
+            ${
+              court.lookupUrl
+                ? `<a href="${escapeHtml(court.lookupUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(court.lookupUrl)}</a>`
+                : "Not yet mapped"
+            }
+          </td>
+        </tr>
+      </table>
+
+      <div class="finder-checklist">
+        <h4>How to find your case number</h4>
+        <ul>
+          ${(court.lookupInstructions || []).map(item => `<li>${escapeHtml(item)}</li>`).join("")}
+        </ul>
+      </div>
+
+      <div class="finder-fields">
+        <label for="caseNumber">Case Number</label>
+        <input id="caseNumber" type="text" placeholder="Enter case number if found" value="${escapeHtml(localStorage.getItem("caseNumber") || "")}" />
+
+        <label for="dispositionDate">Disposition / Final Discharge Date</label>
+        <input id="dispositionDate" type="text" placeholder="MM/DD/YYYY or YYYY-MM-DD" value="${escapeHtml(localStorage.getItem("dispositionDate") || "")}" />
+
+        <div class="finder-actions">
+          <button class="primary-btn" onclick="saveCaseLookupData()">Save Lookup Info</button>
+        </div>
+
+        <div id="finder-success"></div>
+      </div>
+    </div>
+
     <div class="official-form">
       <div class="official-caption">
         <div class="caption-line">${escapeHtml(form.courtCaption)}</div>
