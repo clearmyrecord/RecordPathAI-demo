@@ -1,33 +1,46 @@
-function calculateEligibility(record) {
-  const rule = sealingRules?.[record.state]?.[record.category]?.[record.level];
-
-  if (!rule || !rule.eligible) {
-    return { eligible: false, reason: "Not eligible under current rules." };
+function evaluateAllOffenses(offenses) {
+  if (!offenses.length) {
+    return { eligible: false, reason: "No offenses entered." };
   }
 
-  if (record.openCases === true) {
-    return { eligible: false, reason: "Open cases must be resolved first." };
-  }
+  let latestDate = null;
 
-  if (record.finesPaid === false) {
-    return { eligible: false, reason: "Fines must be paid first." };
-  }
+  for (let offense of offenses) {
 
-  const baseDate = new Date(record.date);
-  const eligibilityDate = new Date(baseDate);
+    if (offense.openCases) {
+      return { eligible: false, reason: "Open cases must be resolved." };
+    }
 
-  if (rule.unit === "years") {
-    eligibilityDate.setFullYear(eligibilityDate.getFullYear() + rule.wait);
-  }
+    if (!offense.finesPaid) {
+      return { eligible: false, reason: "Fines must be paid." };
+    }
 
-  if (rule.unit === "months") {
-    eligibilityDate.setMonth(eligibilityDate.getMonth() + rule.wait);
+    const rule = sealingRules?.[offense.state]?.[offense.category]?.[offense.level];
+
+    if (!rule || !rule.eligible) {
+      return { eligible: false, reason: `Offense ${offense.level} is not eligible.` };
+    }
+
+    const base = new Date(offense.date);
+    const eligibilityDate = new Date(base);
+
+    if (rule.unit === "years") {
+      eligibilityDate.setFullYear(base.getFullYear() + rule.wait);
+    }
+
+    if (rule.unit === "months") {
+      eligibilityDate.setMonth(base.getMonth() + rule.wait);
+    }
+
+    if (!latestDate || eligibilityDate > latestDate) {
+      latestDate = eligibilityDate;
+    }
   }
 
   const today = new Date();
 
   return {
-    eligible: eligibilityDate <= today,
-    eligibilityDate: eligibilityDate.toISOString().split("T")[0]
+    eligible: latestDate <= today,
+    eligibilityDate: latestDate.toISOString().split("T")[0]
   };
 }
