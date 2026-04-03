@@ -674,4 +674,60 @@ button {
     color: #000000;
     text-decoration: none;
   }
+  .progress-wrap {
+  margin-bottom: 18px;
+}
+
+.progress-pill {
+  display: inline-block;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: #eaf1fb;
+  color: #123d8f;
+  border: 1px solid #c9d8ef;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.form-actions {
+  margin-top: 24px;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.stacked-actions {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.secondary-btn-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 12px 18px;
+  border-radius: 10px;
+  font-weight: 700;
+  background: #eef4fc;
+  color: #123d8f;
+  border: 1px solid #c9d8ef;
+  text-decoration: none;
+}
+
+.secondary-btn-link:hover {
+  text-decoration: none;
+  transform: translateY(-1px);
+}
+
+@media (max-width: 700px) {
+  .form-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .secondary-btn-link {
+    width: 100%;
+  }
+}
 }
