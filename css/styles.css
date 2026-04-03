@@ -260,3 +260,82 @@ body {
     background: white;
   }
 }
+.official-form {
+  border: 2px solid #1f2937;
+  padding: 28px;
+  background: white;
+}
+
+.official-caption {
+  text-align: center;
+  font-weight: 700;
+  margin-bottom: 24px;
+}
+
+.caption-line {
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.official-case-grid {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.official-party-block {
+  min-height: 90px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.official-case-box {
+  border: 1px solid #111827;
+  padding: 14px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.official-title {
+  text-align: center;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin: 24px 0 20px;
+  font-size: 20px;
+}
+
+.official-paragraph {
+  line-height: 1.7;
+  margin-bottom: 22px;
+}
+
+.official-section {
+  margin-top: 24px;
+}
+
+.official-signature-block {
+  margin-top: 40px;
+  width: 320px;
+}
+
+.signature-line {
+  margin-top: 26px;
+  border-top: 1px solid #111827;
+  padding-top: 8px;
+}
+
+.signature-date {
+  margin-top: 18px;
+}
+
+@media (max-width: 700px) {
+  .official-case-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .official-signature-block {
+    width: 100%;
+  }
+}
