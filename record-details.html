@@ -1,30 +1,293 @@
-function renderConfidence(confidence) {
-  if (!confidence) return "";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Record Details - ClearMyRecord</title>
 
-  let badgeClass = "red";
-  let badgeText = "Low likelihood";
+  <script src="js/charges.js"></script>
+  <script src="js/sealing-rules.js"></script>
+  <script src="js/eligibility.js"></script>
+  <script src="js/app.js" defer></script>
 
-  if (confidence.score >= 75) {
-    badgeClass = "green";
-    badgeText = "High likelihood";
-  } else if (confidence.score >= 50) {
-    badgeClass = "yellow";
-    badgeText = "Moderate likelihood";
-  }
+  <style>
+    * {
+      box-sizing: border-box;
+    }
 
-  const reasons = confidence.reasons?.length
-    ? `<ul class="offense-summary">${confidence.reasons.map(reason => `<li>${reason}</li>`).join("")}</ul>`
-    : "";
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f3f7fc;
+      color: #1b2430;
+      padding: 24px 16px;
+    }
 
-  return `
-    <div class="confidence-box">
-      <div class="confidence-badge ${badgeClass}">${badgeText}</div>
-      <div class="confidence-score">Likelihood based on current information: ${confidence.score}%</div>
-      <div>${confidence.label}</div>
-      ${reasons}
-      <div class="confidence-note">
-        This percentage is a confidence estimate based on the information entered and current rule matching. It is not legal advice or a guaranteed outcome.
-      </div>
+    .card {
+      max-width: 980px;
+      margin: 0 auto;
+      background: #fff;
+      border: 1px solid #d9e2ec;
+      border-radius: 14px;
+      padding: 24px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+    }
+
+    h1 {
+      margin-top: 0;
+      color: #123d8f;
+    }
+
+    .subtext {
+      color: #5b6b7f;
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+
+    .offense {
+      border: 1px solid #d9e2ec;
+      border-radius: 12px;
+      padding: 18px;
+      margin-bottom: 16px;
+      background: #fbfdff;
+    }
+
+    .offense-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .offense-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #123d8f;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .form-field.full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 11px 12px;
+      border: 1px solid #cfd8e3;
+      border-radius: 10px;
+      font-size: 15px;
+      background: #fff;
+    }
+
+    .checkbox-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 44px;
+      padding-top: 26px;
+    }
+
+    .checkbox-row input {
+      width: auto;
+      transform: scale(1.1);
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+
+    button {
+      appearance: none;
+      border: none;
+      background: #123d8f;
+      color: #fff;
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    button.secondary {
+      background: #e8eef7;
+      color: #1b2430;
+    }
+
+    #result {
+      margin-top: 22px;
+      padding: 18px;
+      border-radius: 12px;
+      background: #eef4ff;
+      border: 1px solid #d5e2fb;
+      line-height: 1.6;
+    }
+
+    .result-bad {
+      background: #fff3f3 !important;
+      border-color: #f0cccc !important;
+    }
+
+    .result-good {
+      background: #eefaf1 !important;
+      border-color: #c7ead0 !important;
+    }
+
+    .result-neutral {
+      background: #fffbea !important;
+      border-color: #f2e2a7 !important;
+    }
+
+    .offense-summary {
+      margin-top: 12px;
+      padding-left: 18px;
+    }
+
+    .offense-summary li {
+      margin-bottom: 6px;
+    }
+
+    .confidence-box {
+      margin-top: 14px;
+      padding: 14px;
+      background: #ffffff;
+      border: 1px solid #d9e2ec;
+      border-radius: 10px;
+    }
+
+    .confidence-badge {
+      display: inline-block;
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .confidence-badge.green {
+      background: #e8f7ee;
+      color: #1f7a3e;
+      border: 1px solid #b7e4c7;
+    }
+
+    .confidence-badge.yellow {
+      background: #fff8e1;
+      color: #8a6d1f;
+      border: 1px solid #f0d98a;
+    }
+
+    .confidence-badge.red {
+      background: #fdecec;
+      color: #a12626;
+      border: 1px solid #efc2c2;
+    }
+
+    .confidence-score {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .confidence-note {
+      margin-top: 8px;
+      font-size: 13px;
+      color: #5b6b7f;
+      line-height: 1.5;
+    }
+
+    .confidence-bar {
+      width: 100%;
+      height: 12px;
+      background: #edf2f7;
+      border-radius: 999px;
+      overflow: hidden;
+      margin: 10px 0 12px;
+      border: 1px solid #d9e2ec;
+    }
+
+    .confidence-bar-fill {
+      height: 100%;
+      border-radius: 999px;
+    }
+
+    .confidence-bar-fill.green {
+      background: #22c55e;
+    }
+
+    .confidence-bar-fill.yellow {
+      background: #f59e0b;
+    }
+
+    .confidence-bar-fill.red {
+      background: #ef4444;
+    }
+
+    .mini-note {
+      font-size: 13px;
+      color: #5b6b7f;
+      margin-top: 12px;
+    }
+
+    @media (max-width: 720px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .actions {
+        flex-direction: column;
+      }
+
+      button {
+        width: 100%;
+      }
+
+      .checkbox-row {
+        padding-top: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Record Details</h1>
+    <p class="subtext">
+      Ohio-only version rebuilt around the March 2025 Ohio Justice &amp; Policy Center handout.
+      This version separates sealing and expungement, uses Ohio waiting periods, supports third-degree felony limits, and adds discharge and clumping inputs.
+    </p>
+
+    <div class="actions">
+      <button type="button" onclick="addOffense()">+ Add Offense</button>
     </div>
-  `;
-}
+
+    <div id="offenses"></div>
+
+    <div class="actions">
+      <button type="button" onclick="checkAllEligibility()">Check Eligibility</button>
+    </div>
+
+    <div id="result" class="result-neutral">
+      Add at least one offense, then click Check Eligibility.
+    </div>
+
+    <div class="mini-note">
+      This screen gives a rule-based estimate. Court discretion, rehabilitation, and court-specific filing practice can still affect the final outcome.
+    </div>
+  </div>
+</body>
+</html>
