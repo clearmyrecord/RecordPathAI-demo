@@ -191,6 +191,25 @@ function renderOffenseSummary(offenseResults) {
   return `<ul class="offense-summary">${items}</ul>`;
 }
 
+function renderConfidence(confidence) {
+  if (!confidence) return "";
+
+  const reasons = confidence.reasons?.length
+    ? `<ul class="offense-summary">${confidence.reasons.map(reason => `<li>${reason}</li>`).join("")}</ul>`
+    : "";
+
+  return `
+    <div style="margin-top:14px; padding:14px; background:#ffffff; border:1px solid #d9e2ec; border-radius:10px;">
+      <strong>Likelihood based on current information: ${confidence.score}%</strong><br>
+      ${confidence.label}
+      ${reasons}
+      <div style="margin-top:8px; font-size:13px; color:#5b6b7f;">
+        This percentage is a confidence estimate based on the information entered and current rule matching. It is not legal advice or a guaranteed outcome.
+      </div>
+    </div>
+  `;
+}
+
 function checkAllEligibility() {
   const resultBox = document.getElementById("result");
   const offenses = collectOffenses();
@@ -201,6 +220,7 @@ function checkAllEligibility() {
     resultBox.innerHTML = `
       <strong>Not Eligible</strong><br>
       ${result.reason || "The record is not currently eligible."}
+      ${renderConfidence(result.confidence)}
       ${renderSummary(result.summary)}
       ${renderOffenseSummary(result.offenseResults || [])}
     `;
@@ -215,6 +235,7 @@ function checkAllEligibility() {
   resultBox.innerHTML = `
     <strong>${isNowEligible ? "Eligible" : "Not Yet Eligible"}</strong><br>
     Overall eligibility date: ${result.eligibilityDate}
+    ${renderConfidence(result.confidence)}
     ${renderSummary(result.summary)}
     ${renderOffenseSummary(result.offenseResults || [])}
   `;
