@@ -3,37 +3,42 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Official Form Packet - ClearMyRecord</title>
+  <title>Eligibility Result - ClearMyRecord</title>
   <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
-  <header class="topbar no-print">
+  <header class="topbar">
     <div class="topbar-inner">
       <div class="logo">ClearMyRecord</div>
       <nav class="nav">
         <a href="index.html">Home</a>
-        <a href="results.html">Back to Result</a>
+        <a href="how-it-works.html">How It Works</a>
       </nav>
     </div>
   </header>
 
   <main class="page">
-    <section class="card wide-card">
-      <div class="packet-header no-print">
-        <h1>Official-form mode</h1>
-        <p class="supporting-text">
-          This version renders a more court-style packet based on the state and county entered.
-        </p>
+    <div class="progress-wrap">
+      <div class="progress-pill">Step 3 of 3</div>
+    </div>
 
-        <div class="packet-actions">
-          <button class="primary-btn packet-btn" onclick="window.print()">Print / Save as PDF</button>
-          <button class="secondary-btn packet-btn" onclick="downloadPacketJson()">Download Data</button>
-        </div>
+    <section class="card">
+      <h1>Next: Eligibility result</h1>
+      <p class="supporting-text">
+        Here is your estimated result based on the information you entered.
+      </p>
+
+      <div id="result-box"></div>
+      <div id="court-finder-box"></div>
+      <div id="reminder-box"></div>
+      <div id="checklist-box"></div>
+
+      <div class="form-actions stacked-actions">
+        <button class="primary-btn" onclick="goToPacket()">
+          Generate Official-Form Packet
+        </button>
+        <a href="eligibility.html" class="secondary-btn-link">Start Over</a>
       </div>
-
-      <div id="packet-content" class="packet-content"></div>
-
-      <div id="packet-checklist-box" class="no-print"></div>
     </section>
   </main>
 
