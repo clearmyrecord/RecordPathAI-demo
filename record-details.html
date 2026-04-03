@@ -2,81 +2,111 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Record Details - ClearMyRecord</title>
-  <link rel="stylesheet" href="css/styles.css" />
+
+  <script src="js/sealing-rules.js"></script>
+  <script src="js/eligibility.js"></script>
+  <script src="js/app.js" defer></script>
+
+  <style>
+    body {
+      font-family: Arial;
+      background: #f3f7fc;
+      padding: 20px;
+    }
+
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 600px;
+      margin: auto;
+    }
+
+    .form-field {
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    select, input {
+      width: 100%;
+      padding: 10px;
+    }
+
+    button {
+      padding: 12px;
+      width: 100%;
+      background: #123d8f;
+      color: white;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .result {
+      margin-top: 20px;
+      padding: 15px;
+      background: #eef4ff;
+    }
+  </style>
 </head>
+
 <body>
-  <header class="topbar">
-    <div class="topbar-inner">
-      <div class="logo">ClearMyRecord</div>
-      <nav class="nav">
-        <a href="index.html">Home</a>
-        <a href="how-it-works.html">How It Works</a>
-      </nav>
-    </div>
-  </header>
 
-  <main class="page">
-    <div class="progress-wrap">
-      <div class="progress-pill">Step 2 of 3</div>
-    </div>
+<div class="card">
+  <h2>Record Details</h2>
 
-    <section class="card">
-      <h1>Next: Record details</h1>
-      <p class="supporting-text">
-        Tell us a little more so we can estimate eligibility.
-      </p>
+  <div class="form-field">
+    <label>State</label>
+    <select id="state">
+      <option value="ohio">Ohio</option>
+    </select>
+  </div>
 
-      <form class="form-grid">
-        <label for="county">County</label>
-        <input id="county" type="text" placeholder="Example: Wood County" />
+  <div class="form-field">
+    <label>Offense Category</label>
+    <select id="offenseCategory">
+      <option value="">Select</option>
+      <option value="misdemeanor">Misdemeanor</option>
+      <option value="felony">Felony</option>
+    </select>
+  </div>
 
-        <label for="felony">Offense level</label>
-        <select id="felony" required>
-          <option value="">Select offense level</option>
-          <option value="3">3rd Degree Felony</option>
-          <option value="4">4th Degree Felony</option>
-          <option value="5">5th Degree Felony</option>
-        </select>
+  <div class="form-field">
+    <label>Offense Level</label>
+    <select id="offenseLevel"></select>
+  </div>
 
-        <label for="violent">Was the offense violent?</label>
-        <select id="violent" required>
-          <option value="">Select one</option>
-          <option value="no">No</option>
-          <option value="yes">Yes</option>
-        </select>
+  <div class="form-field">
+    <label>Final Disposition Date</label>
+    <input type="date" id="finalDate"/>
+  </div>
 
-        <label for="years">Years since final discharge / disposition</label>
-        <input id="years" type="number" min="0" placeholder="Example: 5" required />
+  <div class="form-field">
+    <label>Fines Paid?</label>
+    <select id="finesPaid">
+      <option value="true">Yes</option>
+      <option value="false">No</option>
+    </select>
+  </div>
 
-        <label for="fines">Have all fines been paid?</label>
-        <select id="fines" required>
-          <option value="">Select one</option>
-          <option value="yes">Yes</option>
-          <option value="no">No</option>
-        </select>
+  <div class="form-field">
+    <label>Any Open Cases?</label>
+    <select id="openCases">
+      <option value="false">No</option>
+      <option value="true">Yes</option>
+    </select>
+  </div>
 
-        <label for="openCases">Any open criminal cases?</label>
-        <select id="openCases" required>
-          <option value="">Select one</option>
-          <option value="no">No</option>
-          <option value="yes">Yes</option>
-        </select>
+  <button onclick="checkEligibility()">Check Eligibility</button>
 
-        <label for="convictions">How many convictions are involved?</label>
-        <input id="convictions" type="number" min="1" placeholder="Example: 1" required />
+  <div id="result" class="result"></div>
+</div>
 
-        <div class="form-actions">
-          <button type="button" class="primary-btn" onclick="checkEligibility()">
-            Next: Eligibility Result
-          </button>
-        </div>
-      </form>
-    </section>
-  </main>
-
-  <script src="js/rules.js"></script>
-  <script src="js/app.js"></script>
 </body>
 </html>
