@@ -1,73 +1,74 @@
-function goToDetails() {
+function goToDetails(){
 
 const state = document.getElementById("state").value
 const offense = document.getElementById("offense").value
 
-localStorage.setItem("state", state)
-localStorage.setItem("offense", offense)
+localStorage.setItem("state",state)
+localStorage.setItem("offense",offense)
 
-window.location.href = "record-details.html"
+window.location.href="record-details.html"
 
 }
 
 function checkEligibility(){
 
-const felony = document.getElementById("felony").value
-const years = document.getElementById("years").value
-const fines = document.getElementById("fines").value
+const felony=document.getElementById("felony").value
+const years=document.getElementById("years").value
+const fines=document.getElementById("fines").value
 
-localStorage.setItem("felony", felony)
-localStorage.setItem("years", years)
-localStorage.setItem("fines", fines)
+localStorage.setItem("felony",felony)
+localStorage.setItem("years",years)
+localStorage.setItem("fines",fines)
 
-window.location.href = "results.html"
+window.location.href="results.html"
 
 }
 
-window.onload = function(){
+window.onload=function(){
 
-const resultBox = document.getElementById("result-box")
+const box=document.getElementById("result-box")
+if(!box) return
 
-if(!resultBox) return
+const felony=localStorage.getItem("felony")
+const years=localStorage.getItem("years")
+const fines=localStorage.getItem("fines")
 
-const felony = localStorage.getItem("felony")
-const years = localStorage.getItem("years")
-const fines = localStorage.getItem("fines")
+let result=""
 
-let result = ""
+if(felony<=4 && years>=3 && fines=="yes"){
 
-if(felony == 3 && years >= 3 && fines == "yes"){
-
-result = `
-<h2 class="eligible">You May Be Eligible</h2>
-
-<p>Based on your answers you may qualify to seal your record.</p>
-
-<button class="primary-btn">Start Record Sealing</button>
+result=`
+<div class="result eligible">
+<h3>You May Be Eligible</h3>
+<p>Based on your answers you may qualify for record sealing.</p>
+<button class="primary-btn">Continue</button>
+</div>
 `
 
 }
 
-else if(fines == "no"){
+else if(fines=="no"){
 
-result = `
-<h2 class="warning">More Information Needed</h2>
-
-<p>Outstanding fines must be paid before record sealing.</p>
+result=`
+<div class="result warning">
+<h3>More Information Needed</h3>
+<p>Outstanding fines must be paid before sealing a record.</p>
+</div>
 `
 
 }
 
 else{
 
-result = `
-<h2 class="not-eligible">Not Eligible Yet</h2>
-
+result=`
+<div class="result not-eligible">
+<h3>Not Eligible Yet</h3>
 <p>You may need to wait longer before applying.</p>
+</div>
 `
 
 }
 
-resultBox.innerHTML = result
+box.innerHTML=result
 
 }
