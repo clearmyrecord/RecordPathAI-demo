@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Template Mapper - ClearMyRecord</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    body {
+      margin: 0;
+      background: #f3f7fc;
+      color: #1b2430;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .mapper-wrap {
+      width: min(1180px, 94%);
+      margin: 32px auto 60px;
+    }
+
+    .mapper-card {
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .mapper-card h1,
+    .mapper-card h2,
+    .mapper-card h3 {
+      margin-top: 0;
+      color: #123d8f;
+    }
+
+    .mapper-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    .mapper-grid-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+    }
+
+    .form-block {
+      margin-bottom: 16px;
+    }
+
+    .form-block label {
+      display: block;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .form-block input,
+    .form-block select,
+    .form-block textarea,
+    .form-block button {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #cfd8e3;
+      border-radius: 8px;
+      font: inherit;
+      box-sizing: border-box;
+    }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr auto;
+      gap: 12px;
+      align-items: end;
+      margin-bottom: 12px;
+    }
+
+    .field-row button {
+      width: auto;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+
+    .btn-row button,
+    .template-actions button,
+    .user-actions button {
+      background: #123d8f;
+      color: #fff;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .btn-row button.secondary,
+    .template-actions button.secondary,
+    .user-actions button.secondary {
+      background: #6b7280;
+    }
+
+    .btn-row button.danger,
+    .template-actions button.danger {
+      background: #b42318;
+    }
+
+    .small-note {
+      font-size: 14px;
+      color: #5f6b7a;
+      margin-top: 8px;
+      line-height: 1.5;
+    }
+
+    .data-box,
+    pre {
+      background: #0f1720;
+      color: #d8e1ea;
+      padding: 16px;
+      border-radius: 10px;
+      overflow: auto;
+      font-size: 13px;
+      line-height: 1.5;
+      margin: 0;
+    }
+
+    .template-item {
+      border: 1px solid #d9e2ec;
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 12px;
+      background: #fafcff;
+    }
+
+    .template-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    .key-pill-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .key-pill {
+      background: #e8f0ff;
+      color: #123d8f;
+      border: 1px solid #cddcfb;
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .user-data-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px 20px;
+      margin-top: 14px;
+    }
+
+    .user-data-item {
+      padding: 10px 12px;
+      background: #f8fbff;
+      border: 1px solid #d9e2ec;
+      border-radius: 8px;
+    }
+
+    .user-data-item strong {
+      display: block;
+      margin-bottom: 4px;
+      color: #123d8f;
+    }
+
+    .empty-state {
+      padding: 16px;
+      border-radius: 10px;
+      background: #fff8e6;
+      border: 1px solid #f3d38a;
+      color: #7a5a00;
+    }
+
+    @media (max-width: 900px) {
+      .mapper-grid-2,
+      .mapper-grid-3,
+      .user-data-list,
+      .field-row {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="mapper-wrap">
+    <section class="mapper-card">
+      <h1>Admin Template Mapper</h1>
+      <p>Map court form field names to actual ClearMyRecord user data keys.</p>
+
+      <div class="mapper-grid-3">
+        <div class="form-block">
+          <label for="templateState">State</label>
+          <input type="text" id="templateState" placeholder="Ohio" />
+        </div>
+
+        <div class="form-block">
+          <label for="templateCourt">Court / County</label>
+          <input type="text" id="templateCourt" placeholder="Franklin County Municipal Court" />
+        </div>
+
+        <div class="form-block">
+          <label for="templateName">Template Name</label>
+          <input type="text" id="templateName" placeholder="Record Sealing Petition" />
+        </div>
+      </div>
+
+      <div class="small-note">
+        This page now shows your actual saved intake data from <code>localStorage.cmr_user</code> and lets you map court form fields to those exact keys.
+      </div>
+    </section>
+
+    <section class="mapper-card">
+      <div class="mapper-grid-2">
+        <div>
+          <h2>Current User Data</h2>
+          <div id="userDataWrap"></div>
+
+          <div class="user-actions btn-row">
+            <button type="button" id="refreshUserDataBtn">Refresh User Data</button>
+            <button type="button" id="loadSampleUserBtn" class="secondary">Load Sample User Data</button>
+          </div>
+
+          <div class="small-note">
+            If this area is empty, it means <code>eligibility.html</code> has not saved anything yet. Fill out the intake form, click Next, then come back here and click Refresh User Data.
+          </div>
+        </div>
+
+        <div>
+          <h2>Available User Keys</h2>
+          <div id="availableKeysWrap" class="key-pill-wrap"></div>
+          <div class="small-note">
+            These are the keys you can map directly to court form fields.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="mapper-card">
+      <h2>Field Mapping</h2>
+      <div id="fieldList"></div>
+
+      <div class="btn-row">
+        <button type="button" id="addFieldBtn">Add Field Mapping</button>
+        <button type="button" id="saveTemplateBtn">Save Template</button>
+        <button type="button" id="exportTemplateBtn" class="secondary">Export JSON</button>
+      </div>
+    </section>
+
+    <section class="mapper-card">
+      <h2>Saved Templates</h2>
+      <div id="savedTemplates"></div>
+    </section>
+
+    <section class="mapper-card">
+      <h2>Template JSON Preview</h2>
+      <pre id="jsonPreview">{}</pre>
+    </section>
+  </main>
+
+  <script>
+    const TEMPLATE_STORAGE_KEY = "cmr_template_mappings";
+    const USER_STORAGE_KEY = "cmr_user";
+
+    const defaultUserKeys = [
+      "firstName",
+      "lastName",
+      "email",
+      "phone",
+      "charge",
+      "mailingStreet",
+      "mailingCity",
+      "mailingState",
+      "mailingZip"
+    ];
+
+    function getUserData() {
+      try {
+        return JSON.parse(localStorage.getItem(USER_STORAGE_KEY) || "{}");
+      } catch (error) {
+        return {};
+      }
+    }
+
+    function setSampleUserData() {
+      const sample = {
+        firstName: "Matt",
+        lastName: "Tunstall",
+        email: "matt@example.com",
+        phone: "(702) 555-1212",
+        charge: "Misdemeanor Theft",
+        mailingStreet: "123 Main St",
+        mailingCity: "Las Vegas",
+        mailingState: "NV",
+        mailingZip: "89101"
+      };
+
+      localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(sample));
+      renderUserData();
+      refreshAllKeyDropdowns();
+      updatePreview();
+      alert("Sample user data loaded.");
+    }
+
+    function getAvailableUserKeys() {
+      const liveUserData = getUserData();
+      const liveKeys = Object.keys(liveUserData);
+      return [...new Set([...defaultUserKeys, ...liveKeys])];
+    }
+
+    function renderAvailableKeys() {
+      const wrap = document.getElementById("availableKeysWrap");
+      const keys = getAvailableUserKeys();
+
+      if (!keys.length) {
+        wrap.innerHTML = '<div class="empty-state">No user keys found yet.</div>';
+        return;
+      }
+
+      wrap.innerHTML = keys
+        .map(key => `<span class="key-pill">${key}</span>`)
+        .join("");
+    }
+
+    function renderUserData() {
+      const wrap = document.getElementById("userDataWrap");
+      const userData = getUserData();
+      const keys = Object.keys(userData);
+
+      if (!keys.length) {
+        wrap.innerHTML = `
+          <div class="empty-state">
+            No saved user data found in localStorage under <code>cmr_user</code>.
+          </div>
+        `;
+        return;
+      }
+
+      wrap.innerHTML = `
+        <div class="user-data-list">
+          ${keys.map(key => `
+            <div class="user-data-item">
+              <strong>${key}</strong>
+              <span>${String(userData[key] || "")}</span>
+            </div>
+          `).join("")}
+        </div>
+
+        <h3 style="margin-top:20px;">Raw User JSON</h3>
+        <pre class="data-box">${escapeHtml(JSON.stringify(userData, null, 2))}</pre>
+      `;
+    }
+
+    function createUserKeyOptions(selected = "") {
+      const keys = getAvailableUserKeys();
+
+      return `
+        <option value="">Select a user key</option>
+        ${keys.map(key => `
+          <option value="${escapeAttribute(key)}" ${selected === key ? "selected" : ""}>
+            ${escapeHtml(key)}
+          </option>
+        `).join("")}
+      `;
+    }
+
+    function createFieldRow(formField = "", userKey = "") {
+      const row = document.createElement("div");
+      row.className = "field-row";
+
+      row.innerHTML = `
+        <div class="form-block">
+          <label>Form Field Name</label>
+          <input type="text" class="template-field-name" placeholder="Applicant First Name" value="${escapeAttribute(formField)}" />
+        </div>
+
+        <div class="form-block">
+          <label>User Data Key</label>
+          <select class="template-user-key">
+            ${createUserKeyOptions(userKey)}
+          </select>
+        </div>
+
+        <div class="form-block">
+          <label>&nbsp;</label>
+          <button type="button" class="remove-field-btn danger">Remove</button>
+        </div>
+      `;
+
+      row.querySelector(".remove-field-btn").addEventListener("click", () => {
+        row.remove();
+        updatePreview();
+      });
+
+      row.querySelector(".template-field-name").addEventListener("input", updatePreview);
+      row.querySelector(".template-user-key").addEventListener("change", updatePreview);
+
+      return row;
+    }
+
+    function refreshAllKeyDropdowns() {
+      const rows = document.querySelectorAll(".field-row");
+
+      rows.forEach(row => {
+        const select = row.querySelector(".template-user-key");
+        const currentValue = select.value;
+        select.innerHTML = createUserKeyOptions(currentValue);
+      });
+    }
+
+    function getTemplates() {
+      try {
+        return JSON.parse(localStorage.getItem(TEMPLATE_STORAGE_KEY) || "[]");
+      } catch (error) {
+        return [];
+      }
+    }
+
+    function saveTemplates(templates) {
+      localStorage.setItem(TEMPLATE_STORAGE_KEY, JSON.stringify(templates));
+    }
+
+    function buildTemplateObject() {
+      const state = document.getElementById("templateState").value.trim();
+      const court = document.getElementById("templateCourt").value.trim();
+      const templateName = document.getElementById("templateName").value.trim();
+
+      const rows = [...document.querySelectorAll(".field-row")];
+      const mappings = rows
+        .map(row => {
+          const formField = row.querySelector(".template-field-name").value.trim();
+          const userKey = row.querySelector(".template-user-key").value.trim();
+          return { formField, userKey };
+        })
+        .filter(item => item.formField && item.userKey);
+
+      const userData = getUserData();
+
+      return {
+        id: crypto.randomUUID(),
+        state,
+        court,
+        templateName,
+        mappings,
+        sampleUserData: userData,
+        createdAt: new Date().toISOString()
+      };
+    }
+
+    function updatePreview() {
+      const preview = document.getElementById("jsonPreview");
+      const template = buildTemplateObject();
+      preview.textContent = JSON.stringify(template, null, 2);
+    }
+
+    function renderSavedTemplates() {
+      const wrap = document.getElementById("savedTemplates");
+      const templates = getTemplates();
+
+      if (!templates.length) {
+        wrap.innerHTML = `<div class="empty-state">No saved templates yet.</div>`;
+        return;
+      }
+
+      wrap.innerHTML = templates.map(template => `
+        <div class="template-item">
+          <strong>${escapeHtml(template.templateName || "Untitled Template")}</strong><br />
+          <span>${escapeHtml(template.state || "Unknown State")} — ${escapeHtml(template.court || "Unknown Court")}</span><br />
+          <span>${template.mappings.length} mapped fields</span>
+
+          <div class="template-actions">
+            <button type="button" onclick="loadTemplate('${template.id}')">Load</button>
+            <button type="button" class="secondary" onclick="duplicateTemplate('${template.id}')">Duplicate</button>
+            <button type="button" class="danger" onclick="deleteTemplate('${template.id}')">Delete</button>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function loadTemplate(id) {
+      const template = getTemplates().find(t => t.id === id);
+      if (!template) return;
+
+      document.getElementById("templateState").value = template.state || "";
+      document.getElementById("templateCourt").value = template.court || "";
+      document.getElementById("templateName").value = template.templateName || "";
+
+      const fieldList = document.getElementById("fieldList");
+      fieldList.innerHTML = "";
+
+      (template.mappings || []).forEach(mapping => {
+        fieldList.appendChild(createFieldRow(mapping.formField, mapping.userKey));
+      });
+
+      updatePreview();
+    }
+
+    function duplicateTemplate(id) {
+      const template = getTemplates().find(t => t.id === id);
+      if (!template) return;
+
+      const clone = {
+        ...template,
+        id: crypto.randomUUID(),
+        templateName: `${template.templateName || "Template"} Copy`,
+        createdAt: new Date().toISOString()
+      };
+
+      const templates = getTemplates();
+      templates.push(clone);
+      saveTemplates(templates);
+      renderSavedTemplates();
+    }
+
+    function deleteTemplate(id) {
+      const templates = getTemplates().filter(t => t.id !== id);
+      saveTemplates(templates);
+      renderSavedTemplates();
+    }
+
+    function saveCurrentTemplate() {
+      const template = buildTemplateObject();
+
+      if (!template.state || !template.court || !template.templateName) {
+        alert("Please enter state, court, and template name.");
+        return;
+      }
+
+      if (!template.mappings.length) {
+        alert("Please add at least one field mapping.");
+        return;
+      }
+
+      const templates = getTemplates();
+      templates.push(template);
+      saveTemplates(templates);
+      renderSavedTemplates();
+      updatePreview();
+      alert("Template saved.");
+    }
+
+    function exportCurrentTemplate() {
+      const template = buildTemplateObject();
+      const fileName = `${(template.templateName || "template").replace(/\s+/g, "-").toLowerCase()}.json`;
+      const blob = new Blob([JSON.stringify(template, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = fileName;
+      link.click();
+
+      URL.revokeObjectURL(url);
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+    }
+
+    function escapeAttribute(value) {
+      return escapeHtml(value);
+    }
+
+    document.getElementById("addFieldBtn").addEventListener("click", () => {
+      document.getElementById("fieldList").appendChild(createFieldRow());
+      updatePreview();
+    });
+
+    document.getElementById("saveTemplateBtn").addEventListener("click", saveCurrentTemplate);
+    document.getElementById("exportTemplateBtn").addEventListener("click", exportCurrentTemplate);
+    document.getElementById("refreshUserDataBtn").addEventListener("click", () => {
+      renderUserData();
+      renderAvailableKeys();
+      refreshAllKeyDropdowns();
+      updatePreview();
+    });
+    document.getElementById("loadSampleUserBtn").addEventListener("click", setSampleUserData);
+
+    ["templateState", "templateCourt", "templateName"].forEach(id => {
+      document.getElementById(id).addEventListener("input", updatePreview);
+    });
+
+    document.getElementById("fieldList").appendChild(createFieldRow("Applicant First Name", "firstName"));
+    document.getElementById("fieldList").appendChild(createFieldRow("Applicant Last Name", "lastName"));
+    document.getElementById("fieldList").appendChild(createFieldRow("Applicant Email", "email"));
+    document.getElementById("fieldList").appendChild(createFieldRow("Applicant Phone", "phone"));
+    document.getElementById("fieldList").appendChild(createFieldRow("Charge", "charge"));
+    document.getElementById("fieldList").appendChild(createFieldRow("Mailing Street", "mailingStreet"));
+    document.getElementById("fieldList").appendChild(createFieldRow("Mailing City", "mailingCity"));
+    document.getElementById("fieldList").appendChild(createFieldRow("Mailing State", "mailingState"));
+    document.getElementById("fieldList").appendChild(createFieldRow("Mailing ZIP", "mailingZip"));
+
+    renderUserData();
+    renderAvailableKeys();
+    renderSavedTemplates();
+    updatePreview();
+
+    window.loadTemplate = loadTemplate;
+    window.deleteTemplate = deleteTemplate;
+    window.duplicateTemplate = duplicateTemplate;
+  </script>
+</body>
+</html>
