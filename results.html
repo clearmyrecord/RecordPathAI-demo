@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="css/styles.css" />
   <style>
     .results-wrap {
-      width: min(860px, 92%);
+      width: min(920px, 92%);
       margin: 32px auto 60px;
       background: #ffffff;
       border: 1px solid #e2e9f5;
@@ -108,7 +108,7 @@
     }
 
     .offense-summary-card h3 {
-      margin: 0 0 10px;
+      margin: 0 0 12px;
       color: #2f4467;
       font-size: 20px;
     }
@@ -119,6 +119,55 @@
       gap: 10px 18px;
       color: #5f6f8e;
       font-size: 15px;
+      margin-top: 12px;
+    }
+
+    .status-pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .status-pill.matched {
+      background: #e8f4ec;
+      color: #1f6a35;
+      border: 1px solid #b9ddc4;
+    }
+
+    .status-pill.unmatched {
+      background: #fff4e6;
+      color: #8c5a00;
+      border: 1px solid #efd29f;
+    }
+
+    .status-pill.complete {
+      background: #e9f0fb;
+      color: #3b5685;
+      border: 1px solid #c9d8ef;
+    }
+
+    .status-pill.incomplete {
+      background: #fdeeee;
+      color: #9f2f2f;
+      border: 1px solid #e6b4b4;
+    }
+
+    .offense-strength {
+      margin: 10px 0 0;
+      color: #3b5685;
+      font-size: 15px;
+      line-height: 1.6;
     }
 
     .fingerprint-card {
@@ -227,8 +276,8 @@
       <h1>Eligibility Results</h1>
       <p class="results-intro">
         Here is your current rule-based estimate based on the information entered so far.
-        This page is meant to help you organize the next step, not replace court review
-        or legal advice.
+        This page helps you see how complete your application is and whether your offenses
+        were recognized by the system.
       </p>
 
       <div id="resultsStatus" class="results-status review">
@@ -306,11 +355,14 @@
         offense.disposition,
         offense.offenseDate,
         offense.convictionDate,
-        offense.dischargeDate,
-        offense.notes
+        offense.dischargeDate
       ];
 
       return fields.filter(isFilled).length;
+    }
+
+    function isRecognizedCharge(offense) {
+      return isFilled(offense.matchedChargeId) || isFilled(offense.matchedChargeName);
     }
 
     function buildStatus(offenses) {
@@ -321,25 +373,19 @@
         };
       }
 
-      const hasChargeName = offenses.some((offense) => isFilled(offense.chargeName));
-      const hasDisposition = offenses.some((offense) => isFilled(offense.disposition));
-      const hasState = offenses.some((offense) => isFilled(offense.state));
-      const hasDateInfo = offenses.some((offense) =>
-        isFilled(offense.offenseDate) ||
-        isFilled(offense.convictionDate) ||
-        isFilled(offense.dischargeDate)
-      );
+      const allRecognized = offenses.every((offense) => isRecognizedCharge(offense));
+      const strongDetails = offenses.every((offense) => countCompletedFields(offense) >= 5);
 
-      if (hasChargeName && hasDisposition && hasState && hasDateInfo) {
+      if (allRecognized && strongDetails) {
         return {
           className: "ready",
-          text: "Your record information looks detailed enough for a stronger rule-based estimate."
+          text: "Your offenses were recognized and your application has enough detail for a stronger rule-based estimate."
         };
       }
 
       return {
         className: "review",
-        text: "Your application is started, but adding more offense details will improve the eligibility estimate."
+        text: "Your application is in progress, but one or more offenses still need a recognized charge match or more case details."
       };
     }
 
@@ -351,6 +397,9 @@
       const phone = user.phone || "Not provided";
       const mailing = [user.street, user.city, user.state, user.zip].filter(Boolean).join(", ") || "Not provided";
 
+      const matchedCount = offenses.filter(isRecognizedCharge).length;
+      const unmatchedCount = offenses.length - matchedCount;
+
       wrap.innerHTML = `
         <ul class="results-list">
           <li><strong>Name:</strong> ${escapeHtml(fullName || "Not provided")}</li>
@@ -358,6 +407,8 @@
           <li><strong>Phone:</strong> ${escapeHtml(phone)}</li>
           <li><strong>Mailing Address:</strong> ${escapeHtml(mailing)}</li>
           <li><strong>Offenses Added:</strong> ${offenses.length}</li>
+          <li><strong>Recognized Charges:</strong> ${matchedCount}</li>
+          <li><strong>Unrecognized Charges:</strong> ${unmatchedCount}</li>
         </ul>
       `;
     }
@@ -366,25 +417,21 @@
       const wrap = document.getElementById("estimateSummary");
 
       if (!offenses.length) {
-        wrap.innerHTML = `
-          <p>
-            We cannot estimate eligibility yet because no offenses were added.
-          </p>
-        `;
+        wrap.innerHTML = `<p>We cannot estimate eligibility yet because no offenses were added.</p>`;
         return;
       }
 
-      const totalCompleted = offenses.reduce((sum, offense) => sum + countCompletedFields(offense), 0);
-      const averageCompleted = totalCompleted / offenses.length;
+      const matchedCount = offenses.filter(isRecognizedCharge).length;
+      const averageCompleted = offenses.reduce((sum, offense) => sum + countCompletedFields(offense), 0) / offenses.length;
 
       let summaryText = "";
 
-      if (averageCompleted >= 5) {
-        summaryText = "You have enough detail entered to move forward with a stronger preliminary estimate and packet review.";
-      } else if (averageCompleted >= 3) {
-        summaryText = "Your application is in progress. Add more dates, disposition details, and offense information for a more useful estimate.";
+      if (matchedCount === offenses.length && averageCompleted >= 5) {
+        summaryText = "All offenses are recognized by the charge library and the application has enough detail to support a stronger preliminary estimate.";
+      } else if (matchedCount > 0) {
+        summaryText = "Some offenses were recognized, but the estimate will improve if you match the remaining charges and add more case details.";
       } else {
-        summaryText = "Right now the system only has limited information. Add more offense details before relying on the result.";
+        summaryText = "None of the offenses are matched to the charge library yet. The current estimate is weaker until the system recognizes the charges entered.";
       }
 
       wrap.innerHTML = `<p>${escapeHtml(summaryText)}</p>`;
@@ -397,7 +444,7 @@
       if (!offenses.length) {
         steps.push("Go back and add at least one offense.");
       } else {
-        const missingCharge = offenses.some((offense) => !isFilled(offense.chargeName));
+        const hasUnmatched = offenses.some((offense) => !isRecognizedCharge(offense));
         const missingState = offenses.some((offense) => !isFilled(offense.state));
         const missingDisposition = offenses.some((offense) => !isFilled(offense.disposition));
         const missingDates = offenses.some((offense) =>
@@ -406,12 +453,12 @@
           !isFilled(offense.dischargeDate)
         );
 
-        if (missingCharge) steps.push("Add a charge name for every offense.");
+        if (hasUnmatched) steps.push("Go back and select a suggested charge wherever the system did not recognize the offense.");
         if (missingState) steps.push("Add the state for each offense because rules can vary by state.");
         if (missingDisposition) steps.push("Add the disposition for each offense, such as convicted, dismissed, or not guilty.");
         if (missingDates) steps.push("Add offense, case resolution, or discharge dates wherever possible.");
-        if (!missingCharge && !missingState && !missingDisposition && !missingDates) {
-          steps.push("Review the packet builder and continue organizing your filing information.");
+        if (!hasUnmatched && !missingState && !missingDisposition && !missingDates) {
+          steps.push("Your offense list is in good shape. Continue organizing the packet materials for filing.");
         }
       }
 
@@ -440,21 +487,49 @@
         return;
       }
 
-      wrap.innerHTML = offenses.map((offense, index) => `
-        <div class="offense-summary-card">
-          <h3>Offense ${index + 1}: ${escapeHtml(offense.chargeName || "Unnamed offense")}</h3>
-          <div class="offense-summary-meta">
-            <div><strong>State:</strong> ${escapeHtml(offense.state || "Not provided")}</div>
-            <div><strong>County / Court Area:</strong> ${escapeHtml(offense.county || "Not provided")}</div>
-            <div><strong>Offense Level:</strong> ${escapeHtml(formatValue(offense.offenseLevel))}</div>
-            <div><strong>Disposition:</strong> ${escapeHtml(formatValue(offense.disposition))}</div>
-            <div><strong>Offense Date:</strong> ${escapeHtml(offense.offenseDate || "Not provided")}</div>
-            <div><strong>Case Resolution Date:</strong> ${escapeHtml(offense.convictionDate || "Not provided")}</div>
-            <div><strong>Discharge Date:</strong> ${escapeHtml(offense.dischargeDate || "Not provided")}</div>
-            <div><strong>Notes:</strong> ${escapeHtml(offense.notes || "None")}</div>
+      wrap.innerHTML = offenses.map((offense, index) => {
+        const matched = isRecognizedCharge(offense);
+        const completedCount = countCompletedFields(offense);
+        const strongDetails = completedCount >= 5;
+
+        const matchPill = matched
+          ? `<span class="status-pill matched">Recognized Charge</span>`
+          : `<span class="status-pill unmatched">Unrecognized Charge</span>`;
+
+        const detailPill = strongDetails
+          ? `<span class="status-pill complete">Enough Detail</span>`
+          : `<span class="status-pill incomplete">Needs More Detail</span>`;
+
+        const matchedName = offense.matchedChargeName || "No match selected";
+        const matchedCategory = offense.matchedChargeCategory || "Not categorized";
+
+        return `
+          <div class="offense-summary-card">
+            <h3>Offense ${index + 1}: ${escapeHtml(offense.chargeName || "Unnamed offense")}</h3>
+
+            <div class="status-pill-row">
+              ${matchPill}
+              ${detailPill}
+            </div>
+
+            <p class="offense-strength">
+              <strong>Library Match:</strong> ${escapeHtml(matchedName)}
+              ${matched ? ` · ${escapeHtml(matchedCategory)}` : ""}
+            </p>
+
+            <div class="offense-summary-meta">
+              <div><strong>State:</strong> ${escapeHtml(offense.state || "Not provided")}</div>
+              <div><strong>County / Court Area:</strong> ${escapeHtml(offense.county || "Not provided")}</div>
+              <div><strong>Offense Level:</strong> ${escapeHtml(formatValue(offense.offenseLevel))}</div>
+              <div><strong>Disposition:</strong> ${escapeHtml(formatValue(offense.disposition))}</div>
+              <div><strong>Offense Date:</strong> ${escapeHtml(offense.offenseDate || "Not provided")}</div>
+              <div><strong>Case Resolution Date:</strong> ${escapeHtml(offense.convictionDate || "Not provided")}</div>
+              <div><strong>Discharge Date:</strong> ${escapeHtml(offense.dischargeDate || "Not provided")}</div>
+              <div><strong>Notes:</strong> ${escapeHtml(offense.notes || "None")}</div>
+            </div>
           </div>
-        </div>
-      `).join("");
+        `;
+      }).join("");
     }
 
     function renderFingerprintSummary(review) {
