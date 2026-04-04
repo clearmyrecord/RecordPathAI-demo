@@ -121,6 +121,32 @@
       font-size: 15px;
     }
 
+    .fingerprint-card {
+      background: #fff7e8;
+      border: 2px solid #ead18f;
+    }
+
+    .fingerprint-status {
+      display: inline-block;
+      margin-bottom: 12px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    .fingerprint-status.triggered {
+      background: #f4dca4;
+      color: #7a5800;
+    }
+
+    .fingerprint-status.clear {
+      background: #e9f0fb;
+      color: #3b5685;
+    }
+
     .results-actions {
       display: flex;
       gap: 14px;
@@ -201,7 +227,7 @@
       <h1>Eligibility Results</h1>
       <p class="results-intro">
         Here is your current rule-based estimate based on the information entered so far.
-        This page is designed to help you organize your next step, not replace court review
+        This page is meant to help you organize the next step, not replace court review
         or legal advice.
       </p>
 
@@ -224,6 +250,11 @@
           <h2>What To Do Next</h2>
           <ul id="nextStepsList" class="results-list"></ul>
         </div>
+
+        <div id="fingerprintCard" class="results-card fingerprint-card">
+          <h2>Fingerprint Requirement Check</h2>
+          <div id="fingerprintSummary"></div>
+        </div>
       </div>
 
       <div class="results-card">
@@ -244,6 +275,7 @@
     </section>
   </main>
 
+  <script src="js/fingerprint-rules.js"></script>
   <script>
     function getUser() {
       try {
@@ -358,7 +390,7 @@
       wrap.innerHTML = `<p>${escapeHtml(summaryText)}</p>`;
     }
 
-    function renderNextSteps(offenses) {
+    function renderNextSteps(offenses, fingerprintReview) {
       const list = document.getElementById("nextStepsList");
       const steps = [];
 
@@ -383,7 +415,11 @@
         }
       }
 
-      steps.push("Verify court-specific requirements before filing, since some courts require additional documents or fingerprints.");
+      if (fingerprintReview && fingerprintReview.triggered) {
+        steps.push("Review the fingerprint requirement warning before filing.");
+      }
+
+      steps.push("Verify court-specific requirements before filing.");
       steps.push("Keep your information accurate and update the application if anything changes.");
 
       list.innerHTML = steps.map((step) => `<li>${escapeHtml(step)}</li>`).join("");
@@ -421,6 +457,36 @@
       `).join("");
     }
 
+    function renderFingerprintSummary(review) {
+      const wrap = document.getElementById("fingerprintSummary");
+
+      const statusClass = review.triggered ? "triggered" : "clear";
+      const statusText = review.triggered ? "May Be Required" : "Not Flagged";
+
+      const rulesHtml = (review.matchedRules || []).map((rule) => `
+        <li>
+          <strong>${escapeHtml(rule.state)}:</strong> ${escapeHtml(rule.message)}
+        </li>
+      `).join("");
+
+      const instructionHtml = (review.instructions || []).map((item) => `
+        <li>${escapeHtml(item)}</li>
+      `).join("");
+
+      wrap.innerHTML = `
+        <div class="fingerprint-status ${statusClass}">${statusText}</div>
+        <p style="margin:0 0 14px;">${escapeHtml(review.combinedMessage || "")}</p>
+        <ul class="results-list" style="margin-bottom:14px;">
+          ${rulesHtml || "<li>No state rules were reviewed.</li>"}
+        </ul>
+        <ul class="results-list">
+          ${instructionHtml}
+        </ul>
+      `;
+
+      localStorage.setItem("cmr_fingerprint_review", JSON.stringify(review));
+    }
+
     function formatValue(value) {
       if (!isFilled(value)) return "Not provided";
 
@@ -441,6 +507,14 @@
     function initResultsPage() {
       const user = getUser();
       const offenses = getOffenses();
+      const fingerprintReview = window.evaluateFingerprintRequirement
+        ? window.evaluateFingerprintRequirement(offenses)
+        : {
+            triggered: false,
+            matchedRules: [],
+            combinedMessage: "Fingerprint review could not be loaded.",
+            instructions: ["Verify the court's filing requirements before submitting."]
+          };
 
       const status = buildStatus(offenses);
       const statusEl = document.getElementById("resultsStatus");
@@ -449,8 +523,9 @@
 
       renderReviewedSummary(user, offenses);
       renderEstimateSummary(offenses);
-      renderNextSteps(offenses);
+      renderNextSteps(offenses, fingerprintReview);
       renderOffenseSummary(offenses);
+      renderFingerprintSummary(fingerprintReview);
     }
 
     initResultsPage();
