@@ -3,291 +3,428 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Record Details - ClearMyRecord</title>
-
-  <script src="js/charges.js"></script>
-  <script src="js/sealing-rules.js"></script>
-  <script src="js/eligibility.js"></script>
-  <script src="js/app.js" defer></script>
-
+  <title>Record Details | ClearMyRecord</title>
+  <link rel="stylesheet" href="css/styles.css" />
   <style>
-    * {
-      box-sizing: border-box;
+    .record-details-wrap {
+      width: min(760px, 92%);
+      margin: 32px auto 60px;
+      background: #ffffff;
+      border: 1px solid #e2e9f5;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(78, 110, 167, 0.12);
+      padding: 32px;
     }
 
-    body {
-      margin: 0;
-      font-family: Arial, Helvetica, sans-serif;
-      background: #f3f7fc;
-      color: #1b2430;
-      padding: 24px 16px;
+    .record-details-wrap h1 {
+      margin: 0 0 18px;
+      color: #1f4aa8;
+      font-size: clamp(38px, 5vw, 64px);
+      line-height: 1.05;
+      letter-spacing: -0.03em;
     }
 
-    .card {
-      max-width: 980px;
-      margin: 0 auto;
-      background: #fff;
-      border: 1px solid #d9e2ec;
-      border-radius: 14px;
-      padding: 24px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+    .record-details-intro {
+      margin: 0 0 28px;
+      color: #5f6f8e;
+      font-size: 17px;
+      line-height: 1.7;
     }
 
-    h1 {
-      margin-top: 0;
-      color: #123d8f;
-    }
-
-    .subtext {
-      color: #5b6b7f;
-      margin-bottom: 20px;
-      line-height: 1.5;
-    }
-
-    .offense {
-      border: 1px solid #d9e2ec;
-      border-radius: 12px;
-      padding: 18px;
-      margin-bottom: 16px;
-      background: #fbfdff;
-    }
-
-    .offense-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 14px;
-    }
-
-    .offense-title {
-      font-size: 18px;
-      font-weight: 700;
-      color: #123d8f;
-    }
-
-    .form-grid {
+    .record-actions {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 14px;
+      gap: 16px;
+      margin-bottom: 24px;
     }
 
-    .form-field.full {
-      grid-column: 1 / -1;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 6px;
-      font-weight: 700;
-      font-size: 14px;
-    }
-
-    input,
-    select {
+    .record-action-btn {
       width: 100%;
-      padding: 11px 12px;
-      border: 1px solid #cfd8e3;
-      border-radius: 10px;
-      font-size: 15px;
-      background: #fff;
-    }
-
-    .checkbox-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      min-height: 44px;
-      padding-top: 26px;
-    }
-
-    .checkbox-row input {
-      width: auto;
-      transform: scale(1.1);
-    }
-
-    .actions {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-top: 18px;
-    }
-
-    button {
-      appearance: none;
       border: none;
-      background: #123d8f;
-      color: #fff;
-      padding: 12px 16px;
-      border-radius: 10px;
-      font-size: 15px;
+      border-radius: 18px;
+      padding: 22px 24px;
+      background: #1f4aa8;
+      color: #ffffff;
+      font-size: 20px;
       font-weight: 700;
       cursor: pointer;
+      -webkit-appearance: none;
+      appearance: none;
     }
 
-    button.secondary {
-      background: #e8eef7;
-      color: #1b2430;
+    .record-action-btn:active {
+      transform: translateY(1px);
     }
 
-    #result {
-      margin-top: 22px;
-      padding: 18px;
-      border-radius: 12px;
-      background: #eef4ff;
-      border: 1px solid #d5e2fb;
+    .record-warning {
+      margin: 0 0 24px;
+      padding: 24px;
+      border: 2px solid #eadb98;
+      border-radius: 20px;
+      background: #f7f2df;
+      color: #243755;
+      font-size: 18px;
       line-height: 1.6;
     }
 
-    .result-bad {
-      background: #fff3f3 !important;
-      border-color: #f0cccc !important;
+    .record-footer-note {
+      margin: 0;
+      color: #6a7894;
+      font-size: 17px;
+      line-height: 1.6;
     }
 
-    .result-good {
-      background: #eefaf1 !important;
-      border-color: #c7ead0 !important;
+    .offense-list {
+      display: grid;
+      gap: 18px;
+      margin: 0 0 24px;
     }
 
-    .result-neutral {
-      background: #fffbea !important;
-      border-color: #f2e2a7 !important;
+    .offense-card {
+      border: 1px solid #dbe4f2;
+      border-radius: 18px;
+      background: #f9fbff;
+      padding: 20px;
     }
 
-    .offense-summary {
-      margin-top: 12px;
-      padding-left: 18px;
+    .offense-card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
     }
 
-    .offense-summary li {
-      margin-bottom: 6px;
-    }
-
-    .confidence-box {
-      margin-top: 14px;
-      padding: 14px;
-      background: #ffffff;
-      border: 1px solid #d9e2ec;
-      border-radius: 10px;
-    }
-
-    .confidence-badge {
-      display: inline-block;
-      padding: 8px 14px;
-      border-radius: 999px;
-      font-size: 14px;
+    .offense-card-title {
+      font-size: 20px;
       font-weight: 700;
+      color: #2f4467;
+    }
+
+    .offense-remove-btn {
+      border: none;
+      background: #d64545;
+      color: #ffffff;
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-weight: 700;
+      cursor: pointer;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    .offense-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .offense-field {
+      display: block;
+    }
+
+    .offense-field-full {
+      grid-column: 1 / -1;
+    }
+
+    .offense-field label {
+      display: block;
       margin-bottom: 8px;
-    }
-
-    .confidence-badge.green {
-      background: #e8f7ee;
-      color: #1f7a3e;
-      border: 1px solid #b7e4c7;
-    }
-
-    .confidence-badge.yellow {
-      background: #fff8e1;
-      color: #8a6d1f;
-      border: 1px solid #f0d98a;
-    }
-
-    .confidence-badge.red {
-      background: #fdecec;
-      color: #a12626;
-      border: 1px solid #efc2c2;
-    }
-
-    .confidence-score {
-      font-size: 18px;
       font-weight: 700;
-      margin-bottom: 6px;
+      color: #3d567d;
     }
 
-    .confidence-note {
-      margin-top: 8px;
-      font-size: 13px;
-      color: #5b6b7f;
-      line-height: 1.5;
-    }
-
-    .confidence-bar {
+    .offense-field input,
+    .offense-field select,
+    .offense-field textarea {
       width: 100%;
-      height: 12px;
-      background: #edf2f7;
-      border-radius: 999px;
-      overflow: hidden;
-      margin: 10px 0 12px;
-      border: 1px solid #d9e2ec;
+      padding: 14px;
+      border: 1px solid #d7e1ef;
+      border-radius: 12px;
+      background: #ffffff;
+      color: #243755;
+      font: inherit;
+      -webkit-appearance: none;
+      appearance: none;
     }
 
-    .confidence-bar-fill {
-      height: 100%;
-      border-radius: 999px;
+    .empty-offense-state {
+      margin: 0 0 24px;
+      padding: 18px 20px;
+      border: 1px dashed #c8d5ea;
+      border-radius: 16px;
+      background: #f8fbff;
+      color: #6a7894;
+      font-size: 16px;
     }
 
-    .confidence-bar-fill.green {
-      background: #22c55e;
-    }
+    @media (max-width: 700px) {
+      .record-details-wrap {
+        padding: 24px;
+      }
 
-    .confidence-bar-fill.yellow {
-      background: #f59e0b;
-    }
-
-    .confidence-bar-fill.red {
-      background: #ef4444;
-    }
-
-    .mini-note {
-      font-size: 13px;
-      color: #5b6b7f;
-      margin-top: 12px;
-    }
-
-    @media (max-width: 720px) {
-      .form-grid {
+      .offense-grid {
         grid-template-columns: 1fr;
       }
 
-      .actions {
+      .offense-card-head {
         flex-direction: column;
+        align-items: flex-start;
       }
 
-      button {
+      .offense-remove-btn {
         width: 100%;
-      }
-
-      .checkbox-row {
-        padding-top: 0;
       }
     }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h1>Record Details</h1>
-    <p class="subtext">
-      Ohio-only version rebuilt around the March 2025 Ohio Justice &amp; Policy Center handout.
-      This version separates sealing and expungement, uses Ohio waiting periods, supports third-degree felony limits, and adds discharge and clumping inputs.
-    </p>
+  <header class="site-header">
+    <div class="container nav-wrap">
+      <a href="index.html" class="brand">
+        <span class="brand-icon">📄</span>
+        <span class="brand-text">ClearMyRecord</span>
+      </a>
 
-    <div class="actions">
-      <button type="button" onclick="addOffense()">+ Add Offense</button>
+      <nav class="main-nav">
+        <a href="how-it-works.html">How It Works</a>
+        <a href="eligibility.html">Eligibility</a>
+        <a href="eligibility.html" class="nav-btn nav-btn-light">Check Eligibility</a>
+      </nav>
     </div>
+  </header>
 
-    <div id="offenses"></div>
+  <main>
+    <section class="record-details-wrap">
+      <h1>Record Details</h1>
 
-    <div class="actions">
-      <button type="button" onclick="checkAllEligibility()">Check Eligibility</button>
-    </div>
+      <p class="record-details-intro">
+        Add the offense details you want reviewed. This step helps organize the
+        record information needed for your eligibility estimate and the rest of
+        the application flow.
+      </p>
 
-    <div id="result" class="result-neutral">
-      Add at least one offense, then click Check Eligibility.
-    </div>
+      <div id="offenseList" class="offense-list"></div>
 
-    <div class="mini-note">
-      This screen gives a rule-based estimate. Court discretion, rehabilitation, and court-specific filing practice can still affect the final outcome.
-    </div>
-  </div>
+      <div id="emptyState" class="empty-offense-state">
+        No offenses added yet.
+      </div>
+
+      <div class="record-actions">
+        <button type="button" id="addOffenseBtn" class="record-action-btn">+ Add Offense</button>
+        <button type="button" id="checkEligibilityBtn" class="record-action-btn">Check Eligibility</button>
+      </div>
+
+      <div class="record-warning">
+        Add at least one offense, then click Check Eligibility.
+      </div>
+
+      <p class="record-footer-note">
+        This screen provides a rule-based estimate. Filing requirements can vary
+        by court and state, and some courts may require additional documents or
+        fingerprints with the application.
+      </p>
+    </section>
+  </main>
+
+  <script>
+    const offenseListEl = document.getElementById("offenseList");
+    const emptyStateEl = document.getElementById("emptyState");
+    const addOffenseBtn = document.getElementById("addOffenseBtn");
+    const checkEligibilityBtn = document.getElementById("checkEligibilityBtn");
+
+    function getSavedOffenses() {
+      try {
+        return JSON.parse(localStorage.getItem("cmr_offenses") || "[]");
+      } catch (error) {
+        return [];
+      }
+    }
+
+    function saveOffenses(offenses) {
+      localStorage.setItem("cmr_offenses", JSON.stringify(offenses));
+    }
+
+    function createOffenseObject() {
+      return {
+        chargeName: "",
+        state: "",
+        county: "",
+        offenseLevel: "",
+        disposition: "",
+        offenseDate: "",
+        convictionDate: "",
+        dischargeDate: "",
+        notes: ""
+      };
+    }
+
+    function renderOffenses() {
+      const offenses = getSavedOffenses();
+      offenseListEl.innerHTML = "";
+
+      if (!offenses.length) {
+        emptyStateEl.style.display = "block";
+        return;
+      }
+
+      emptyStateEl.style.display = "none";
+
+      offenses.forEach((offense, index) => {
+        const card = document.createElement("div");
+        card.className = "offense-card";
+        card.innerHTML = `
+          <div class="offense-card-head">
+            <div class="offense-card-title">Offense ${index + 1}</div>
+            <button type="button" class="offense-remove-btn" data-index="${index}">Remove</button>
+          </div>
+
+          <div class="offense-grid">
+            <div class="offense-field offense-field-full">
+              <label for="chargeName-${index}">Charge Name</label>
+              <input type="text" id="chargeName-${index}" data-index="${index}" data-field="chargeName" value="${escapeHtml(offense.chargeName || "")}" placeholder="Example: Theft, Assault, Drug Possession" />
+            </div>
+
+            <div class="offense-field">
+              <label for="state-${index}">State</label>
+              <input type="text" id="state-${index}" data-index="${index}" data-field="state" value="${escapeHtml(offense.state || "")}" placeholder="State" />
+            </div>
+
+            <div class="offense-field">
+              <label for="county-${index}">County / Court Area</label>
+              <input type="text" id="county-${index}" data-index="${index}" data-field="county" value="${escapeHtml(offense.county || "")}" placeholder="County or court area" />
+            </div>
+
+            <div class="offense-field">
+              <label for="offenseLevel-${index}">Offense Level</label>
+              <select id="offenseLevel-${index}" data-index="${index}" data-field="offenseLevel">
+                <option value="">Select level</option>
+                <option value="misdemeanor" ${offense.offenseLevel === "misdemeanor" ? "selected" : ""}>Misdemeanor</option>
+                <option value="felony" ${offense.offenseLevel === "felony" ? "selected" : ""}>Felony</option>
+                <option value="minor-misdemeanor" ${offense.offenseLevel === "minor-misdemeanor" ? "selected" : ""}>Minor Misdemeanor</option>
+                <option value="unknown" ${offense.offenseLevel === "unknown" ? "selected" : ""}>Not Sure</option>
+              </select>
+            </div>
+
+            <div class="offense-field">
+              <label for="disposition-${index}">Disposition</label>
+              <select id="disposition-${index}" data-index="${index}" data-field="disposition">
+                <option value="">Select disposition</option>
+                <option value="convicted" ${offense.disposition === "convicted" ? "selected" : ""}>Convicted</option>
+                <option value="dismissed" ${offense.disposition === "dismissed" ? "selected" : ""}>Dismissed</option>
+                <option value="not-guilty" ${offense.disposition === "not-guilty" ? "selected" : ""}>Not Guilty</option>
+                <option value="no-bill" ${offense.disposition === "no-bill" ? "selected" : ""}>No Bill</option>
+                <option value="unknown" ${offense.disposition === "unknown" ? "selected" : ""}>Not Sure</option>
+              </select>
+            </div>
+
+            <div class="offense-field">
+              <label for="offenseDate-${index}">Offense Date</label>
+              <input type="date" id="offenseDate-${index}" data-index="${index}" data-field="offenseDate" value="${escapeHtml(offense.offenseDate || "")}" />
+            </div>
+
+            <div class="offense-field">
+              <label for="convictionDate-${index}">Conviction / Case Resolution Date</label>
+              <input type="date" id="convictionDate-${index}" data-index="${index}" data-field="convictionDate" value="${escapeHtml(offense.convictionDate || "")}" />
+            </div>
+
+            <div class="offense-field offense-field-full">
+              <label for="dischargeDate-${index}">Discharge / Sentence Completion Date</label>
+              <input type="date" id="dischargeDate-${index}" data-index="${index}" data-field="dischargeDate" value="${escapeHtml(offense.dischargeDate || "")}" />
+            </div>
+
+            <div class="offense-field offense-field-full">
+              <label for="notes-${index}">Notes</label>
+              <textarea id="notes-${index}" data-index="${index}" data-field="notes" rows="3" placeholder="Anything important about this offense">${escapeHtml(offense.notes || "")}</textarea>
+            </div>
+          </div>
+        `;
+
+        offenseListEl.appendChild(card);
+      });
+
+      bindOffenseInputs();
+      bindRemoveButtons();
+    }
+
+    function bindOffenseInputs() {
+      const inputs = offenseListEl.querySelectorAll("input, select, textarea");
+
+      inputs.forEach((input) => {
+        input.addEventListener("input", handleFieldUpdate);
+        input.addEventListener("change", handleFieldUpdate);
+      });
+    }
+
+    function bindRemoveButtons() {
+      const buttons = offenseListEl.querySelectorAll(".offense-remove-btn");
+
+      buttons.forEach((button) => {
+        button.addEventListener("click", () => {
+          const index = Number(button.dataset.index);
+          const offenses = getSavedOffenses();
+          offenses.splice(index, 1);
+          saveOffenses(offenses);
+          renderOffenses();
+        });
+      });
+    }
+
+    function handleFieldUpdate(event) {
+      const input = event.target;
+      const index = Number(input.dataset.index);
+      const field = input.dataset.field;
+      const offenses = getSavedOffenses();
+
+      if (!offenses[index]) return;
+
+      offenses[index][field] = input.value;
+      saveOffenses(offenses);
+    }
+
+    function addOffense() {
+      const offenses = getSavedOffenses();
+      offenses.push(createOffenseObject());
+      saveOffenses(offenses);
+      renderOffenses();
+
+      setTimeout(() => {
+        const lastInput = document.getElementById(`chargeName-${offenses.length - 1}`);
+        if (lastInput) {
+          lastInput.scrollIntoView({ behavior: "smooth", block: "center" });
+          lastInput.focus();
+        }
+      }, 50);
+    }
+
+    function checkEligibility() {
+      const offenses = getSavedOffenses();
+
+      if (!offenses.length) {
+        alert("Please add at least one offense before continuing.");
+        return;
+      }
+
+      localStorage.setItem("cmr_record_details_complete", "true");
+
+      window.location.href = "results.html";
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+    }
+
+    addOffenseBtn.addEventListener("click", addOffense);
+    addOffenseBtn.addEventListener("touchstart", function() {}, { passive: true });
+
+    checkEligibilityBtn.addEventListener("click", checkEligibility);
+    checkEligibilityBtn.addEventListener("touchstart", function() {}, { passive: true });
+
+    renderOffenses();
+  </script>
 </body>
 </html>
