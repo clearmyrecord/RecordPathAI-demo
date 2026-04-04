@@ -2,286 +2,74 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ClearMyRecord - Eligibility Check</title>
-
-  <script src="js/charges.js"></script>
-  <script src="js/intake.js" defer></script>
-
-  <script>
-    window.cmrFallbackCharges = [
-      { id: "petty_theft", label: "Petty Theft" },
-      { id: "shoplifting", label: "Shoplifting" },
-      { id: "criminal_trespass", label: "Criminal Trespass" },
-      { id: "drug_possession_minor", label: "Drug Possession (Minor)" },
-      { id: "drug_possession_felony", label: "Drug Possession (Felony)" },
-      { id: "traffic_conviction", label: "Traffic Conviction" },
-      { id: "theft_in_office", label: "Theft in Office" },
-      { id: "assault", label: "Assault" },
-      { id: "aggravated_assault", label: "Aggravated Assault" },
-      { id: "domestic_violence", label: "Domestic Violence" },
-      { id: "violating_protection_order", label: "Violating Protection Order" },
-      { id: "felonious_assault", label: "Felonious Assault" },
-      { id: "burglary_2911_12_a1_a3", label: "Burglary (R.C. 2911.12(A)(1)-(3))" },
-      { id: "robbery", label: "Robbery" },
-      { id: "sex_offense", label: "Sex Offense" },
-      { id: "sexual_imposition", label: "Sexual Imposition" },
-      { id: "public_indecency", label: "Public Indecency" },
-      { id: "rc_2921_43", label: "R.C. 2921.43 Offense" },
-      { id: "custom_other", label: "Other / Not Listed" }
-    ];
-  </script>
-
-  <style>
-    * {
-      box-sizing: border-box;
-    }
-
-    :root {
-      --blue: #123d8f;
-      --blue-dark: #0d2f71;
-      --bg: #f3f7fc;
-      --card: #ffffff;
-      --line: #d9e2ec;
-      --text: #1b2430;
-      --muted: #5b6b7f;
-    }
-
-    body {
-      margin: 0;
-      font-family: Arial, Helvetica, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-    }
-
-    .topbar {
-      background: var(--blue);
-      color: white;
-      padding: 18px 0;
-    }
-
-    .topbar-inner {
-      width: min(1100px, 92%);
-      margin: 0 auto;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 16px;
-      flex-wrap: wrap;
-    }
-
-    .logo {
-      font-size: 22px;
-      font-weight: 800;
-    }
-
-    .nav {
-      display: flex;
-      gap: 18px;
-      flex-wrap: wrap;
-    }
-
-    .nav a {
-      color: white;
-      text-decoration: none;
-      font-weight: 700;
-    }
-
-    .page {
-      width: min(1100px, 92%);
-      margin: 28px auto 60px;
-    }
-
-    .step-label {
-      font-size: 18px;
-      margin-bottom: 12px;
-      color: var(--text);
-    }
-
-    .card {
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: 20px;
-      padding: 28px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
-    }
-
-    h1 {
-      margin: 0 0 10px;
-      font-size: 48px;
-      line-height: 1.1;
-      color: #111827;
-    }
-
-    .subtitle {
-      margin: 0 0 26px;
-      color: var(--muted);
-      font-size: 18px;
-      line-height: 1.6;
-    }
-
-    .form-grid {
-      display: grid;
-      gap: 18px;
-    }
-
-    .form-field label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 700;
-      font-size: 14px;
-    }
-
-    .form-field input,
-    .form-field select {
-      width: 100%;
-      padding: 14px 16px;
-      border: 1px solid #cfd8e3;
-      border-radius: 14px;
-      font-size: 16px;
-      background: #fff;
-      color: var(--text);
-    }
-
-    .helper {
-      margin-top: 8px;
-      font-size: 13px;
-      color: var(--muted);
-      line-height: 1.5;
-    }
-
-    .actions {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-top: 24px;
-    }
-
-    .btn {
-      appearance: none;
-      border: none;
-      border-radius: 12px;
-      padding: 14px 18px;
-      font-size: 15px;
-      font-weight: 800;
-      cursor: pointer;
-      text-decoration: none;
-      display: inline-block;
-    }
-
-    .btn-primary {
-      background: var(--blue);
-      color: white;
-    }
-
-    .btn-secondary {
-      background: #e8eef7;
-      color: var(--text);
-    }
-
-    .status {
-      margin-top: 16px;
-      padding: 12px 14px;
-      border-radius: 12px;
-      border: 1px solid var(--line);
-      background: #f8fbff;
-      color: var(--muted);
-      display: none;
-      line-height: 1.5;
-    }
-
-    .status.error {
-      display: block;
-      background: #fff3f3;
-      border-color: #efc2c2;
-      color: #a12626;
-    }
-
-    .status.success {
-      display: block;
-      background: #eefaf1;
-      border-color: #b7e4c7;
-      color: #1f7a3e;
-    }
-
-    @media (max-width: 760px) {
-      h1 {
-        font-size: 34px;
-      }
-
-      .card {
-        padding: 22px;
-      }
-
-      .actions {
-        flex-direction: column;
-      }
-
-      .btn {
-        width: 100%;
-        text-align: center;
-      }
-    }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Eligibility - ClearMyRecord</title>
+  <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
-  <header class="topbar">
-    <div class="topbar-inner">
-      <div class="logo">ClearMyRecord</div>
-      <nav class="nav">
-        <a href="eligibility.html">Home</a>
-        <a href="how-it-works.html">How It Works</a>
-      </nav>
+
+  <main class="form-card">
+    <h1>Check Your Eligibility</h1>
+
+    <div class="form-grid">
+
+      <div class="form-field">
+        <label for="firstName">First Name</label>
+        <input type="text" id="firstName" />
+      </div>
+
+      <div class="form-field">
+        <label for="lastName">Last Name</label>
+        <input type="text" id="lastName" />
+      </div>
+
+      <div class="form-field">
+        <label for="email">Email</label>
+        <input type="email" id="email" />
+      </div>
+
+      <div class="form-field">
+        <label for="phone">Phone</label>
+        <input type="text" id="phone" />
+      </div>
+
+      <div class="form-field">
+        <label for="charge">Select Charge</label>
+        <select id="charge"></select>
+      </div>
+
+      <!-- 🔥 MAILING ADDRESS -->
+      <h3>Mailing Address</h3>
+
+      <div class="form-field">
+        <label for="mailingStreet">Street Address</label>
+        <input type="text" id="mailingStreet" />
+      </div>
+
+      <div class="form-field">
+        <label for="mailingCity">City</label>
+        <input type="text" id="mailingCity" />
+      </div>
+
+      <div class="form-field">
+        <label for="mailingState">State</label>
+        <input type="text" id="mailingState" />
+      </div>
+
+      <div class="form-field">
+        <label for="mailingZip">ZIP Code</label>
+        <input type="text" id="mailingZip" />
+      </div>
+
     </div>
-  </header>
 
-  <main class="page">
-    <div class="step-label">Step 1 of 3</div>
-
-    <section class="card">
-      <h1>Start your free eligibility check</h1>
-      <p class="subtitle">Enter your details below to begin.</p>
-
-      <div class="form-grid">
-        <div class="form-field">
-          <label for="fullName">Full name</label>
-          <input type="text" id="fullName" placeholder="Your full name" />
-        </div>
-
-        <div class="form-field">
-          <label for="email">Email</label>
-          <input type="email" id="email" placeholder="you@example.com" />
-        </div>
-
-        <div class="form-field">
-          <label for="mailingAddress">Mailing address</label>
-          <input type="text" id="mailingAddress" placeholder="Street, city, state ZIP" />
-          <div class="helper">This will be used later for packet creation and court-ready PDF forms.</div>
-        </div>
-
-        <div class="form-field">
-          <label for="state">State</label>
-          <select id="state">
-            <option value="ohio">Ohio</option>
-          </select>
-        </div>
-
-        <div class="form-field">
-          <label for="offenseType">Offense type</label>
-          <select id="offenseType">
-            <option value="">Loading charges...</option>
-          </select>
-          <div class="helper">This pulls from your charge library. You can add all offenses in the next step.</div>
-        </div>
-      </div>
-
-      <div class="actions">
-        <button type="button" class="btn btn-primary" id="nextBtn">Continue to Record Details</button>
-        <a class="btn btn-secondary" href="how-it-works.html">How It Works</a>
-      </div>
-
-      <div id="statusBox" class="status"></div>
-    </section>
+    <div class="form-actions">
+      <button type="button" id="nextBtn">Next</button>
+    </div>
   </main>
+
+  <script src="js/charges.js"></script>
+  <script src="intake.js"></script>
+
 </body>
 </html>
