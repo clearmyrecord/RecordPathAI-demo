@@ -3,395 +3,167 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sealing Packet - ClearMyRecord</title>
-
-  <style>
-    * {
-      box-sizing: border-box;
-    }
-
-    :root {
-      --blue: #123d8f;
-      --blue-dark: #0d2f71;
-      --bg: #f3f7fc;
-      --card: #ffffff;
-      --line: #d9e2ec;
-      --text: #1b2430;
-      --muted: #5b6b7f;
-      --soft-blue: #eef4ff;
-      --green: #1f7a3e;
-      --yellow: #8a6d1f;
-      --red: #a12626;
-    }
-
-    body {
-      margin: 0;
-      font-family: Arial, Helvetica, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-    }
-
-    .topbar {
-      background: var(--blue);
-      color: white;
-      padding: 18px 0;
-    }
-
-    .topbar-inner {
-      width: min(1100px, 92%);
-      margin: 0 auto;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-
-    .logo {
-      font-size: 22px;
-      font-weight: 800;
-    }
-
-    .nav {
-      display: flex;
-      gap: 18px;
-      flex-wrap: wrap;
-    }
-
-    .nav a {
-      color: white;
-      text-decoration: none;
-      font-weight: 700;
-    }
-
-    .page {
-      width: min(1100px, 92%);
-      margin: 28px auto 60px;
-    }
-
-    .card {
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      padding: 24px;
-      margin-bottom: 18px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
-    }
-
-    .title {
-      margin: 0 0 10px;
-      font-size: 30px;
-      color: var(--blue-dark);
-    }
-
-    .subtitle {
-      margin: 0 0 14px;
-      color: var(--muted);
-      line-height: 1.6;
-    }
-
-    .section-title {
-      font-size: 20px;
-      margin-bottom: 10px;
-      color: var(--blue-dark);
-    }
-
-    .highlight-box {
-      background: var(--soft-blue);
-      border: 1px solid var(--line);
-      border-left: 5px solid var(--blue);
-      padding: 14px;
-      border-radius: 10px;
-      line-height: 1.6;
-    }
-
-    .grid-2 {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 16px;
-    }
-
-    .stat {
-      border: 1px solid var(--line);
-      border-radius: 10px;
-      padding: 14px;
-      background: #fafcff;
-    }
-
-    .stat-label {
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--muted);
-      text-transform: uppercase;
-      margin-bottom: 6px;
-    }
-
-    .stat-value {
-      font-size: 22px;
-      font-weight: 800;
-    }
-
-    ul {
-      padding-left: 18px;
-      line-height: 1.6;
-    }
-
-    li {
-      margin-bottom: 6px;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 12px;
-    }
-
-    th, td {
-      border: 1px solid var(--line);
-      padding: 10px;
-      text-align: left;
-      font-size: 14px;
-    }
-
-    th {
-      background: #f4f8ff;
-      font-weight: 800;
-    }
-
-    .actions {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-top: 14px;
-    }
-
-    .btn {
-      border: none;
-      border-radius: 10px;
-      padding: 12px 16px;
-      font-size: 15px;
-      font-weight: 800;
-      cursor: pointer;
-      text-decoration: none;
-      display: inline-block;
-    }
-
-    .btn-primary {
-      background: var(--blue);
-      color: white;
-    }
-
-    .btn-secondary {
-      background: #e8eef7;
-      color: var(--text);
-    }
-
-    .status {
-      font-weight: 800;
-    }
-
-    .status.green { color: var(--green); }
-    .status.yellow { color: var(--yellow); }
-    .status.red { color: var(--red); }
-
-    @media (max-width: 760px) {
-      .grid-2 {
-        grid-template-columns: 1fr;
-      }
-
-      .actions {
-        flex-direction: column;
-      }
-
-      .btn {
-        width: 100%;
-        text-align: center;
-      }
-    }
-
-    @media print {
-      @page {
-        margin: 0.6in;
-      }
-
-      body {
-        background: white !important;
-      }
-
-      .topbar,
-      .actions {
-        display: none !important;
-      }
-
-      .page {
-        width: 100% !important;
-        margin: 0 !important;
-      }
-
-      .card {
-        box-shadow: none !important;
-        border-radius: 0 !important;
-        page-break-inside: avoid;
-      }
-    }
-  </style>
+  <title>How It Works | ClearMyRecord</title>
+  <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
+  <header class="site-header">
+    <div class="container nav-wrap">
+      <a href="index.html" class="brand">
+        <span class="brand-icon">📄</span>
+        <span class="brand-text">ClearMyRecord</span>
+      </a>
 
-  <header class="topbar">
-    <div class="topbar-inner">
-      <div class="logo">ClearMyRecord</div>
-      <nav class="nav">
-        <a href="index.html">Home</a>
-        <a href="record-details.html">Record Details</a>
-        <a href="results.html">Results</a>
+      <nav class="main-nav">
+        <a href="how-it-works.html">How It Works</a>
+        <a href="eligibility.html">Eligibility</a>
+        <a href="eligibility.html" class="nav-btn nav-btn-light">Sign Up</a>
+        <a href="eligibility.html" class="nav-btn nav-btn-ghost">Log In</a>
       </nav>
     </div>
   </header>
 
-  <main class="page">
-
-    <section class="card">
-      <h1 class="title">Your Filing Packet</h1>
-      <p class="subtitle">
-        This page turns your results into a real-world action plan: what to file, when to file, and what documents to prepare.
-      </p>
-    </section>
-
-    <section class="card">
-      <h2 class="section-title">Eligibility Overview</h2>
-      <div class="grid-2">
-        <div class="stat">
-          <div class="stat-label">Sealing</div>
-          <div class="stat-value" id="sealDate">—</div>
-        </div>
-        <div class="stat">
-          <div class="stat-label">Expungement</div>
-          <div class="stat-value" id="expDate">—</div>
-        </div>
-      </div>
-
-      <div id="statusText" style="margin-top:12px;"></div>
-    </section>
-
-    <section class="card">
-      <h2 class="section-title">Filing Instructions</h2>
-      <div id="instructions"></div>
-    </section>
-
-    <section class="card">
-      <h2 class="section-title">Documents You Need</h2>
-      <ul id="documents"></ul>
-    </section>
-
-    <section class="card">
-      <h2 class="section-title">Offense Breakdown</h2>
-      <div id="offenseTable"></div>
-    </section>
-
-    <section class="card">
-      <h2 class="section-title">Next Steps</h2>
-      <ul id="nextSteps"></ul>
-
-      <div class="actions">
-        <button class="btn btn-primary" onclick="window.print()">Print Packet</button>
-        <a class="btn btn-secondary" href="results.html">Back to Results</a>
-        <a class="btn btn-secondary" href="record-details.html">Edit Record</a>
+  <main class="how-wireframe-page">
+    <section class="how-wireframe-hero">
+      <div class="container">
+        <h1>How It Works:</h1>
+        <h2>Automatic Criminal Record Clearing</h2>
+        <p>Clear your record fast in just 4 simple steps.</p>
       </div>
     </section>
 
+    <section class="how-flow-section">
+      <div class="container how-flow-wrap">
+
+        <div class="flow-step">
+          <div class="flow-card">
+            <div class="flow-number-col">
+              <div class="flow-number">1</div>
+            </div>
+
+            <div class="flow-content">
+              <h3>1. Check Your Eligibility</h3>
+              <p>
+                Answer a few simple questions about your past charges,
+                convictions, and when they occurred. Our system instantly checks
+                if you may be eligible to have your record cleared.
+              </p>
+            </div>
+
+            <div class="flow-illustration flow-illustration-checklist">
+              <div class="mini-screen">
+                <div class="mini-line short"></div>
+                <div class="mini-line"></div>
+                <div class="mini-line"></div>
+                <div class="mini-badge">✓</div>
+              </div>
+              <div class="mini-phone">✓</div>
+            </div>
+          </div>
+
+          <div class="flow-arrow">↓</div>
+        </div>
+
+        <div class="flow-step">
+          <div class="flow-card">
+            <div class="flow-number-col">
+              <div class="flow-number">2</div>
+            </div>
+
+            <div class="flow-content">
+              <h3>2. We Generate Your Forms</h3>
+              <p>
+                If you qualify, we automatically generate the court forms you
+                need to clear your record. We fill in the information for you to
+                help make everything accurate and organized.
+              </p>
+            </div>
+
+            <div class="flow-illustration flow-illustration-court">
+              <div class="court-building">
+                <div class="court-roof"></div>
+                <div class="court-body"></div>
+              </div>
+              <div class="court-check">✓</div>
+              <div class="court-arrow">↗</div>
+            </div>
+          </div>
+
+          <div class="flow-arrow">↓</div>
+        </div>
+
+        <div class="flow-step">
+          <div class="flow-card">
+            <div class="flow-number-col">
+              <div class="flow-number">3</div>
+            </div>
+
+            <div class="flow-content">
+              <h3>3. We File with the Court</h3>
+              <p>
+                We prepare your completed forms for filing with the appropriate
+                court in your county. The goal is to make the process easier,
+                clearer, and less overwhelming.
+              </p>
+            </div>
+
+            <div class="flow-illustration flow-illustration-person">
+              <div class="person-card-head"></div>
+              <div class="person-card-body"></div>
+              <div class="person-phone">✓</div>
+            </div>
+          </div>
+
+          <div class="flow-arrow">↓</div>
+        </div>
+
+        <div class="flow-step">
+          <div class="flow-card">
+            <div class="flow-number-col">
+              <div class="flow-number">4</div>
+            </div>
+
+            <div class="flow-content">
+              <h3>4. Get Your Record Cleared</h3>
+              <p>
+                Once the court approves the filing, your criminal record can be
+                sealed or expunged. You receive confirmation that your record
+                has been cleared.
+              </p>
+            </div>
+
+            <div class="flow-illustration flow-illustration-success">
+              <div class="person-card-head"></div>
+              <div class="person-card-body"></div>
+              <div class="success-phone">✓</div>
+              <div class="spark spark-one">✦</div>
+              <div class="spark spark-two">✦</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <section class="how-wireframe-cta">
+      <div class="container how-wireframe-cta-inner">
+        <h2>Ready to Clear Your Record?</h2>
+        <a href="eligibility.html" class="wireframe-main-cta">
+          Start Your Free Eligibility Check
+        </a>
+      </div>
+    </section>
   </main>
 
-  <script>
-    function getResult() {
-      try {
-        return JSON.parse(localStorage.getItem("cmrResults")) || null;
-      } catch {
-        return null;
-      }
-    }
-
-    function renderPacket() {
-      const result = getResult();
-      if (!result) return;
-
-      document.getElementById("sealDate").textContent =
-        result.sealingAvailable ? result.sealingEligibilityDate : "Blocked";
-
-      document.getElementById("expDate").textContent =
-        result.expungementAvailable ? result.expungementEligibilityDate : "Blocked";
-
-      let status = "";
-      if (result.eligible) {
-        status = `<div class="status green">${result.statusText}</div>`;
-      } else if (result.sealingAvailable || result.expungementAvailable) {
-        status = `<div class="status yellow">${result.statusText}</div>`;
-      } else {
-        status = `<div class="status red">${result.reason}</div>`;
-      }
-
-      document.getElementById("statusText").innerHTML = status;
-
-      // Instructions
-      let instructions = "";
-      if (result.sealingAvailable) {
-        instructions += `<p><strong>Sealing:</strong> File an Application for Sealing of Record in the court where the case was handled after ${result.sealingEligibilityDate}.</p>`;
-      }
-      if (result.expungementAvailable) {
-        instructions += `<p><strong>Expungement:</strong> File an Application for Expungement after ${result.expungementEligibilityDate}.</p>`;
-      }
-      if (!instructions) {
-        instructions = "<p>No filing path available based on current data.</p>";
-      }
-
-      document.getElementById("instructions").innerHTML = instructions;
-
-      // Documents
-      document.getElementById("documents").innerHTML = `
-        <li>Case numbers for each offense</li>
-        <li>Discharge documentation (proof sentence completed)</li>
-        <li>Payment receipts (fines/fees)</li>
-        <li>Identification</li>
-      `;
-
-      // Offense table
-      if (result.offenseResults?.length) {
-        const rows = result.offenseResults.map((o, i) => `
-          <tr>
-            <td>${i + 1}</td>
-            <td>${o.chargeLabel}</td>
-            <td>${o.level}</td>
-            <td>${o.sealingDate}</td>
-            <td>${o.expungementDate}</td>
-          </tr>
-        `).join("");
-
-        document.getElementById("offenseTable").innerHTML = `
-          <table>
-            <tr>
-              <th>#</th>
-              <th>Charge</th>
-              <th>Level</th>
-              <th>Sealing</th>
-              <th>Expungement</th>
-            </tr>
-            ${rows}
-          </table>
-        `;
-      }
-
-      // Next steps
-      document.getElementById("nextSteps").innerHTML = `
-        <li>Confirm all case details are accurate</li>
-        <li>Verify discharge completion dates</li>
-        <li>Double-check exclusions (DV, violent, sex offenses)</li>
-        <li>File in correct court</li>
-        <li>Prepare for possible hearing</li>
-      `;
-    }
-
-    renderPacket();
-  </script>
-
+  <footer class="site-footer">
+    <div class="container footer-wrap">
+      <div class="footer-links">
+        <a href="how-it-works.html">FAQ</a>
+        <a href="how-it-works.html">About Us</a>
+        <a href="how-it-works.html">Contact</a>
+      </div>
+      <p>© 2026 ClearMyRecord. All rights reserved.</p>
+    </div>
+  </footer>
 </body>
 </html>
