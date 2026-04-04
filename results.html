@@ -3,709 +3,457 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Results - ClearMyRecord</title>
-
+  <title>Eligibility Results | ClearMyRecord</title>
+  <link rel="stylesheet" href="css/styles.css" />
   <style>
-    * {
-      box-sizing: border-box;
+    .results-wrap {
+      width: min(860px, 92%);
+      margin: 32px auto 60px;
+      background: #ffffff;
+      border: 1px solid #e2e9f5;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(78, 110, 167, 0.12);
+      padding: 32px;
     }
 
-    :root {
-      --blue: #123d8f;
-      --blue-dark: #0d2f71;
-      --bg: #f3f7fc;
-      --card: #ffffff;
-      --line: #d9e2ec;
-      --text: #1b2430;
-      --muted: #5b6b7f;
-      --green-bg: #e8f7ee;
-      --green-border: #b7e4c7;
-      --green-text: #1f7a3e;
-      --yellow-bg: #fff8e1;
-      --yellow-border: #f0d98a;
-      --yellow-text: #8a6d1f;
-      --red-bg: #fdecec;
-      --red-border: #efc2c2;
-      --red-text: #a12626;
-      --soft-blue: #eef4ff;
+    .results-wrap h1 {
+      margin: 0 0 14px;
+      color: #1f4aa8;
+      font-size: clamp(38px, 5vw, 60px);
+      line-height: 1.05;
+      letter-spacing: -0.03em;
     }
 
-    body {
-      margin: 0;
-      font-family: Arial, Helvetica, sans-serif;
-      background: var(--bg);
-      color: var(--text);
+    .results-intro {
+      margin: 0 0 28px;
+      color: #5f6f8e;
+      font-size: 18px;
+      line-height: 1.7;
     }
 
-    .topbar {
-      background: var(--blue);
-      color: white;
-      padding: 18px 0;
-    }
-
-    .topbar-inner {
-      width: min(1100px, 92%);
-      margin: 0 auto;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 16px;
-      flex-wrap: wrap;
-    }
-
-    .logo {
-      font-size: 22px;
-      font-weight: 800;
-    }
-
-    .nav {
-      display: flex;
-      gap: 18px;
-      flex-wrap: wrap;
-    }
-
-    .nav a {
-      color: white;
-      text-decoration: none;
-      font-weight: 700;
-    }
-
-    .page {
-      width: min(1100px, 92%);
-      margin: 28px auto 60px;
-    }
-
-    .hero-card,
-    .section-card {
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: 16px;
+    .results-status {
+      margin-bottom: 24px;
       padding: 24px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
-      margin-bottom: 18px;
-    }
-
-    .eyebrow {
-      font-size: 13px;
+      border-radius: 20px;
+      font-size: 20px;
+      line-height: 1.5;
       font-weight: 700;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      color: var(--blue);
-      margin-bottom: 8px;
     }
 
-    .hero-title {
-      margin: 0 0 10px;
-      font-size: 34px;
-      line-height: 1.1;
-      color: var(--blue-dark);
+    .results-status.ready {
+      background: #eaf7ee;
+      border: 2px solid #9dd2ab;
+      color: #1f6a35;
     }
 
-    .hero-subtitle {
-      margin: 0;
-      color: var(--muted);
-      line-height: 1.6;
-      max-width: 850px;
+    .results-status.review {
+      background: #fff7e8;
+      border: 2px solid #ead18f;
+      color: #85620b;
     }
 
-    .status-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-top: 18px;
+    .results-status.blocked {
+      background: #fdeeee;
+      border: 2px solid #e1a3a3;
+      color: #9f2f2f;
     }
 
-    .status-pill {
-      display: inline-block;
-      padding: 10px 16px;
-      border-radius: 999px;
-      font-size: 14px;
-      font-weight: 800;
-      border: 1px solid transparent;
-    }
-
-    .status-pill.green {
-      background: var(--green-bg);
-      border-color: var(--green-border);
-      color: var(--green-text);
-    }
-
-    .status-pill.yellow {
-      background: var(--yellow-bg);
-      border-color: var(--yellow-border);
-      color: var(--yellow-text);
-    }
-
-    .status-pill.red {
-      background: var(--red-bg);
-      border-color: var(--red-border);
-      color: var(--red-text);
-    }
-
-    .grid-2 {
+    .results-grid {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 18px;
+      margin-bottom: 28px;
     }
 
-    .stat-box {
-      background: #f8fbff;
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      padding: 18px;
+    .results-card {
+      background: #f9fbff;
+      border: 1px solid #dbe4f2;
+      border-radius: 18px;
+      padding: 22px;
     }
 
-    .stat-label {
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      margin-bottom: 8px;
-    }
-
-    .stat-value {
-      font-size: 28px;
-      font-weight: 800;
-      color: var(--text);
-    }
-
-    .stat-subvalue {
-      margin-top: 6px;
-      font-size: 14px;
-      color: var(--muted);
-      line-height: 1.5;
-    }
-
-    .section-title {
-      margin: 0 0 12px;
+    .results-card h2 {
+      margin: 0 0 14px;
+      color: #2f4467;
       font-size: 24px;
-      color: var(--blue-dark);
     }
 
-    .section-copy {
-      margin: 0 0 16px;
-      color: var(--muted);
+    .results-card p {
+      margin: 0;
+      color: #5f6f8e;
+      line-height: 1.7;
+      font-size: 17px;
+    }
+
+    .results-list {
+      margin: 0;
+      padding-left: 20px;
+      color: #2f4467;
+    }
+
+    .results-list li {
+      margin-bottom: 10px;
       line-height: 1.6;
     }
 
-    .confidence-wrap {
-      background: #fff;
-      border: 1px solid var(--line);
-      border-radius: 14px;
+    .offense-summary-list {
+      display: grid;
+      gap: 16px;
+    }
+
+    .offense-summary-card {
+      background: #ffffff;
+      border: 1px solid #dbe4f2;
+      border-radius: 16px;
       padding: 18px;
     }
 
-    .confidence-badge {
-      display: inline-block;
-      padding: 8px 14px;
-      border-radius: 999px;
-      font-size: 14px;
-      font-weight: 800;
-      margin-bottom: 10px;
-      border: 1px solid transparent;
+    .offense-summary-card h3 {
+      margin: 0 0 10px;
+      color: #2f4467;
+      font-size: 20px;
     }
 
-    .confidence-badge.green {
-      background: var(--green-bg);
-      color: var(--green-text);
-      border-color: var(--green-border);
-    }
-
-    .confidence-badge.yellow {
-      background: var(--yellow-bg);
-      color: var(--yellow-text);
-      border-color: var(--yellow-border);
-    }
-
-    .confidence-badge.red {
-      background: var(--red-bg);
-      color: var(--red-text);
-      border-color: var(--red-border);
-    }
-
-    .confidence-score {
-      font-size: 30px;
-      font-weight: 800;
-      margin-bottom: 10px;
-    }
-
-    .confidence-bar {
-      width: 100%;
-      height: 14px;
-      border-radius: 999px;
-      overflow: hidden;
-      background: #edf2f7;
-      border: 1px solid var(--line);
-      margin-bottom: 12px;
-    }
-
-    .confidence-bar-fill {
-      height: 100%;
-      border-radius: 999px;
-    }
-
-    .confidence-bar-fill.green {
-      background: #22c55e;
-    }
-
-    .confidence-bar-fill.yellow {
-      background: #f59e0b;
-    }
-
-    .confidence-bar-fill.red {
-      background: #ef4444;
-    }
-
-    .bullet-list {
-      margin: 10px 0 0 20px;
-      padding: 0;
-      line-height: 1.6;
-    }
-
-    .bullet-list li {
-      margin-bottom: 6px;
-    }
-
-    .reason-box {
-      border: 1px solid var(--line);
-      border-left: 5px solid var(--blue);
-      background: var(--soft-blue);
-      border-radius: 12px;
-      padding: 16px;
-      line-height: 1.6;
-    }
-
-    .reason-box.red {
-      border-left-color: #dc2626;
-      background: #fff5f5;
-    }
-
-    .reason-box.yellow {
-      border-left-color: #d97706;
-      background: #fffaf0;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 12px;
-      background: white;
-    }
-
-    th,
-    td {
-      border: 1px solid var(--line);
-      padding: 12px;
-      text-align: left;
-      vertical-align: top;
-      font-size: 14px;
-      line-height: 1.5;
-    }
-
-    th {
-      background: #f8fbff;
-      font-weight: 800;
-      color: var(--blue-dark);
-    }
-
-    .actions {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-top: 16px;
-    }
-
-    .btn {
-      display: inline-block;
-      border: none;
-      border-radius: 10px;
-      padding: 12px 16px;
+    .offense-summary-meta {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px 18px;
+      color: #5f6f8e;
       font-size: 15px;
-      font-weight: 800;
+    }
+
+    .results-actions {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-top: 28px;
+    }
+
+    .results-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 56px;
+      padding: 16px 22px;
+      border-radius: 16px;
+      font-weight: 700;
+      font-size: 18px;
       text-decoration: none;
+      border: none;
       cursor: pointer;
     }
 
-    .btn-primary {
-      background: var(--blue);
-      color: white;
+    .results-btn-primary {
+      background: linear-gradient(180deg, #86b7fb 0%, #5d91e6 100%);
+      color: #ffffff;
+      box-shadow: 0 10px 30px rgba(78, 110, 167, 0.12);
     }
 
-    .btn-secondary {
-      background: #e8eef7;
-      color: var(--text);
+    .results-btn-secondary {
+      background: #ffffff;
+      color: #39527c;
+      border: 1px solid #dce5f2;
     }
 
-    .helper-note {
-      margin-top: 12px;
-      font-size: 13px;
-      color: var(--muted);
-      line-height: 1.6;
+    .results-disclaimer {
+      margin-top: 24px;
+      color: #6a7894;
+      font-size: 16px;
+      line-height: 1.7;
     }
 
-    .empty {
-      padding: 16px;
-      border: 1px dashed var(--line);
-      border-radius: 12px;
-      background: #fafcff;
-      color: var(--muted);
-    }
+    @media (max-width: 700px) {
+      .results-wrap {
+        padding: 24px;
+      }
 
-    @media (max-width: 760px) {
-      .grid-2 {
+      .offense-summary-meta {
         grid-template-columns: 1fr;
       }
 
-      .hero-title {
-        font-size: 28px;
-      }
-
-      .stat-value {
-        font-size: 24px;
-      }
-
-      .confidence-score {
-        font-size: 26px;
-      }
-
-      .actions {
+      .results-actions {
         flex-direction: column;
       }
 
-      .btn {
+      .results-btn {
         width: 100%;
-        text-align: center;
-      }
-    }
-
-    @media print {
-      @page {
-        margin: 0.6in;
-      }
-
-      body {
-        background: white !important;
-      }
-
-      .topbar,
-      .actions {
-        display: none !important;
-      }
-
-      .page {
-        width: 100% !important;
-        margin: 0 !important;
-      }
-
-      .hero-card,
-      .section-card {
-        box-shadow: none !important;
-        border-radius: 0 !important;
-        page-break-inside: avoid;
       }
     }
   </style>
 </head>
 <body>
-  <header class="topbar">
-    <div class="topbar-inner">
-      <div class="logo">ClearMyRecord</div>
-      <nav class="nav">
-        <a href="index.html">Home</a>
-        <a href="record-details.html">Record Details</a>
-        <a href="packet.html">Packet</a>
+  <header class="site-header">
+    <div class="container nav-wrap">
+      <a href="index.html" class="brand">
+        <span class="brand-icon">📄</span>
+        <span class="brand-text">ClearMyRecord</span>
+      </a>
+
+      <nav class="main-nav">
+        <a href="how-it-works.html">How It Works</a>
+        <a href="eligibility.html">Eligibility</a>
+        <a href="eligibility.html" class="nav-btn nav-btn-light">Check Eligibility</a>
       </nav>
     </div>
   </header>
 
-  <main class="page">
-    <section class="hero-card">
-      <div class="eyebrow">Results</div>
-      <h1 class="hero-title">Your Ohio record review</h1>
-      <p class="hero-subtitle">
-        This page shows estimated sealing and expungement timing, the strongest block we found, a confidence score, and the offense-by-offense breakdown used by the calculator.
+  <main>
+    <section class="results-wrap">
+      <h1>Eligibility Results</h1>
+      <p class="results-intro">
+        Here is your current rule-based estimate based on the information entered so far.
+        This page is designed to help you organize your next step, not replace court review
+        or legal advice.
       </p>
 
-      <div class="status-row" id="statusRow"></div>
-    </section>
+      <div id="resultsStatus" class="results-status review">
+        We need a little more detail to give you a stronger eligibility estimate.
+      </div>
 
-    <section class="section-card">
-      <h2 class="section-title">Overall outcome</h2>
-      <div class="grid-2">
-        <div class="stat-box">
-          <div class="stat-label">Sealing</div>
-          <div class="stat-value" id="sealingDateValue">—</div>
-          <div class="stat-subvalue" id="sealingDateNote">No data loaded yet.</div>
+      <div class="results-grid">
+        <div class="results-card">
+          <h2>What We Reviewed</h2>
+          <div id="reviewedSummary"></div>
         </div>
 
-        <div class="stat-box">
-          <div class="stat-label">Expungement</div>
-          <div class="stat-value" id="expungementDateValue">—</div>
-          <div class="stat-subvalue" id="expungementDateNote">No data loaded yet.</div>
+        <div class="results-card">
+          <h2>Current Estimate</h2>
+          <div id="estimateSummary"></div>
+        </div>
+
+        <div class="results-card">
+          <h2>What To Do Next</h2>
+          <ul id="nextStepsList" class="results-list"></ul>
         </div>
       </div>
 
-      <div class="helper-note">
-        These dates are only as strong as the record details entered. Missing facts, charge-level exceptions, and court discretion can change the answer.
+      <div class="results-card">
+        <h2>Offense Summary</h2>
+        <div id="offenseSummaryList" class="offense-summary-list"></div>
       </div>
-    </section>
 
-    <section class="section-card">
-      <h2 class="section-title">Likelihood based on current information</h2>
-      <div class="confidence-wrap" id="confidenceWrap">
-        <div class="empty">No confidence score available yet.</div>
+      <div class="results-actions">
+        <a href="record-details.html" class="results-btn results-btn-secondary">Edit Record Details</a>
+        <a href="packet.html" class="results-btn results-btn-primary">Continue to Packet Builder</a>
       </div>
-    </section>
 
-    <section class="section-card">
-      <h2 class="section-title">Why this result came back</h2>
-      <div id="reasonWrap" class="reason-box">
-        Add record details and run the calculator first.
-      </div>
-    </section>
-
-    <section class="section-card">
-      <h2 class="section-title">Record summary</h2>
-      <div id="summaryWrap" class="empty">
-        No summary loaded yet.
-      </div>
-    </section>
-
-    <section class="section-card">
-      <h2 class="section-title">Offense-by-offense breakdown</h2>
-      <div class="section-copy">
-        This table shows the charge, level, and the estimated sealing and expungement dates for each offense entered.
-      </div>
-      <div id="offenseTableWrap" class="empty">
-        No offense data loaded yet.
-      </div>
-    </section>
-
-    <section class="section-card">
-      <h2 class="section-title">What still needs human review</h2>
-      <ul class="bullet-list">
-        <li>Whether the discharge date entered is correct.</li>
-        <li>Whether convictions should be clumped and counted as one.</li>
-        <li>Whether any charge falls into a statute-specific exclusion.</li>
-        <li>Whether pending charges, rehabilitation, or other court findings affect relief.</li>
-      </ul>
-
-      <div class="actions">
-        <button class="btn btn-primary" onclick="window.print()">Print / Save Results</button>
-        <a class="btn btn-secondary" href="record-details.html">Edit Record Details</a>
-        <a class="btn btn-secondary" href="packet.html">Open Packet</a>
-      </div>
+      <p class="results-disclaimer">
+        This estimate depends on the information entered by the user and may change as more
+        details are added. Filing requirements vary by state and by court. Some courts may
+        require additional documents, certified records, or fingerprints with the application.
+      </p>
     </section>
   </main>
 
   <script>
-    function getStoredResult() {
+    function getUser() {
       try {
-        const raw = localStorage.getItem("cmrResults");
-        return raw ? JSON.parse(raw) : null;
+        return JSON.parse(localStorage.getItem("cmr_user") || "{}");
       } catch (error) {
-        return null;
+        return {};
       }
     }
 
-    function getBadgeClassFromScore(score) {
-      if (score >= 75) return "green";
-      if (score >= 50) return "yellow";
-      return "red";
-    }
-
-    function renderStatus(result) {
-      const row = document.getElementById("statusRow");
-
-      if (!result) {
-        row.innerHTML = '<span class="status-pill yellow">No result loaded</span>';
-        return;
-      }
-
-      const pills = [];
-
-      if (result.eligible) {
-        pills.push('<span class="status-pill green">Eligible now</span>');
-      } else if (result.sealingAvailable || result.expungementAvailable) {
-        pills.push('<span class="status-pill yellow">Not yet eligible</span>');
-      } else {
-        pills.push('<span class="status-pill red">Currently blocked</span>');
-      }
-
-      if (result.sealingAvailable) {
-        pills.push('<span class="status-pill green">Sealing path found</span>');
-      } else {
-        pills.push('<span class="status-pill red">No sealing path found</span>');
-      }
-
-      if (result.expungementAvailable) {
-        pills.push('<span class="status-pill green">Expungement path found</span>');
-      } else {
-        pills.push('<span class="status-pill red">No expungement path found</span>');
-      }
-
-      row.innerHTML = pills.join("");
-    }
-
-    function renderDates(result) {
-      const sealingValue = document.getElementById("sealingDateValue");
-      const sealingNote = document.getElementById("sealingDateNote");
-      const expValue = document.getElementById("expungementDateValue");
-      const expNote = document.getElementById("expungementDateNote");
-
-      if (!result) {
-        return;
-      }
-
-      if (result.sealingAvailable && result.sealingEligibilityDate) {
-        sealingValue.textContent = result.sealingEligibilityDate;
-        sealingNote.textContent = result.eligible
-          ? "Based on the current inputs, sealing appears available now or by this date."
-          : "This is the estimated sealing eligibility date.";
-      } else {
-        sealingValue.textContent = "Blocked";
-        sealingNote.textContent = "The current input appears to block sealing.";
-      }
-
-      if (result.expungementAvailable && result.expungementEligibilityDate) {
-        expValue.textContent = result.expungementEligibilityDate;
-        expNote.textContent = result.eligible
-          ? "Based on the current inputs, expungement appears available now or by this date."
-          : "This is the estimated expungement eligibility date.";
-      } else {
-        expValue.textContent = "Blocked";
-        expNote.textContent = "The current input appears to block expungement.";
+    function getOffenses() {
+      try {
+        return JSON.parse(localStorage.getItem("cmr_offenses") || "[]");
+      } catch (error) {
+        return [];
       }
     }
 
-    function renderConfidence(result) {
-      const wrap = document.getElementById("confidenceWrap");
+    function isFilled(value) {
+      return String(value || "").trim() !== "";
+    }
 
-      if (!result || !result.confidence) {
-        return;
+    function countCompletedFields(offense) {
+      const fields = [
+        offense.chargeName,
+        offense.state,
+        offense.county,
+        offense.offenseLevel,
+        offense.disposition,
+        offense.offenseDate,
+        offense.convictionDate,
+        offense.dischargeDate,
+        offense.notes
+      ];
+
+      return fields.filter(isFilled).length;
+    }
+
+    function buildStatus(offenses) {
+      if (!offenses.length) {
+        return {
+          className: "blocked",
+          text: "No offenses were added yet. Add at least one offense to get an eligibility estimate."
+        };
       }
 
-      const confidence = result.confidence;
-      const badgeClass = getBadgeClassFromScore(confidence.score);
-      const badgeText =
-        badgeClass === "green"
-          ? "High likelihood"
-          : badgeClass === "yellow"
-          ? "Moderate likelihood"
-          : "Low likelihood";
+      const hasChargeName = offenses.some((offense) => isFilled(offense.chargeName));
+      const hasDisposition = offenses.some((offense) => isFilled(offense.disposition));
+      const hasState = offenses.some((offense) => isFilled(offense.state));
+      const hasDateInfo = offenses.some((offense) =>
+        isFilled(offense.offenseDate) ||
+        isFilled(offense.convictionDate) ||
+        isFilled(offense.dischargeDate)
+      );
 
-      const reasons = confidence.reasons?.length
-        ? `<ul class="bullet-list">${confidence.reasons.map(reason => `<li>${reason}</li>`).join("")}</ul>`
-        : "";
+      if (hasChargeName && hasDisposition && hasState && hasDateInfo) {
+        return {
+          className: "ready",
+          text: "Your record information looks detailed enough for a stronger rule-based estimate."
+        };
+      }
+
+      return {
+        className: "review",
+        text: "Your application is started, but adding more offense details will improve the eligibility estimate."
+      };
+    }
+
+    function renderReviewedSummary(user, offenses) {
+      const wrap = document.getElementById("reviewedSummary");
+
+      const fullName = [user.firstName, user.lastName].filter(Boolean).join(" ").trim();
+      const email = user.email || "Not provided";
+      const phone = user.phone || "Not provided";
+      const mailing = [user.street, user.city, user.state, user.zip].filter(Boolean).join(", ") || "Not provided";
 
       wrap.innerHTML = `
-        <div class="confidence-badge ${badgeClass}">${badgeText}</div>
-        <div class="confidence-score">${confidence.score}%</div>
-        <div class="confidence-bar">
-          <div class="confidence-bar-fill ${badgeClass}" style="width: ${confidence.score}%;"></div>
-        </div>
-        <div>${confidence.label || ""}</div>
-        ${reasons}
-        <div class="confidence-note">
-          This is a confidence estimate based on the data entered and the rules currently configured in ClearMyRecord. It is not legal advice or a guaranteed court outcome.
-        </div>
+        <ul class="results-list">
+          <li><strong>Name:</strong> ${escapeHtml(fullName || "Not provided")}</li>
+          <li><strong>Email:</strong> ${escapeHtml(email)}</li>
+          <li><strong>Phone:</strong> ${escapeHtml(phone)}</li>
+          <li><strong>Mailing Address:</strong> ${escapeHtml(mailing)}</li>
+          <li><strong>Offenses Added:</strong> ${offenses.length}</li>
+        </ul>
       `;
     }
 
-    function renderReason(result) {
-      const wrap = document.getElementById("reasonWrap");
+    function renderEstimateSummary(offenses) {
+      const wrap = document.getElementById("estimateSummary");
 
-      if (!result) {
+      if (!offenses.length) {
+        wrap.innerHTML = `
+          <p>
+            We cannot estimate eligibility yet because no offenses were added.
+          </p>
+        `;
         return;
       }
 
-      let className = "reason-box";
-      if (!result.eligible && !(result.sealingAvailable || result.expungementAvailable)) {
-        className += " red";
-      } else if (!result.eligible) {
-        className += " yellow";
+      const totalCompleted = offenses.reduce((sum, offense) => sum + countCompletedFields(offense), 0);
+      const averageCompleted = totalCompleted / offenses.length;
+
+      let summaryText = "";
+
+      if (averageCompleted >= 5) {
+        summaryText = "You have enough detail entered to move forward with a stronger preliminary estimate and packet review.";
+      } else if (averageCompleted >= 3) {
+        summaryText = "Your application is in progress. Add more dates, disposition details, and offense information for a more useful estimate.";
+      } else {
+        summaryText = "Right now the system only has limited information. Add more offense details before relying on the result.";
       }
 
-      wrap.className = className;
-      wrap.innerHTML = result.reason && result.reason.trim()
-        ? result.reason
-        : "No blocking reason was returned. Review the dates and summary below.";
+      wrap.innerHTML = `<p>${escapeHtml(summaryText)}</p>`;
     }
 
-    function renderSummary(result) {
-      const wrap = document.getElementById("summaryWrap");
+    function renderNextSteps(offenses) {
+      const list = document.getElementById("nextStepsList");
+      const steps = [];
 
-      if (!result || !result.summary) {
-        wrap.innerHTML = "No conviction summary was returned.";
-        return;
+      if (!offenses.length) {
+        steps.push("Go back and add at least one offense.");
+      } else {
+        const missingCharge = offenses.some((offense) => !isFilled(offense.chargeName));
+        const missingState = offenses.some((offense) => !isFilled(offense.state));
+        const missingDisposition = offenses.some((offense) => !isFilled(offense.disposition));
+        const missingDates = offenses.some((offense) =>
+          !isFilled(offense.offenseDate) &&
+          !isFilled(offense.convictionDate) &&
+          !isFilled(offense.dischargeDate)
+        );
+
+        if (missingCharge) steps.push("Add a charge name for every offense.");
+        if (missingState) steps.push("Add the state for each offense because rules can vary by state.");
+        if (missingDisposition) steps.push("Add the disposition for each offense, such as convicted, dismissed, or not guilty.");
+        if (missingDates) steps.push("Add offense, case resolution, or discharge dates wherever possible.");
+        if (!missingCharge && !missingState && !missingDisposition && !missingDates) {
+          steps.push("Review the packet builder and continue organizing your filing information.");
+        }
       }
 
-      const s = result.summary;
+      steps.push("Verify court-specific requirements before filing, since some courts require additional documents or fingerprints.");
+      steps.push("Keep your information accurate and update the application if anything changes.");
 
-      wrap.innerHTML = `
-        <div><strong>Count after clumping:</strong> ${s.totalConvictions}</div>
-        <div><strong>Raw conviction count:</strong> ${s.totalConvictionsRaw}</div>
-        <div><strong>Misdemeanor convictions:</strong> ${s.misdemeanorConvictions}</div>
-        <div><strong>Felony convictions:</strong> ${s.felonyConvictions}</div>
-        <div><strong>Third-degree felony convictions:</strong> ${s.f3Convictions}</div>
-        <div><strong>Highest felony level:</strong> ${s.highestFelonyLevel || "None"}</div>
-      `;
+      list.innerHTML = steps.map((step) => `<li>${escapeHtml(step)}</li>`).join("");
     }
 
-    function renderOffenseTable(result) {
-      const wrap = document.getElementById("offenseTableWrap");
+    function renderOffenseSummary(offenses) {
+      const wrap = document.getElementById("offenseSummaryList");
 
-      if (!result || !result.offenseResults || !result.offenseResults.length) {
+      if (!offenses.length) {
+        wrap.innerHTML = `
+          <div class="offense-summary-card">
+            <h3>No offenses added</h3>
+            <div class="offense-summary-meta">
+              <div>Add offense details on the previous page to continue.</div>
+            </div>
+          </div>
+        `;
         return;
       }
 
-      const rows = result.offenseResults.map((offense, index) => `
-        <tr>
-          <td>${index + 1}</td>
-          <td>${offense.chargeLabel || ""}</td>
-          <td>${offense.outcome || ""}</td>
-          <td>${offense.category || ""}</td>
-          <td>${offense.level || ""}</td>
-          <td>${offense.dischargeDate || ""}</td>
-          <td>${offense.sealingDate || ""}</td>
-          <td>${offense.expungementDate || ""}</td>
-        </tr>
+      wrap.innerHTML = offenses.map((offense, index) => `
+        <div class="offense-summary-card">
+          <h3>Offense ${index + 1}: ${escapeHtml(offense.chargeName || "Unnamed offense")}</h3>
+          <div class="offense-summary-meta">
+            <div><strong>State:</strong> ${escapeHtml(offense.state || "Not provided")}</div>
+            <div><strong>County / Court Area:</strong> ${escapeHtml(offense.county || "Not provided")}</div>
+            <div><strong>Offense Level:</strong> ${escapeHtml(formatValue(offense.offenseLevel))}</div>
+            <div><strong>Disposition:</strong> ${escapeHtml(formatValue(offense.disposition))}</div>
+            <div><strong>Offense Date:</strong> ${escapeHtml(offense.offenseDate || "Not provided")}</div>
+            <div><strong>Case Resolution Date:</strong> ${escapeHtml(offense.convictionDate || "Not provided")}</div>
+            <div><strong>Discharge Date:</strong> ${escapeHtml(offense.dischargeDate || "Not provided")}</div>
+            <div><strong>Notes:</strong> ${escapeHtml(offense.notes || "None")}</div>
+          </div>
+        </div>
       `).join("");
-
-      wrap.innerHTML = `
-        <table>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Charge</th>
-              <th>Outcome</th>
-              <th>Category</th>
-              <th>Level</th>
-              <th>Discharge / Final Disposition</th>
-              <th>Sealing Date</th>
-              <th>Expungement Date</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${rows}
-          </tbody>
-        </table>
-      `;
     }
 
-    function bootResultsPage() {
-      const result = getStoredResult();
-      renderStatus(result);
-      renderDates(result);
-      renderConfidence(result);
-      renderReason(result);
-      renderSummary(result);
-      renderOffenseTable(result);
+    function formatValue(value) {
+      if (!isFilled(value)) return "Not provided";
+
+      return String(value)
+        .replaceAll("-", " ")
+        .replace(/\b\w/g, (char) => char.toUpperCase());
     }
 
-    bootResultsPage();
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+    }
+
+    function initResultsPage() {
+      const user = getUser();
+      const offenses = getOffenses();
+
+      const status = buildStatus(offenses);
+      const statusEl = document.getElementById("resultsStatus");
+      statusEl.className = `results-status ${status.className}`;
+      statusEl.textContent = status.text;
+
+      renderReviewedSummary(user, offenses);
+      renderEstimateSummary(offenses);
+      renderNextSteps(offenses);
+      renderOffenseSummary(offenses);
+    }
+
+    initResultsPage();
   </script>
 </body>
 </html>
