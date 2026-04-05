@@ -6,139 +6,201 @@
   <title>Record Details - ClearMyRecord</title>
   <link rel="stylesheet" href="css/styles.css" />
 </head>
-
 <body>
-
-<header class="topbar">
-  <div class="topbar-inner">
-    <div class="logo">ClearMyRecord</div>
-    <nav class="nav">
-      <a href="index.html">Home</a>
-      <a href="how-it-works.html">How It Works</a>
-      <a href="faq.html">FAQ</a>
-    </nav>
-  </div>
-</header>
-
-<main class="container">
-
-  <section class="form-section">
-    <div class="form-card">
-
-      <h1>Record Details</h1>
-      <p class="section-intro">
-        Enter your case details. Start typing — we’ll suggest the correct options.
-      </p>
-
-      <form id="recordForm" class="form-grid">
-
-        <!-- Charge -->
-        <div class="form-field">
-          <label>Charge Name</label>
-          <input type="text" id="chargeName" list="chargeList" placeholder="Start typing..." />
-          <datalist id="chargeList"></datalist>
-        </div>
-
-        <!-- Level -->
-        <div class="form-field">
-          <label>Charge Level</label>
-          <input type="text" id="chargeLevel" list="levelList" placeholder="Start typing..." />
-          <datalist id="levelList"></datalist>
-        </div>
-
-        <!-- Status -->
-        <div class="form-field">
-          <label>Case Status</label>
-          <input type="text" id="caseStatus" list="statusList" placeholder="Start typing..." />
-          <datalist id="statusList"></datalist>
-        </div>
-
-        <!-- Disposition -->
-        <div class="form-field">
-          <label>Disposition</label>
-          <input type="text" id="disposition" list="dispositionList" placeholder="Start typing..." />
-          <datalist id="dispositionList"></datalist>
-        </div>
-
-        <!-- Plea -->
-        <div class="form-field">
-          <label>Plea</label>
-          <input type="text" id="plea" list="pleaList" placeholder="Start typing..." />
-          <datalist id="pleaList"></datalist>
-        </div>
-
-        <!-- Sentence -->
-        <div class="form-field">
-          <label>Sentence Type</label>
-          <input type="text" id="sentenceType" list="sentenceList" placeholder="Start typing..." />
-          <datalist id="sentenceList"></datalist>
-        </div>
-
-        <!-- Court -->
-        <div class="form-field">
-          <label>Court Type</label>
-          <input type="text" id="courtType" list="courtList" placeholder="Start typing..." />
-          <datalist id="courtList"></datalist>
-        </div>
-
-        <!-- State -->
-        <div class="form-field">
-          <label>State</label>
-          <input type="text" id="state" list="stateList" placeholder="Start typing..." />
-          <datalist id="stateList"></datalist>
-        </div>
-
-        <!-- County -->
-        <div class="form-field">
-          <label>County</label>
-          <input type="text" id="county" list="countyList" placeholder="Start typing..." />
-          <datalist id="countyList"></datalist>
-        </div>
-
-        <!-- Agency -->
-        <div class="form-field">
-          <label>Arresting Agency</label>
-          <input type="text" id="agency" list="agencyList" placeholder="Start typing..." />
-          <datalist id="agencyList"></datalist>
-        </div>
-
-        <!-- Dates -->
-        <div class="form-field">
-          <label>Filing Date</label>
-          <input type="date" id="filingDate" />
-        </div>
-
-        <div class="form-field">
-          <label>Disposition Date</label>
-          <input type="date" id="dispositionDate" />
-        </div>
-
-        <div class="form-field">
-          <label>Sentence Completion</label>
-          <input type="date" id="completionDate" />
-        </div>
-
-        <!-- Notes -->
-        <div class="form-field full">
-          <label>Notes</label>
-          <textarea id="notes" rows="4"></textarea>
-        </div>
-
-        <!-- Buttons -->
-        <div class="form-actions full">
-          <button type="button" class="btn-secondary" id="addCase">+ Add Another Case</button>
-          <button type="submit" class="btn-primary">Continue</button>
-        </div>
-
-      </form>
-
+  <header class="site-header">
+    <div class="site-shell header-inner">
+      <a href="index.html" class="brand">ClearMyRecord</a>
+      <nav class="main-nav">
+        <a href="index.html">Home</a>
+        <a href="how-it-works.html">How It Works</a>
+        <a href="faq.html">FAQ</a>
+      </nav>
     </div>
-  </section>
+  </header>
 
-</main>
+  <main class="site-shell page-wrap">
+    <section class="form-card">
+      <div class="form-head">
+        <h1>Record Details</h1>
+        <p>Enter the details for this record. Start typing in any field to see suggestions.</p>
+      </div>
 
-<script src="js/charges.js"></script>
-<script src="js/record-details.js"></script>
+      <form id="recordDetailsForm" novalidate>
+        <div class="case-card">
+          <div class="case-card-top">
+            <button type="button" class="case-remove-btn" id="removeCaseBtn">Remove</button>
+          </div>
 
+          <div class="field-stack">
+
+            <div class="autosuggest-field" data-field="chargeName">
+              <label for="chargeName">Charge Name</label>
+              <input
+                type="text"
+                id="chargeName"
+                name="chargeName"
+                class="autosuggest-input"
+                placeholder="Start typing charge name"
+                autocomplete="off"
+              />
+              <div class="autosuggest-panel" id="chargeNamePanel"></div>
+            </div>
+
+            <div class="autosuggest-field" data-field="chargeLevel">
+              <label for="chargeLevel">Charge Level</label>
+              <input
+                type="text"
+                id="chargeLevel"
+                name="chargeLevel"
+                class="autosuggest-input"
+                placeholder="Start typing charge level"
+                autocomplete="off"
+              />
+              <div class="autosuggest-panel" id="chargeLevelPanel"></div>
+            </div>
+
+            <div class="autosuggest-field" data-field="caseStatus">
+              <label for="caseStatus">Case Status</label>
+              <input
+                type="text"
+                id="caseStatus"
+                name="caseStatus"
+                class="autosuggest-input"
+                placeholder="Start typing case status"
+                autocomplete="off"
+              />
+              <div class="autosuggest-panel" id="caseStatusPanel"></div>
+            </div>
+
+            <div class="autosuggest-field" data-field="disposition">
+              <label for="disposition">Disposition</label>
+              <input
+                type="text"
+                id="disposition"
+                name="disposition"
+                class="autosuggest-input"
+                placeholder="Start typing disposition"
+                autocomplete="off"
+              />
+              <div class="autosuggest-panel" id="dispositionPanel"></div>
+            </div>
+
+            <div class="autosuggest-field" data-field="plea">
+              <label for="plea">Plea</label>
+              <input
+                type="text"
+                id="plea"
+                name="plea"
+                class="autosuggest-input"
+                placeholder="Start typing plea"
+                autocomplete="off"
+              />
+              <div class="autosuggest-panel" id="pleaPanel"></div>
+            </div>
+
+            <div class="autosuggest-field" data-field="sentenceType">
+              <label for="sentenceType">Sentence Type</label>
+              <input
+                type="text"
+                id="sentenceType"
+                name="sentenceType"
+                class="autosuggest-input"
+                placeholder="Start typing sentence type"
+                autocomplete="off"
+              />
+              <div class="autosuggest-panel" id="sentenceTypePanel"></div>
+            </div>
+
+            <div class="autosuggest-field" data-field="courtType">
+              <label for="courtType">Court Type</label>
+              <input
+                type="text"
+                id="courtType"
+                name="courtType"
+                class="autosuggest-input"
+                placeholder="Start typing court type"
+                autocomplete="off"
+              />
+              <div class="autosuggest-panel" id="courtTypePanel"></div>
+            </div>
+
+            <div class="autosuggest-field" data-field="state">
+              <label for="state">State</label>
+              <input
+                type="text"
+                id="state"
+                name="state"
+                class="autosuggest-input"
+                placeholder="Start typing state"
+                autocomplete="off"
+              />
+              <div class="autosuggest-panel" id="statePanel"></div>
+            </div>
+
+            <div class="autosuggest-field" data-field="county">
+              <label for="county">County</label>
+              <input
+                type="text"
+                id="county"
+                name="county"
+                class="autosuggest-input"
+                placeholder="Start typing county"
+                autocomplete="off"
+              />
+              <div class="autosuggest-panel" id="countyPanel"></div>
+            </div>
+
+            <div class="autosuggest-field" data-field="arrestingAgency">
+              <label for="arrestingAgency">Arresting Agency</label>
+              <input
+                type="text"
+                id="arrestingAgency"
+                name="arrestingAgency"
+                class="autosuggest-input"
+                placeholder="Start typing arresting agency"
+                autocomplete="off"
+              />
+              <div class="autosuggest-panel" id="arrestingAgencyPanel"></div>
+            </div>
+
+            <div class="standard-field">
+              <label for="filingDate">Filing Date</label>
+              <input type="date" id="filingDate" name="filingDate" class="standard-input" />
+            </div>
+
+            <div class="standard-field">
+              <label for="dispositionDate">Disposition Date</label>
+              <input type="date" id="dispositionDate" name="dispositionDate" class="standard-input" />
+            </div>
+
+            <div class="standard-field">
+              <label for="sentenceCompletionDate">Sentence Completion Date</label>
+              <input type="date" id="sentenceCompletionDate" name="sentenceCompletionDate" class="standard-input" />
+            </div>
+
+            <div class="standard-field">
+              <label for="notes">Notes</label>
+              <textarea
+                id="notes"
+                name="notes"
+                class="standard-input standard-textarea"
+                rows="5"
+                placeholder="Anything else the court should know?"
+              ></textarea>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" id="addAnotherCaseBtn">+ Add Another Case</button>
+          <button type="submit" class="btn btn-primary">Continue</button>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <script src="js/charges.js"></script>
+  <script src="js/record-details.js"></script>
 </body>
 </html>
