@@ -1,533 +1,177 @@
-/* =========================
-   ClearMyRecord - Full Stylesheet
-   ========================= */
-
-* {
-  box-sizing: border-box;
+.page-shell {
+  padding: 24px 16px 48px;
 }
 
-html {
-  -webkit-text-size-adjust: 100%;
-}
-
-body {
-  margin: 0;
-  font-family: Arial, Helvetica, sans-serif;
-  background: #f4f7fb;
-  color: #243b63;
-  line-height: 1.5;
-}
-
-/* =========================
-   Layout
-   ========================= */
-
-.container {
-  width: min(1100px, 92%);
+.form-shell {
+  max-width: 760px;
   margin: 0 auto;
-}
-
-main.container {
-  padding: 28px 0 48px;
-}
-
-/* =========================
-   Header / Nav
-   ========================= */
-
-.topbar {
-  background: #ffffff;
-  border-bottom: 1px solid #dbe5f0;
-  position: sticky;
-  top: 0;
-  z-index: 50;
-}
-
-.topbar-inner {
-  width: min(1100px, 92%);
-  margin: 0 auto;
-  min-height: 72px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-}
-
-.logo {
-  font-size: 28px;
-  font-weight: 800;
-  color: #123d8f;
-  letter-spacing: -0.02em;
-}
-
-.nav {
-  display: flex;
-  align-items: center;
-  gap: 18px;
-  flex-wrap: wrap;
-}
-
-.nav a {
-  color: #36527f;
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 15px;
-}
-
-.nav a:hover {
-  color: #123d8f;
-}
-
-/* =========================
-   Hero / Generic sections
-   ========================= */
-
-.section,
-.form-section {
-  padding: 24px 0;
-}
-
-.section-card,
-.form-card,
-.card {
-  background: #ffffff;
-  border: 1px solid #dbe5f0;
-  border-radius: 28px;
-  box-shadow: 0 10px 30px rgba(18, 61, 143, 0.05);
 }
 
 .form-card {
-  max-width: 760px;
-  margin: 0 auto;
-  padding: 28px 22px 26px;
+  background: #fff;
+  border: 1px solid #dfe7f2;
+  border-radius: 28px;
+  padding: 20px 16px 28px;
+  box-shadow: 0 8px 24px rgba(31, 64, 122, 0.06);
 }
 
-.section-card,
-.card {
-  padding: 28px 24px;
-}
-
-h1,
-h2,
-h3 {
-  margin-top: 0;
+.form-card h1 {
+  margin: 0 0 8px;
   color: #2f4d7c;
-  letter-spacing: -0.02em;
 }
 
-h1 {
-  font-size: clamp(32px, 4vw, 42px);
-  line-height: 1.08;
+.form-intro {
+  margin: 0 0 24px;
+  color: #6c7f99;
+}
+
+.case-card {
+  margin-bottom: 24px;
+}
+
+.case-topbar {
   margin-bottom: 12px;
 }
 
-h2 {
-  font-size: clamp(24px, 3vw, 32px);
-  line-height: 1.15;
-  margin-bottom: 12px;
-}
-
-h3 {
+.remove-case-btn {
+  width: 100%;
+  border: none;
+  border-radius: 24px;
+  padding: 16px 20px;
   font-size: 20px;
-  margin-bottom: 10px;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(180deg, #ef9a9a 0%, #dd5e5e 100%);
 }
 
-p {
-  margin-top: 0;
-  color: #536b92;
-}
-
-.section-intro {
-  font-size: 18px;
-  color: #5b7398;
-  margin-bottom: 26px;
-}
-
-/* =========================
-   Form Layout
-   ========================= */
-
-.form-grid {
+.case-fields {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 22px;
+  gap: 20px;
 }
 
-.form-field {
-  position: relative;
-  width: 100%;
-}
-
-.form-field-full,
-.full {
-  grid-column: 1 / -1;
-}
-
-.form-field label {
+.autosuggest-field label,
+.standard-field label {
   display: block;
-  font-size: 18px;
+  margin-bottom: 10px;
+  color: #3e5b86;
+  font-size: 17px;
   font-weight: 800;
-  color: #3c5a87;
-  margin-bottom: 12px;
 }
-
-/* =========================
-   Inputs / Selects / Textareas
-   ========================= */
-
-.form-field input,
-.form-field select,
-.form-field textarea,
-input[type="text"],
-input[type="email"],
-input[type="tel"],
-input[type="date"],
-input[type="number"],
-select,
-textarea {
-  width: 100%;
-  display: block;
-  appearance: none;
-  -webkit-appearance: none;
-  border: 2px solid #d4dfed;
-  background: #ffffff;
-  color: #243b63;
-  border-radius: 28px;
-  padding: 22px 24px;
-  font-size: 24px;
-  line-height: 1.2;
-  outline: none;
-  box-shadow: 0 2px 0 rgba(255, 255, 255, 0.8) inset;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
-}
-
-textarea {
-  resize: vertical;
-  min-height: 140px;
-  font-size: 20px;
-  line-height: 1.4;
-}
-
-input::placeholder,
-textarea::placeholder {
-  color: #9baecc;
-}
-
-/* Strong mobile-style focus like screenshot */
-.form-field input:focus,
-.form-field select:focus,
-.form-field textarea:focus,
-input:focus,
-select:focus,
-textarea:focus {
-  border-color: #75bdf6;
-  box-shadow:
-    0 0 0 4px rgba(117, 189, 246, 0.22),
-    0 8px 24px rgba(117, 189, 246, 0.12);
-}
-
-/* Date input cleanup */
-input[type="date"] {
-  min-height: 78px;
-  font-size: 22px;
-}
-
-input[type="date"]::-webkit-calendar-picker-indicator {
-  opacity: 0.7;
-  cursor: pointer;
-}
-
-/* Datalist fallback cleanup */
-input[list]::-webkit-calendar-picker-indicator {
-  display: none !important;
-}
-
-input[list] {
-  background-image: none;
-}
-
-/* =========================
-   Custom Autosuggest Dropdown
-   ========================= */
 
 .autosuggest-wrap {
   position: relative;
 }
 
+.autosuggest-input,
+.standard-input {
+  width: 100%;
+  border: 2px solid #d7e2ef;
+  border-radius: 24px;
+  background: #fff;
+  color: #243b63;
+  font-size: 20px;
+  padding: 20px 18px;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.autosuggest-input:focus,
+.standard-input:focus {
+  border-color: #78bef6;
+  box-shadow: 0 0 0 4px rgba(120, 190, 246, 0.22);
+}
+
+.notes-input {
+  min-height: 120px;
+  resize: vertical;
+}
+
 .autosuggest-menu {
   position: absolute;
+  top: calc(100% + 10px);
   left: 0;
   right: 0;
-  top: calc(100% + 12px);
-  z-index: 40;
-  background: #ffffff;
-  border: 1px solid #d6e1ee;
-  border-radius: 28px;
-  box-shadow: 0 14px 34px rgba(27, 56, 108, 0.12);
+  background: #fff;
+  border: 1px solid #dfe7f2;
+  border-radius: 24px;
+  box-shadow: 0 10px 24px rgba(31, 64, 122, 0.12);
   overflow: hidden;
-  max-height: 360px;
-  overflow-y: auto;
+  z-index: 20;
 }
 
 .autosuggest-item {
   display: block;
   width: 100%;
-  padding: 22px 28px 20px;
+  border: none;
+  border-bottom: 1px solid #e6edf6;
+  background: #fff;
   text-align: left;
-  border: 0;
-  background: #ffffff;
-  border-bottom: 1px solid #e4edf6;
-  cursor: pointer;
+  padding: 18px 18px 16px;
 }
 
 .autosuggest-item:last-child {
-  border-bottom: 0;
-}
-
-.autosuggest-item:hover,
-.autosuggest-item.active {
-  background: #f5faff;
+  border-bottom: none;
 }
 
 .autosuggest-title {
   display: block;
-  font-size: 24px;
+  font-size: 18px;
   font-weight: 800;
   color: #243b63;
-  line-height: 1.15;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .autosuggest-subtitle {
   display: block;
-  font-size: 18px;
-  color: #7388ab;
-  line-height: 1.2;
+  font-size: 14px;
+  color: #7387a5;
 }
-
-/* =========================
-   Buttons
-   ========================= */
-
-.form-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  margin-top: 6px;
-}
-
-button,
-.btn,
-.btn-primary,
-.btn-secondary,
-.btn-danger,
-a.btn {
-  appearance: none;
-  -webkit-appearance: none;
-  border: 0;
-  cursor: pointer;
-  text-decoration: none;
-  font-weight: 800;
-  font-size: 22px;
-  line-height: 1;
-  border-radius: 24px;
-  min-height: 72px;
-  padding: 20px 24px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.15s ease, box-shadow 0.2s ease, opacity 0.2s ease;
-}
-
-button:hover,
-.btn:hover,
-.btn-primary:hover,
-.btn-secondary:hover,
-.btn-danger:hover,
-a.btn:hover {
-  transform: translateY(-1px);
-}
-
-button:active,
-.btn:active,
-.btn-primary:active,
-.btn-secondary:active,
-.btn-danger:active,
-a.btn:active {
-  transform: translateY(0);
-}
-
-.btn-primary {
-  background: linear-gradient(180deg, #2c67cc 0%, #123d8f 100%);
-  color: #ffffff;
-  box-shadow: 0 10px 22px rgba(18, 61, 143, 0.2);
-}
-
-.btn-secondary {
-  background: #eef4fb;
-  color: #2f4d7c;
-  border: 1px solid #d6e1ee;
-}
-
-.btn-danger {
-  background: linear-gradient(180deg, #f38b8b 0%, #de5f5f 100%);
-  color: #ffffff;
-  box-shadow: 0 10px 22px rgba(222, 95, 95, 0.22);
-}
-
-/* =========================
-   Footer
-   ========================= */
-
-.site-footer,
-.footer {
-  margin-top: 48px;
-  background: #ffffff;
-  border-top: 1px solid #dbe5f0;
-}
-
-.footer-inner {
-  width: min(1100px, 92%);
-  margin: 0 auto;
-  padding: 22px 0 34px;
-  color: #6a80a2;
-  font-size: 15px;
-}
-
-.footer a,
-.site-footer a {
-  color: #36527f;
-  text-decoration: none;
-}
-
-.footer a:hover,
-.site-footer a:hover {
-  color: #123d8f;
-}
-
-/* =========================
-   Utility
-   ========================= */
 
 .hidden {
-  display: none !important;
+  display: none;
 }
 
-.text-center {
-  text-align: center;
+.full-width {
+  grid-column: 1 / -1;
 }
 
-.mt-0 {
-  margin-top: 0 !important;
+.form-actions {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+  margin-top: 8px;
 }
 
-.mb-0 {
-  margin-bottom: 0 !important;
+.primary-btn,
+.secondary-btn {
+  width: 100%;
+  border: none;
+  border-radius: 24px;
+  padding: 18px 20px;
+  font-size: 18px;
+  font-weight: 800;
+  cursor: pointer;
 }
 
-/* =========================
-   Tablet / Desktop
-   ========================= */
+.primary-btn {
+  background: #123d8f;
+  color: #fff;
+}
+
+.secondary-btn {
+  background: #eef4fb;
+  color: #2f4d7c;
+  border: 1px solid #dfe7f2;
+}
 
 @media (min-width: 768px) {
   .form-card {
-    padding: 34px 34px 30px;
+    padding: 28px 24px 32px;
   }
 
-  .form-grid.two-col {
+  .case-fields {
     grid-template-columns: 1fr 1fr;
-  }
-
-  .form-actions.row {
-    flex-direction: row;
-    justify-content: space-between;
-  }
-}
-
-/* =========================
-   Mobile tuning
-   ========================= */
-
-@media (max-width: 767px) {
-  .topbar-inner {
-    min-height: 66px;
-  }
-
-  .logo {
-    font-size: 24px;
-  }
-
-  .nav {
-    gap: 12px;
-  }
-
-  .nav a {
-    font-size: 14px;
-  }
-
-  .form-card {
-    border-radius: 24px;
-    padding: 22px 16px 22px;
-  }
-
-  .section-intro {
-    font-size: 17px;
-    margin-bottom: 20px;
-  }
-
-  .form-field label {
-    font-size: 17px;
-    margin-bottom: 10px;
-  }
-
-  .form-field input,
-  .form-field select,
-  .form-field textarea,
-  input[type="text"],
-  input[type="email"],
-  input[type="tel"],
-  input[type="date"],
-  input[type="number"],
-  select,
-  textarea {
-    font-size: 20px;
-    min-height: 74px;
-    padding: 20px 20px;
-    border-radius: 24px;
-  }
-
-  textarea {
-    min-height: 130px;
-    font-size: 18px;
-  }
-
-  .autosuggest-menu {
-    border-radius: 24px;
-    top: calc(100% + 10px);
-  }
-
-  .autosuggest-item {
-    padding: 18px 20px;
-  }
-
-  .autosuggest-title {
-    font-size: 19px;
-    margin-bottom: 6px;
-  }
-
-  .autosuggest-subtitle {
-    font-size: 16px;
-  }
-
-  button,
-  .btn,
-  .btn-primary,
-  .btn-secondary,
-  .btn-danger,
-  a.btn {
-    width: 100%;
-    font-size: 20px;
-    min-height: 68px;
-    border-radius: 22px;
   }
 }
