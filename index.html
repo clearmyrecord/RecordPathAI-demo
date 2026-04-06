@@ -4,23 +4,583 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ClearMyRecord</title>
-  <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #f3f5fb;
+      --surface: #ffffff;
+      --surface-soft: #edf2fb;
+      --text: #233f73;
+      --muted: #65789e;
+      --border: #dfe7f5;
+      --primary: #6ea5f5;
+      --primary-dark: #4f84da;
+      --shadow: 0 12px 30px rgba(50, 80, 140, 0.08);
+      --radius: 22px;
+      --container: 1180px;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .container {
+      width: min(var(--container), 94%);
+      margin: 0 auto;
+    }
+
+    .site-header {
+      padding: 18px 0;
+    }
+
+    .site-header .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 18px;
+      font-weight: 700;
+      color: #3c6db4;
+    }
+
+    .brand-icon {
+      width: 28px;
+      height: 28px;
+      border: 2px solid #222;
+      border-radius: 3px;
+      background: #fff;
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .brand-icon::before,
+    .brand-icon::after {
+      content: "";
+      position: absolute;
+      left: 5px;
+      right: 5px;
+      height: 2px;
+      background: #222;
+    }
+
+    .brand-icon::before {
+      top: 8px;
+      box-shadow: 0 6px 0 #222, 0 12px 0 #222;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+
+    .nav a {
+      font-size: 14px;
+      color: var(--text);
+    }
+
+    .nav .nav-pill {
+      padding: 12px 20px;
+      border-radius: 14px;
+      background: #eaf1fd;
+      font-weight: 700;
+    }
+
+    .nav .nav-outline {
+      padding: 11px 18px;
+      border-radius: 14px;
+      border: 1px solid #d6deed;
+      background: #fff;
+      font-weight: 700;
+    }
+
+    .hero {
+      padding: 24px 0 36px;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.02fr 0.98fr;
+      gap: 48px;
+      align-items: center;
+    }
+
+    .hero-copy h1 {
+      margin: 0 0 20px;
+      font-size: clamp(48px, 7vw, 82px);
+      line-height: 0.95;
+      letter-spacing: -2px;
+      font-weight: 800;
+      max-width: 560px;
+    }
+
+    .hero-copy p {
+      max-width: 520px;
+      margin: 0 0 26px;
+      font-size: 20px;
+      line-height: 1.45;
+      color: var(--muted);
+    }
+
+    .hero-cta {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 290px;
+      padding: 22px 34px;
+      border-radius: 22px;
+      background: linear-gradient(180deg, #7cb2fb 0%, #5e95eb 100%);
+      color: #fff;
+      font-size: 22px;
+      font-weight: 800;
+      box-shadow: 0 16px 28px rgba(90, 139, 228, 0.28);
+    }
+
+    .hero-note {
+      margin-top: 22px;
+      font-size: 17px;
+      color: var(--text);
+    }
+
+    .hero-visual {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .illustration {
+      width: 100%;
+      max-width: 560px;
+      aspect-ratio: 1.12 / 1;
+      background: rgba(255, 255, 255, 0.25);
+      border-radius: 34px;
+      position: relative;
+    }
+
+    .ill-bg-card {
+      position: absolute;
+      border-radius: 22px;
+      background: #fff;
+      border: 1px solid #dde6f4;
+    }
+
+    .ill-bg-card.top {
+      width: 120px;
+      height: 92px;
+      top: 52px;
+      left: 190px;
+    }
+
+    .ill-bg-card.main {
+      width: 240px;
+      height: 160px;
+      top: 128px;
+      left: 160px;
+    }
+
+    .ill-line {
+      position: absolute;
+      height: 10px;
+      border-radius: 999px;
+      background: #c9d8f2;
+      left: 188px;
+    }
+
+    .ill-line.one {
+      width: 120px;
+      top: 156px;
+    }
+
+    .ill-line.two {
+      width: 150px;
+      top: 184px;
+    }
+
+    .ill-line.three {
+      width: 118px;
+      top: 212px;
+    }
+
+    .ill-person-head {
+      width: 86px;
+      height: 86px;
+      border-radius: 50%;
+      background: #7c97c7;
+      position: absolute;
+      top: 54px;
+      left: 68px;
+      z-index: 2;
+    }
+
+    .ill-person-body {
+      width: 170px;
+      height: 220px;
+      border-radius: 90px 90px 30px 30px;
+      background: linear-gradient(180deg, #7e98c7 0%, #6886ba 100%);
+      position: absolute;
+      top: 118px;
+      left: 38px;
+      z-index: 2;
+    }
+
+    .ill-person-arm {
+      width: 48px;
+      height: 96px;
+      border-radius: 24px;
+      background: #d9e4f8;
+      position: absolute;
+      top: 184px;
+      left: 180px;
+      transform: rotate(18deg);
+      z-index: 3;
+    }
+
+    .ill-shadow {
+      width: 230px;
+      height: 130px;
+      border-radius: 50%;
+      background: rgba(205, 220, 245, 0.55);
+      position: absolute;
+      bottom: 16px;
+      left: 88px;
+    }
+
+    .check {
+      position: absolute;
+      width: 72px;
+      height: 72px;
+      border-radius: 18px;
+      background: linear-gradient(180deg, #6fa8fb 0%, #5c93ea 100%);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-size: 38px;
+      font-weight: 800;
+      box-shadow: 0 14px 22px rgba(93, 143, 234, 0.26);
+      z-index: 4;
+    }
+
+    .check.one {
+      top: 146px;
+      right: 84px;
+    }
+
+    .check.two {
+      top: 184px;
+      right: 18px;
+    }
+
+    .check.three {
+      top: 250px;
+      right: 32px;
+    }
+
+    section {
+      padding: 28px 0;
+    }
+
+    .section-title {
+      text-align: center;
+      font-size: clamp(34px, 4vw, 58px);
+      line-height: 1.08;
+      margin: 0 0 34px;
+      letter-spacing: -1px;
+      font-weight: 800;
+    }
+
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .step-card {
+      background: rgba(255, 255, 255, 0.7);
+      border: 1px solid #e2e8f4;
+      border-radius: 24px;
+      padding: 36px 26px 30px;
+      text-align: center;
+      min-height: 330px;
+    }
+
+    .step-icon {
+      width: 110px;
+      height: 110px;
+      border-radius: 26px;
+      background: #e8eefb;
+      display: grid;
+      place-items: center;
+      margin: 0 auto 26px;
+      font-size: 54px;
+    }
+
+    .step-card h3 {
+      margin: 0 0 14px;
+      font-size: 21px;
+      line-height: 1.3;
+    }
+
+    .step-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.55;
+      max-width: 260px;
+      margin-inline: auto;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 22px;
+      text-align: center;
+    }
+
+    .feature {
+      padding: 0 10px;
+    }
+
+    .feature-icon {
+      width: 72px;
+      height: 72px;
+      border-radius: 20px;
+      display: grid;
+      place-items: center;
+      margin: 0 auto 18px;
+      background: linear-gradient(180deg, #7bb0fb 0%, #6498ec 100%);
+      font-size: 34px;
+      box-shadow: 0 12px 20px rgba(95, 145, 235, 0.22);
+    }
+
+    .feature h4 {
+      margin: 0 0 10px;
+      font-size: 18px;
+    }
+
+    .feature p {
+      margin: 0;
+      font-size: 15px;
+      line-height: 1.5;
+      color: var(--muted);
+    }
+
+    .testimonial {
+      margin-top: 22px;
+      background: rgba(255, 255, 255, 0.7);
+      border: 1px solid #e0e8f5;
+      border-radius: 24px;
+      padding: 34px 28px 30px;
+      display: grid;
+      grid-template-columns: 84px 1fr;
+      gap: 20px;
+      align-items: end;
+    }
+
+    .testimonial-avatar {
+      width: 76px;
+      height: 76px;
+      border-radius: 50%;
+      background: #e8eef9;
+      display: grid;
+      place-items: center;
+      font-size: 40px;
+      align-self: end;
+    }
+
+    .testimonial-content {
+      position: relative;
+      padding-top: 16px;
+    }
+
+    .quote-mark {
+      position: absolute;
+      top: -8px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-size: 54px;
+      line-height: 1;
+      color: #b8c7e3;
+      font-weight: 700;
+    }
+
+    .testimonial p {
+      margin: 18px 0 16px;
+      color: var(--text);
+      font-size: 17px;
+      line-height: 1.6;
+      max-width: 920px;
+    }
+
+    .stars {
+      font-size: 22px;
+      color: #9eb1d4;
+      letter-spacing: 4px;
+    }
+
+    .bottom-cta {
+      padding: 36px 0 70px;
+      text-align: center;
+    }
+
+    .bottom-cta .hero-cta {
+      min-width: 460px;
+      max-width: 100%;
+    }
+
+    @media (max-width: 1100px) {
+      .hero-grid,
+      .steps-grid,
+      .features-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-copy {
+        order: 1;
+      }
+
+      .hero-visual {
+        order: 2;
+      }
+
+      .hero-copy h1,
+      .hero-copy p {
+        max-width: none;
+      }
+
+      .step-card {
+        min-height: auto;
+      }
+
+      .feature {
+        max-width: 420px;
+        margin: 0 auto;
+      }
+
+      .bottom-cta .hero-cta {
+        min-width: 280px;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .site-header .container {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .nav {
+        gap: 12px;
+      }
+
+      .hero {
+        padding-top: 8px;
+      }
+
+      .hero-copy h1 {
+        font-size: 54px;
+        letter-spacing: -1px;
+      }
+
+      .hero-copy p {
+        font-size: 18px;
+      }
+
+      .hero-cta {
+        width: 100%;
+        min-width: 0;
+        padding: 18px 22px;
+        font-size: 20px;
+      }
+
+      .illustration {
+        max-width: 100%;
+        min-height: 380px;
+      }
+
+      .ill-bg-card.top {
+        left: 50%;
+        transform: translateX(-8%);
+      }
+
+      .ill-bg-card.main {
+        left: 42%;
+        transform: translateX(-10%);
+      }
+
+      .ill-person-head {
+        left: 34px;
+      }
+
+      .ill-person-body {
+        left: 10px;
+      }
+
+      .ill-person-arm {
+        left: 142px;
+      }
+
+      .check.one {
+        right: 52px;
+      }
+
+      .check.two {
+        right: 6px;
+      }
+
+      .check.three {
+        right: 14px;
+      }
+
+      .section-title {
+        font-size: 40px;
+      }
+
+      .testimonial {
+        grid-template-columns: 1fr;
+        text-align: left;
+      }
+
+      .testimonial-avatar {
+        align-self: start;
+      }
+    }
+  </style>
 </head>
 <body>
   <header class="site-header">
-    <div class="container header-inner">
-      <a href="index.html" class="logo">
-        <span class="logo-mark"></span>
+    <div class="container">
+      <a href="#" class="brand">
+        <span class="brand-icon" aria-hidden="true"></span>
         <span>ClearMyRecord</span>
       </a>
 
-      <nav class="site-nav">
+      <nav class="nav">
         <a href="how-it-works.html">How It Works</a>
-        <a href="eligibility.html" class="active">Check Eligibility</a>
-        <a href="faq.html">FAQ</a>
-        <a href="about.html">About</a>
-        <a href="contact.html">Contact</a>
-        <a href="#" class="nav-button">Log In</a>
+        <a href="eligibility.html">Eligibility</a>
+        <a href="eligibility.html" class="nav-pill">Check Eligibility</a>
+        <a href="login.html" class="nav-outline">Log In</a>
       </nav>
     </div>
   </header>
@@ -30,132 +590,98 @@
       <div class="container hero-grid">
         <div class="hero-copy">
           <h1>Clear Your Criminal Record with More Confidence</h1>
-          <p>Find out whether you may qualify for record sealing or expungement in 60 seconds or less.</p>
-
-          <div class="hero-actions">
-            <a href="eligibility.html" class="btn btn-primary">Check Eligibility</a>
-          </div>
-
-          <div class="trust-line">100% Free &amp; Confidential</div>
+          <p>
+            Find out whether you may qualify for record sealing or
+            expungement in 60 seconds or less.
+          </p>
+          <a href="eligibility.html" class="hero-cta">Check Eligibility</a>
+          <div class="hero-note">100% Free &amp; Confidential</div>
         </div>
 
-        <div class="hero-visual" aria-hidden="true">
-          <div class="visual-card">
-            <div class="visual-person"></div>
-            <div class="visual-monitor"></div>
-            <div class="visual-stand"></div>
-            <div class="visual-shield"></div>
-            <div class="visual-shield-two"></div>
-            <div class="visual-shield-three"></div>
+        <div class="hero-visual">
+          <div class="illustration" aria-hidden="true">
+            <div class="ill-bg-card top"></div>
+            <div class="ill-bg-card main"></div>
+            <div class="ill-line one"></div>
+            <div class="ill-line two"></div>
+            <div class="ill-line three"></div>
+            <div class="ill-person-head"></div>
+            <div class="ill-person-body"></div>
+            <div class="ill-person-arm"></div>
+            <div class="ill-shadow"></div>
+            <div class="check one">✓</div>
+            <div class="check two">✓</div>
+            <div class="check three">✓</div>
           </div>
         </div>
       </div>
     </section>
 
-    <section class="section">
+    <section>
       <div class="container">
         <h2 class="section-title">Simple steps to get started.</h2>
 
-        <div class="card-grid three">
-          <div class="card step-card">
-            <div class="icon-box">🔎</div>
-            <h3>Check Eligibility</h3>
-            <p>Answer a few questions about your record and timeline.</p>
-          </div>
+        <div class="steps-grid">
+          <article class="step-card">
+            <div class="step-icon">🔎</div>
+            <h3>1. Check Eligibility</h3>
+            <p>
+              Answer a few questions about your record, charges, and case timing.
+            </p>
+          </article>
 
-          <div class="card step-card">
-            <div class="icon-box">📄</div>
-            <h3>Generate Forms</h3>
-            <p>Organize the details needed for your record-clearing packet.</p>
-          </div>
+          <article class="step-card">
+            <div class="step-icon">📝</div>
+            <h3>2. Generate Forms</h3>
+            <p>
+              If you may qualify, ClearMyRecord helps organize the information
+              needed for court forms and packet preparation.
+            </p>
+          </article>
 
-          <div class="card step-card">
-            <div class="icon-box">🏛️</div>
-            <h3>Prepare to File</h3>
-            <p>Review the next steps before filing with the court.</p>
-          </div>
+          <article class="step-card">
+            <div class="step-icon">🏛️</div>
+            <h3>3. Prepare to File</h3>
+            <p>
+              Review the process, required documents, and court-specific steps
+              before filing with the court.
+            </p>
+          </article>
         </div>
       </div>
     </section>
 
-    <section class="section-lg">
+    <section>
       <div class="container">
         <h2 class="section-title">What ClearMyRecord Helps With</h2>
 
-        <div class="card-grid four">
-          <div class="feature-card">
-            <div class="icon-box">⏱</div>
-            <h3>Fast Screening</h3>
-            <p>Get an eligibility check in minutes.</p>
-          </div>
+        <div class="features-grid">
+          <article class="feature">
+            <div class="feature-icon">⏱️</div>
+            <h4>Fast Screening</h4>
+            <p>Get an eligibility check in minutes, not weeks.</p>
+          </article>
 
-          <div class="feature-card">
-            <div class="icon-box">🛡</div>
-            <h3>Confidential</h3>
+          <article class="feature">
+            <div class="feature-icon">🛡️</div>
+            <h4>Confidential</h4>
             <p>Your information stays private and organized.</p>
-          </div>
+          </article>
 
-          <div class="feature-card">
-            <div class="icon-box">📝</div>
-            <h3>Form Support</h3>
-            <p>Structure your information for cleaner packet prep.</p>
-          </div>
+          <article class="feature">
+            <div class="feature-icon">📄</div>
+            <h4>Form Support</h4>
+            <p>Helps structure the information needed for forms and packets.</p>
+          </article>
 
-          <div class="feature-card">
-            <div class="icon-box">⚖</div>
-            <h3>Court Awareness</h3>
-            <p>Understand the process before you file.</p>
-          </div>
+          <article class="feature">
+            <div class="feature-icon">⚖️</div>
+            <h4>Court Awareness</h4>
+            <p>Some courts have extra requirements, including fingerprints.</p>
+          </article>
         </div>
-      </div>
-    </section>
 
-    <section class="section">
-      <div class="container">
-        <div class="card quote-card">
-          <div class="quote-mark">“</div>
-          <p>ClearMyRecord helps people understand where to start, what information they need, and whether they may qualify before going deeper into the court process.</p>
-          <small>Built to make a complicated process easier to begin.</small>
-        </div>
-      </div>
-    </section>
+        <div class="testimonial">
+          <div class="testimonial-avatar">👤</div>
 
-    <section class="section">
-      <div class="container">
-        <div class="cta-strip">
-          <h2>Ready to see if you qualify?</h2>
-          <p>Start your free eligibility check now.</p>
-          <a href="eligibility.html" class="btn btn-primary">Start Eligibility Check</a>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <footer class="site-footer">
-    <div class="container footer-inner">
-      <div class="footer-block">
-        <h3>ClearMyRecord</h3>
-        <p>Helping people understand record sealing and expungement options with simple, affordable tools.</p>
-      </div>
-
-      <div class="footer-block">
-        <h4>Quick Links</h4>
-        <ul>
-          <li><a href="how-it-works.html">How It Works</a></li>
-          <li><a href="eligibility.html">Check Eligibility</a></li>
-          <li><a href="faq.html">FAQ</a></li>
-        </ul>
-      </div>
-
-      <div class="footer-block">
-        <h4>Contact</h4>
-        <p>Email: support@clearmyrecord.com</p>
-      </div>
-    </div>
-
-    <div class="container footer-bottom">
-      &copy; 2026 ClearMyRecord. All rights reserved.
-    </div>
-  </footer>
-</body>
-</html>
+          <div class
