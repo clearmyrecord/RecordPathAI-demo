@@ -1,351 +1,464 @@
-const SUGGESTION_DATA = {
-  chargeName: {
-    placeholder: "Start typing a charge",
-    suggestions: (() => {
-      if (!window.chargeLibrary || !Array.isArray(window.chargeLibrary)) return [];
-      return window.chargeLibrary.map((item) => {
-        if (typeof item === "string") {
-          return { title: item, subtitle: "Charge" };
+(function () {
+  const offenseList = document.getElementById("offenseList");
+  const emptyState = document.getElementById("emptyState");
+  const addOffenseBtn = document.getElementById("addOffenseBtn");
+  const backBtn = document.getElementById("backBtn");
+  const continueBtn = document.getElementById("continueBtn");
+  const recordStatus = document.getElementById("recordStatus");
+
+  const fallbackCharges = [
+    "DUI",
+    "OVI",
+    "Assault",
+    "Domestic Violence",
+    "Drug Possession",
+    "Disorderly Conduct",
+    "Petty Theft",
+    "Theft",
+    "Burglary",
+    "Criminal Trespass",
+    "Receiving Stolen Property",
+    "Resisting Arrest",
+    "Menacing",
+    "Driving Under Suspension"
+  ];
+
+  const dispositionOptions = [
+    "Dismissed",
+    "Not Guilty",
+    "Guilty",
+    "No Contest",
+    "Deferred",
+    "Reduced",
+    "Vacated",
+    "Expunged",
+    "Sealed"
+  ];
+
+  const levelOptions = [
+    "Misdemeanor",
+    "Felony",
+    "Infraction",
+    "Citation",
+    "Traffic",
+    "Minor Misdemeanor"
+  ];
+
+  const caseTypeOptions = [
+    "Criminal",
+    "Traffic",
+    "Misdemeanor",
+    "Felony",
+    "Municipal",
+    "County",
+    "Common Pleas"
+  ];
+
+  const courtOptions = [
+    "Municipal Court",
+    "County Court",
+    "Common Pleas Court",
+    "District Court",
+    "Justice Court"
+  ];
+
+  const countyOptions = [
+    "Clark County",
+    "Cuyahoga County",
+    "Franklin County",
+    "Hamilton County",
+    "Lucas County",
+    "Montgomery County",
+    "Summit County"
+  ];
+
+  let offenseCounter = 0;
+  let activeSuggestionBox = null;
+
+  function normalizeChargeLibrary() {
+    try {
+      if (!Array.isArray(window.CHARGES)) {
+        return fallbackCharges.slice();
+      }
+
+      const normalized = window.CHARGES
+        .map((item) => {
+          if (typeof item === "string") return item.trim();
+          if (item && typeof item.name === "string") return item.name.trim();
+          if (item && typeof item.charge === "string") return item.charge.trim();
+          if (item && typeof item.title === "string") return item.title.trim();
+          return "";
+        })
+        .filter(Boolean);
+
+      return normalized.length ? uniqueStrings(normalized) : fallbackCharges.slice();
+    } catch (error) {
+      console.error("Charge library failed to load.", error);
+      return fallbackCharges.slice();
+    }
+  }
+
+  function uniqueStrings(list) {
+    return Array.from(new Set(list.map((item) => String(item).trim()).filter(Boolean)));
+  }
+
+  const chargeLibrary = normalizeChargeLibrary();
+
+  function escapeHtml(value) {
+    return String(value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  function closeActiveSuggestions() {
+    if (activeSuggestionBox) {
+      activeSuggestionBox.classList.remove("is-open");
+      activeSuggestionBox.innerHTML = "";
+      activeSuggestionBox = null;
+    }
+  }
+
+  function updateEmptyState() {
+    const count = offenseList.querySelectorAll(".rd-offense").length;
+    emptyState.hidden = count > 0;
+
+    if (count === 0) {
+      recordStatus.textContent = "No offenses added";
+    } else if (count === 1) {
+      recordStatus.textContent = "1 offense added";
+    } else {
+      recordStatus.textContent = `${count} offenses added`;
+    }
+  }
+
+  function createField({
+    label,
+    name,
+    type = "text",
+    placeholder = "",
+    full = false,
+    suggestions = null,
+    helper = ""
+  }) {
+    const field = document.createElement("div");
+    field.className = `rd-field${full ? " rd-field-full" : ""}`;
+
+    const inputId = `${name}-${Math.random().toString(36).slice(2, 10)}`;
+
+    let inputMarkup = "";
+
+    if (type === "textarea") {
+      inputMarkup = `
+        <textarea
+          class="rd-textarea"
+          id="${inputId}"
+          name="${escapeHtml(name)}"
+          placeholder="${escapeHtml(placeholder)}"
+          rows="4"
+        ></textarea>
+      `;
+    } else {
+      inputMarkup = `
+        <input
+          class="rd-input"
+          id="${inputId}"
+          name="${escapeHtml(name)}"
+          type="${escapeHtml(type)}"
+          placeholder="${escapeHtml(placeholder)}"
+          autocomplete="off"
+        />
+      `;
+    }
+
+    field.innerHTML = `
+      <label class="rd-label" for="${inputId}">${escapeHtml(label)}</label>
+      ${inputMarkup}
+      ${suggestions ? '<div class="rd-suggestions"></div>' : ""}
+      ${helper ? `<div class="rd-helper">${escapeHtml(helper)}</div>` : ""}
+    `;
+
+    if (suggestions) {
+      const input = field.querySelector(type === "textarea" ? "textarea" : "input");
+      const box = field.querySelector(".rd-suggestions");
+      bindSuggestions(input, box, suggestions);
+    }
+
+    return field;
+  }
+
+  function bindSuggestions(input, box, sourceList) {
+    let activeIndex = -1;
+    let currentMatches = [];
+
+    function render(matches) {
+      currentMatches = matches;
+      activeIndex = -1;
+
+      if (!matches.length) {
+        box.classList.remove("is-open");
+        box.innerHTML = "";
+        if (activeSuggestionBox === box) activeSuggestionBox = null;
+        return;
+      }
+
+      box.innerHTML = matches
+        .map((item) => `<div class="rd-suggestion">${escapeHtml(item)}</div>`)
+        .join("");
+
+      box.classList.add("is-open");
+      activeSuggestionBox = box;
+
+      Array.from(box.querySelectorAll(".rd-suggestion")).forEach((node, index) => {
+        node.addEventListener("mousedown", function (event) {
+          event.preventDefault();
+          choose(index);
+        });
+      });
+    }
+
+    function choose(index) {
+      if (index < 0 || index >= currentMatches.length) return;
+      input.value = currentMatches[index];
+      box.classList.remove("is-open");
+      box.innerHTML = "";
+      if (activeSuggestionBox === box) activeSuggestionBox = null;
+      input.dispatchEvent(new Event("change", { bubbles: true }));
+    }
+
+    function filterList(value) {
+      const query = value.trim().toLowerCase();
+      if (!query) {
+        render([]);
+        return;
+      }
+
+      const startsWith = [];
+      const includes = [];
+
+      sourceList.forEach((item) => {
+        const text = String(item);
+        const lower = text.toLowerCase();
+
+        if (lower.startsWith(query)) {
+          startsWith.push(text);
+        } else if (lower.includes(query)) {
+          includes.push(text);
         }
-        return {
-          title: item.name || item.charge || item.title || "",
-          subtitle: item.category || item.group || "Charge"
-        };
-      }).filter(x => x.title);
-    })()
-  },
+      });
 
-  disposition: {
-    placeholder: "Select disposition",
-    suggestions: [
-      { title: "Dismissed", subtitle: "Case outcome" },
-      { title: "Convicted", subtitle: "Case outcome" },
-      { title: "Acquitted", subtitle: "Case outcome" },
-      { title: "Deferred Adjudication", subtitle: "Case outcome" },
-      { title: "Diversion Completed", subtitle: "Case outcome" },
-      { title: "Charges Dropped", subtitle: "Case outcome" },
-      { title: "No Contest", subtitle: "Case outcome" },
-      { title: "Vacated", subtitle: "Case outcome" }
-    ]
-  },
+      render([...startsWith, ...includes].slice(0, 8));
+    }
 
-  chargeLevel: {
-    placeholder: "Select charge level",
-    suggestions: [
-      { title: "Infraction", subtitle: "Level" },
-      { title: "Violation", subtitle: "Level" },
-      { title: "Misdemeanor", subtitle: "Level" },
-      { title: "Gross Misdemeanor", subtitle: "Level" },
-      { title: "Felony", subtitle: "Level" },
-      { title: "Unclassified Felony", subtitle: "Level" }
-    ]
-  },
+    input.addEventListener("input", function () {
+      filterList(input.value);
+    });
 
-  caseStatus: {
-    placeholder: "Select case status",
-    suggestions: [
-      { title: "Open", subtitle: "Status" },
-      { title: "Closed", subtitle: "Status" },
-      { title: "Pending", subtitle: "Status" },
-      { title: "Dismissed", subtitle: "Status" },
-      { title: "Sealed", subtitle: "Status" },
-      { title: "Expunged", subtitle: "Status" }
-    ]
-  },
+    input.addEventListener("focus", function () {
+      if (input.value.trim()) {
+        filterList(input.value);
+      }
+    });
 
-  plea: {
-    placeholder: "Select plea",
-    suggestions: [
-      { title: "Guilty", subtitle: "Plea" },
-      { title: "Not Guilty", subtitle: "Plea" },
-      { title: "No Contest", subtitle: "Plea" },
-      { title: "Alford Plea", subtitle: "Plea" }
-    ]
-  },
+    input.addEventListener("keydown", function (event) {
+      const items = Array.from(box.querySelectorAll(".rd-suggestion"));
+      if (!items.length) return;
 
-  sentenceType: {
-    placeholder: "Select sentence type",
-    suggestions: [
-      { title: "Jail", subtitle: "Sentence" },
-      { title: "Prison", subtitle: "Sentence" },
-      { title: "Probation", subtitle: "Sentence" },
-      { title: "Fine", subtitle: "Sentence" },
-      { title: "Community Service", subtitle: "Sentence" },
-      { title: "Treatment Program", subtitle: "Sentence" },
-      { title: "Time Served", subtitle: "Sentence" },
-      { title: "No Sentence", subtitle: "Sentence" }
-    ]
-  },
+      if (event.key === "ArrowDown") {
+        event.preventDefault();
+        activeIndex = (activeIndex + 1) % items.length;
+      } else if (event.key === "ArrowUp") {
+        event.preventDefault();
+        activeIndex = activeIndex <= 0 ? items.length - 1 : activeIndex - 1;
+      } else if (event.key === "Enter") {
+        if (activeIndex >= 0) {
+          event.preventDefault();
+          choose(activeIndex);
+        }
+        return;
+      } else if (event.key === "Escape") {
+        box.classList.remove("is-open");
+        box.innerHTML = "";
+        if (activeSuggestionBox === box) activeSuggestionBox = null;
+        return;
+      } else {
+        return;
+      }
 
-  courtType: {
-    placeholder: "Select court type",
-    suggestions: [
-      { title: "Municipal Court", subtitle: "Court" },
-      { title: "Justice Court", subtitle: "Court" },
-      { title: "District Court", subtitle: "Court" },
-      { title: "Superior Court", subtitle: "Court" },
-      { title: "Circuit Court", subtitle: "Court" },
-      { title: "County Court", subtitle: "Court" }
-    ]
-  },
+      items.forEach((item, index) => {
+        item.classList.toggle("is-active", index === activeIndex);
+      });
+    });
 
-  state: {
-    placeholder: "Select state",
-    suggestions: [
-      "Alabama","Alaska","Arizona","Arkansas","California","Colorado","Connecticut",
-      "Delaware","Florida","Georgia","Hawaii","Idaho","Illinois","Indiana","Iowa",
-      "Kansas","Kentucky","Louisiana","Maine","Maryland","Massachusetts","Michigan",
-      "Minnesota","Mississippi","Missouri","Montana","Nebraska","Nevada","New Hampshire",
-      "New Jersey","New Mexico","New York","North Carolina","North Dakota","Ohio",
-      "Oklahoma","Oregon","Pennsylvania","Rhode Island","South Carolina","South Dakota",
-      "Tennessee","Texas","Utah","Vermont","Virginia","Washington","West Virginia",
-      "Wisconsin","Wyoming"
-    ].map(x => ({ title: x, subtitle: "State" }))
-  },
-
-  county: {
-    placeholder: "Select county",
-    suggestions: [
-      { title: "Clark County", subtitle: "County" },
-      { title: "Washoe County", subtitle: "County" },
-      { title: "Cuyahoga County", subtitle: "County" },
-      { title: "Franklin County", subtitle: "County" },
-      { title: "Maricopa County", subtitle: "County" },
-      { title: "Los Angeles County", subtitle: "County" }
-    ]
-  },
-
-  arrestingAgency: {
-    placeholder: "Select agency",
-    suggestions: [
-      { title: "Las Vegas Metropolitan Police Department", subtitle: "Agency" },
-      { title: "Henderson Police Department", subtitle: "Agency" },
-      { title: "North Las Vegas Police Department", subtitle: "Agency" },
-      { title: "Sheriff's Office", subtitle: "Agency" },
-      { title: "Highway Patrol", subtitle: "Agency" },
-      { title: "State Police", subtitle: "Agency" }
-    ]
-  }
-};
-
-const CASE_FIELDS = [
-  { key: "chargeName", label: "Charge Name" },
-  { key: "disposition", label: "Disposition" },
-  { key: "chargeLevel", label: "Charge Level" },
-  { key: "caseStatus", label: "Case Status" },
-  { key: "plea", label: "Plea" },
-  { key: "sentenceType", label: "Sentence Type" },
-  { key: "courtType", label: "Court Type" },
-  { key: "state", label: "State" },
-  { key: "county", label: "County" },
-  { key: "arrestingAgency", label: "Arresting Agency" }
-];
-
-let caseCount = 0;
-
-function escapeHtml(value) {
-  return String(value)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#39;");
-}
-
-function normalize(value) {
-  return String(value || "").trim().toLowerCase();
-}
-
-function buildCaseCard(index) {
-  const wrapper = document.createElement("section");
-  wrapper.className = "case-card";
-  wrapper.dataset.caseIndex = index;
-
-  const removeButton = index === 0
-    ? ""
-    : `<button type="button" class="remove-case-btn" data-remove-case="${index}">Remove</button>`;
-
-  wrapper.innerHTML = `
-    <div class="case-topbar">
-      ${removeButton}
-    </div>
-
-    <div class="case-fields">
-      ${CASE_FIELDS.map((field) => {
-        const cfg = SUGGESTION_DATA[field.key];
-        return `
-          <div class="autosuggest-field" data-field-key="${field.key}">
-            <label for="${field.key}_${index}">${field.label}</label>
-            <div class="autosuggest-wrap">
-              <input
-                type="text"
-                id="${field.key}_${index}"
-                name="${field.key}_${index}"
-                class="autosuggest-input"
-                autocomplete="off"
-                placeholder="${escapeHtml(cfg.placeholder)}"
-              />
-              <div class="autosuggest-menu hidden"></div>
-            </div>
-          </div>
-        `;
-      }).join("")}
-
-      <div class="standard-field">
-        <label for="filingDate_${index}">Filing Date</label>
-        <input type="date" id="filingDate_${index}" name="filingDate_${index}" class="standard-input" />
-      </div>
-
-      <div class="standard-field">
-        <label for="dispositionDate_${index}">Disposition Date</label>
-        <input type="date" id="dispositionDate_${index}" name="dispositionDate_${index}" class="standard-input" />
-      </div>
-
-      <div class="standard-field">
-        <label for="sentenceCompletionDate_${index}">Sentence Completion Date</label>
-        <input type="date" id="sentenceCompletionDate_${index}" name="sentenceCompletionDate_${index}" class="standard-input" />
-      </div>
-
-      <div class="standard-field full-width">
-        <label for="notes_${index}">Notes</label>
-        <textarea id="notes_${index}" name="notes_${index}" class="standard-input notes-input" rows="4" placeholder="Add anything helpful"></textarea>
-      </div>
-    </div>
-  `;
-
-  return wrapper;
-}
-
-function renderSuggestionMenu(menu, matches) {
-  if (!matches.length) {
-    menu.innerHTML = "";
-    menu.classList.add("hidden");
-    return;
+    input.addEventListener("blur", function () {
+      setTimeout(function () {
+        box.classList.remove("is-open");
+        box.innerHTML = "";
+        if (activeSuggestionBox === box) activeSuggestionBox = null;
+      }, 140);
+    });
   }
 
-  menu.innerHTML = matches.map((item, idx) => `
-    <button type="button" class="autosuggest-item" data-value="${escapeHtml(item.title)}" data-index="${idx}">
-      <span class="autosuggest-title">${escapeHtml(item.title)}</span>
-      <span class="autosuggest-subtitle">${escapeHtml(item.subtitle || "")}</span>
-    </button>
-  `).join("");
+  function buildOffenseCard(index) {
+    const card = document.createElement("section");
+    card.className = "rd-offense";
+    card.dataset.offenseIndex = String(index);
 
-  menu.classList.remove("hidden");
-}
+    const top = document.createElement("div");
+    top.className = "rd-offense-top";
 
-function getMatches(fieldKey, value) {
-  const source = SUGGESTION_DATA[fieldKey]?.suggestions || [];
-  const q = normalize(value);
+    const title = document.createElement("h2");
+    title.className = "rd-offense-title";
+    title.textContent = `Offense ${index + 1}`;
 
-  if (!q) return source.slice(0, 6);
+    const removeBtn = document.createElement("button");
+    removeBtn.type = "button";
+    removeBtn.className = "rd-btn rd-btn-small rd-remove-btn";
+    removeBtn.textContent = "Remove";
 
-  return source
-    .filter(item =>
-      normalize(item.title).includes(q) ||
-      normalize(item.subtitle).includes(q)
-    )
-    .slice(0, 8);
-}
+    top.appendChild(title);
+    top.appendChild(removeBtn);
 
-function closeAllMenus(exceptMenu = null) {
-  document.querySelectorAll(".autosuggest-menu").forEach((menu) => {
-    if (menu !== exceptMenu) {
-      menu.classList.add("hidden");
+    const grid = document.createElement("div");
+    grid.className = "rd-grid";
+
+    grid.appendChild(createField({
+      label: "Charge Name",
+      name: `charge_name_${index}`,
+      placeholder: "Start typing a charge",
+      suggestions: chargeLibrary,
+      helper: "Suggestions come from your charge library."
+    }));
+
+    grid.appendChild(createField({
+      label: "Disposition / Outcome",
+      name: `disposition_${index}`,
+      placeholder: "Start typing a disposition",
+      suggestions: dispositionOptions
+    }));
+
+    grid.appendChild(createField({
+      label: "Charge Level",
+      name: `charge_level_${index}`,
+      placeholder: "Start typing a level",
+      suggestions: levelOptions
+    }));
+
+    grid.appendChild(createField({
+      label: "Case Type",
+      name: `case_type_${index}`,
+      placeholder: "Start typing a case type",
+      suggestions: caseTypeOptions
+    }));
+
+    grid.appendChild(createField({
+      label: "Court",
+      name: `court_${index}`,
+      placeholder: "Start typing a court",
+      suggestions: courtOptions
+    }));
+
+    grid.appendChild(createField({
+      label: "County",
+      name: `county_${index}`,
+      placeholder: "Start typing a county",
+      suggestions: countyOptions
+    }));
+
+    grid.appendChild(createField({
+      label: "Arrest Date",
+      name: `arrest_date_${index}`,
+      type: "date"
+    }));
+
+    grid.appendChild(createField({
+      label: "Case Number",
+      name: `case_number_${index}`,
+      placeholder: "Optional"
+    }));
+
+    grid.appendChild(createField({
+      label: "Notes",
+      name: `notes_${index}`,
+      type: "textarea",
+      placeholder: "Anything else about this offense...",
+      full: true
+    }));
+
+    card.appendChild(top);
+    card.appendChild(grid);
+
+    removeBtn.addEventListener("click", function () {
+      card.remove();
+      renumberOffenses();
+      updateEmptyState();
+    });
+
+    return card;
+  }
+
+  function renumberOffenses() {
+    const cards = Array.from(offenseList.querySelectorAll(".rd-offense"));
+    cards.forEach((card, index) => {
+      const title = card.querySelector(".rd-offense-title");
+      if (title) title.textContent = `Offense ${index + 1}`;
+    });
+  }
+
+  function addOffense() {
+    const card = buildOffenseCard(offenseCounter);
+    offenseCounter += 1;
+    offenseList.appendChild(card);
+    updateEmptyState();
+
+    const firstInput = card.querySelector(".rd-input, .rd-textarea");
+    if (firstInput) firstInput.focus();
+  }
+
+  function collectData() {
+    const cards = Array.from(offenseList.querySelectorAll(".rd-offense"));
+    return cards.map((card) => {
+      const data = {};
+      Array.from(card.querySelectorAll("input, textarea")).forEach((field) => {
+        data[field.name] = field.value;
+      });
+      return data;
+    });
+  }
+
+  addOffenseBtn.addEventListener("click", addOffense);
+
+  backBtn.addEventListener("click", function () {
+    if (document.referrer) {
+      window.history.back();
+    } else {
+      window.location.href = "eligibility.html";
     }
   });
-}
 
-function initAutosuggestForCard(card) {
-  const fields = card.querySelectorAll(".autosuggest-field");
+  continueBtn.addEventListener("click", function () {
+    const data = collectData();
+    try {
+      sessionStorage.setItem("clearMyRecord_recordDetails", JSON.stringify(data));
+    } catch (error) {
+      console.warn("Could not save record details to sessionStorage.", error);
+    }
 
-  fields.forEach((field) => {
-    const fieldKey = field.dataset.fieldKey;
-    const input = field.querySelector(".autosuggest-input");
-    const menu = field.querySelector(".autosuggest-menu");
+    console.log("Record details saved:", data);
 
-    input.addEventListener("focus", () => {
-      const matches = getMatches(fieldKey, input.value);
-      renderSuggestionMenu(menu, matches);
-      closeAllMenus(menu);
-    });
-
-    input.addEventListener("input", () => {
-      const matches = getMatches(fieldKey, input.value);
-      renderSuggestionMenu(menu, matches);
-      closeAllMenus(menu);
-    });
-
-    menu.addEventListener("click", (event) => {
-      const item = event.target.closest(".autosuggest-item");
-      if (!item) return;
-      input.value = item.dataset.value || "";
-      menu.classList.add("hidden");
-      input.dispatchEvent(new Event("change", { bubbles: true }));
-    });
-  });
-}
-
-function addCaseCard() {
-  const wrap = document.getElementById("casesWrap");
-  const card = buildCaseCard(caseCount);
-  wrap.appendChild(card);
-  initAutosuggestForCard(card);
-  caseCount += 1;
-}
-
-function removeCase(index) {
-  const card = document.querySelector(`.case-card[data-case-index="${index}"]`);
-  if (card) card.remove();
-}
-
-function collectFormData() {
-  const cards = [...document.querySelectorAll(".case-card")];
-
-  return cards.map((card) => {
-    const idx = card.dataset.caseIndex;
-    return {
-      chargeName: document.getElementById(`chargeName_${idx}`)?.value || "",
-      disposition: document.getElementById(`disposition_${idx}`)?.value || "",
-      chargeLevel: document.getElementById(`chargeLevel_${idx}`)?.value || "",
-      caseStatus: document.getElementById(`caseStatus_${idx}`)?.value || "",
-      plea: document.getElementById(`plea_${idx}`)?.value || "",
-      sentenceType: document.getElementById(`sentenceType_${idx}`)?.value || "",
-      courtType: document.getElementById(`courtType_${idx}`)?.value || "",
-      state: document.getElementById(`state_${idx}`)?.value || "",
-      county: document.getElementById(`county_${idx}`)?.value || "",
-      arrestingAgency: document.getElementById(`arrestingAgency_${idx}`)?.value || "",
-      filingDate: document.getElementById(`filingDate_${idx}`)?.value || "",
-      dispositionDate: document.getElementById(`dispositionDate_${idx}`)?.value || "",
-      sentenceCompletionDate: document.getElementById(`sentenceCompletionDate_${idx}`)?.value || "",
-      notes: document.getElementById(`notes_${idx}`)?.value || ""
-    };
-  });
-}
-
-document.addEventListener("click", (event) => {
-  const removeBtn = event.target.closest("[data-remove-case]");
-  if (removeBtn) {
-    removeCase(removeBtn.dataset.removeCase);
-    return;
-  }
-
-  if (!event.target.closest(".autosuggest-wrap")) {
-    closeAllMenus();
-  }
-});
-
-document.addEventListener("DOMContentLoaded", () => {
-  addCaseCard();
-
-  document.getElementById("addCaseBtn").addEventListener("click", () => {
-    addCaseCard();
+    if (window.location.href.includes("record-details.html")) {
+      window.location.href = "packet.html";
+    }
   });
 
-  document.getElementById("recordDetailsForm").addEventListener("submit", (event) => {
-    event.preventDefault();
-
-    const payload = collectFormData();
-    localStorage.setItem("cmr_record_details", JSON.stringify(payload));
-    window.location.href = "packet.html";
+  document.addEventListener("click", function (event) {
+    if (!event.target.closest(".rd-field")) {
+      closeActiveSuggestions();
+    }
   });
-});
+
+  addOffense();
+  updateEmptyState();
+})();
