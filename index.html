@@ -10,16 +10,17 @@
     }
 
     :root {
-      --bg: #f3f5fb;
+      --bg: #eef2f8;
       --surface: #ffffff;
-      --surface-soft: #edf2fb;
-      --text: #233f73;
-      --muted: #65789e;
-      --border: #dfe7f5;
-      --primary: #6ea5f5;
-      --primary-dark: #4f84da;
-      --shadow: 0 12px 30px rgba(50, 80, 140, 0.08);
-      --radius: 22px;
+      --text: #233d70;
+      --muted: #667796;
+      --line: #dbe3f0;
+      --blue: #6da7ff;
+      --blue-dark: #4f88e8;
+      --blue-soft: #dfe9fb;
+      --icon: #7f98c7;
+      --shadow: 0 10px 30px rgba(50, 78, 128, 0.08);
+      --radius: 24px;
       --container: 1180px;
     }
 
@@ -35,422 +36,425 @@
     }
 
     a {
-      text-decoration: none;
       color: inherit;
+      text-decoration: none;
     }
 
     .container {
-      width: min(var(--container), 94%);
+      width: min(var(--container), calc(100% - 32px));
       margin: 0 auto;
     }
 
+    /* Header */
     .site-header {
-      padding: 18px 0;
+      padding: 20px 0 12px;
     }
 
-    .site-header .container {
+    .header-inner {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 24px;
+      gap: 20px;
     }
 
     .brand {
       display: flex;
       align-items: center;
       gap: 12px;
-      font-size: 18px;
       font-weight: 700;
-      color: #3c6db4;
+      font-size: 18px;
+      color: #3b6db4;
     }
 
     .brand-icon {
-      width: 28px;
-      height: 28px;
+      width: 26px;
+      height: 32px;
       border: 2px solid #222;
-      border-radius: 3px;
+      border-radius: 2px;
       background: #fff;
       position: relative;
-      flex-shrink: 0;
+      flex: 0 0 auto;
     }
 
     .brand-icon::before,
     .brand-icon::after {
       content: "";
       position: absolute;
-      left: 5px;
-      right: 5px;
+      left: 4px;
+      right: 4px;
       height: 2px;
-      background: #222;
+      background: #999;
     }
 
     .brand-icon::before {
       top: 8px;
-      box-shadow: 0 6px 0 #222, 0 12px 0 #222;
+      box-shadow: 0 6px 0 #999, 0 12px 0 #999;
     }
 
     .nav {
       display: flex;
       align-items: center;
-      gap: 18px;
+      gap: 14px;
       flex-wrap: wrap;
     }
 
     .nav a {
-      font-size: 14px;
+      font-size: 16px;
       color: var(--text);
+      padding: 10px 12px;
+      border-radius: 14px;
     }
 
-    .nav .nav-pill {
-      padding: 12px 20px;
-      border-radius: 14px;
-      background: #eaf1fd;
+    .nav .nav-cta {
+      background: #e8f0fd;
       font-weight: 700;
+      padding: 12px 18px;
     }
 
-    .nav .nav-outline {
-      padding: 11px 18px;
-      border-radius: 14px;
-      border: 1px solid #d6deed;
+    .nav .nav-login {
       background: #fff;
+      border: 1px solid #d6dfed;
       font-weight: 700;
+      padding: 12px 18px;
     }
 
+    /* Hero */
     .hero {
-      padding: 24px 0 36px;
+      padding: 26px 0 44px;
     }
 
     .hero-grid {
       display: grid;
-      grid-template-columns: 1.02fr 0.98fr;
-      gap: 48px;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 40px;
       align-items: center;
     }
 
     .hero-copy h1 {
-      margin: 0 0 20px;
-      font-size: clamp(48px, 7vw, 82px);
+      margin: 0 0 18px;
+      font-size: clamp(54px, 8vw, 84px);
       line-height: 0.95;
       letter-spacing: -2px;
       font-weight: 800;
-      max-width: 560px;
+      max-width: 620px;
     }
 
     .hero-copy p {
-      max-width: 520px;
-      margin: 0 0 26px;
+      margin: 0 0 28px;
       font-size: 20px;
-      line-height: 1.45;
+      line-height: 1.5;
       color: var(--muted);
+      max-width: 560px;
     }
 
-    .hero-cta {
+    .hero-button {
       display: inline-flex;
       align-items: center;
       justify-content: center;
       min-width: 290px;
       padding: 22px 34px;
       border-radius: 22px;
-      background: linear-gradient(180deg, #7cb2fb 0%, #5e95eb 100%);
+      background: linear-gradient(180deg, #7fb2ff 0%, #5b93eb 100%);
       color: #fff;
-      font-size: 22px;
+      font-size: 20px;
       font-weight: 800;
-      box-shadow: 0 16px 28px rgba(90, 139, 228, 0.28);
+      box-shadow: 0 10px 22px rgba(91, 147, 235, 0.22);
     }
 
     .hero-note {
-      margin-top: 22px;
-      font-size: 17px;
+      margin-top: 24px;
+      font-size: 16px;
       color: var(--text);
     }
 
-    .hero-visual {
+    .hero-art {
       display: flex;
       justify-content: center;
       align-items: center;
     }
 
-    .illustration {
+    .hero-illustration {
       width: 100%;
-      max-width: 560px;
-      aspect-ratio: 1.12 / 1;
-      background: rgba(255, 255, 255, 0.25);
-      border-radius: 34px;
+      max-width: 520px;
+      aspect-ratio: 1.15 / 0.9;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 42px;
       position: relative;
     }
 
-    .ill-bg-card {
+    .hero-illustration .doc-top {
       position: absolute;
-      border-radius: 22px;
-      background: #fff;
-      border: 1px solid #dde6f4;
-    }
-
-    .ill-bg-card.top {
-      width: 120px;
-      height: 92px;
-      top: 52px;
-      left: 190px;
-    }
-
-    .ill-bg-card.main {
-      width: 240px;
-      height: 160px;
-      top: 128px;
-      left: 160px;
-    }
-
-    .ill-line {
-      position: absolute;
-      height: 10px;
-      border-radius: 999px;
-      background: #c9d8f2;
-      left: 188px;
-    }
-
-    .ill-line.one {
-      width: 120px;
-      top: 156px;
-    }
-
-    .ill-line.two {
+      top: 56px;
+      left: 210px;
       width: 150px;
-      top: 184px;
+      height: 110px;
+      background: #f4f4f1;
+      border-radius: 18px;
+      border: 1px solid #d8dde8;
     }
 
-    .ill-line.three {
-      width: 118px;
-      top: 212px;
+    .hero-illustration .doc-main {
+      position: absolute;
+      top: 140px;
+      left: 185px;
+      width: 215px;
+      height: 160px;
+      background: #f2f1ee;
+      border-radius: 18px;
+      border: 1px solid #d8dde8;
     }
 
-    .ill-person-head {
-      width: 86px;
-      height: 86px;
+    .hero-illustration .doc-main::before,
+    .hero-illustration .doc-main::after {
+      content: "";
+      position: absolute;
+      left: 26px;
+      right: 50px;
+      height: 10px;
+      border-radius: 8px;
+      background: #c9d7f3;
+    }
+
+    .hero-illustration .doc-main::before {
+      top: 28px;
+      box-shadow: 0 32px 0 #c9d7f3, 0 64px 0 #c9d7f3;
+    }
+
+    .hero-illustration .person-head {
+      position: absolute;
+      top: 58px;
+      left: 92px;
+      width: 88px;
+      height: 88px;
+      background: var(--icon);
       border-radius: 50%;
-      background: #7c97c7;
-      position: absolute;
-      top: 54px;
-      left: 68px;
-      z-index: 2;
     }
 
-    .ill-person-body {
-      width: 170px;
-      height: 220px;
-      border-radius: 90px 90px 30px 30px;
-      background: linear-gradient(180deg, #7e98c7 0%, #6886ba 100%);
+    .hero-illustration .person-body {
       position: absolute;
-      top: 118px;
-      left: 38px;
-      z-index: 2;
+      top: 128px;
+      left: 58px;
+      width: 172px;
+      height: 170px;
+      background: linear-gradient(180deg, #7f98c7 0%, #708ab7 100%);
+      border-radius: 90px 90px 40px 40px;
     }
 
-    .ill-person-arm {
-      width: 48px;
-      height: 96px;
-      border-radius: 24px;
-      background: #d9e4f8;
+    .hero-illustration .person-arm {
       position: absolute;
-      top: 184px;
-      left: 180px;
+      top: 196px;
+      left: 168px;
+      width: 58px;
+      height: 98px;
+      background: #d6deef;
+      border-radius: 30px;
       transform: rotate(18deg);
       z-index: 3;
     }
 
-    .ill-shadow {
-      width: 230px;
-      height: 130px;
-      border-radius: 50%;
-      background: rgba(205, 220, 245, 0.55);
+    .hero-illustration .person-base {
       position: absolute;
-      bottom: 16px;
-      left: 88px;
+      bottom: 22px;
+      left: 86px;
+      width: 232px;
+      height: 118px;
+      background: rgba(214, 222, 239, 0.7);
+      border-radius: 80px 80px 28px 28px;
     }
 
-    .check {
+    .hero-illustration .check {
       position: absolute;
-      width: 72px;
-      height: 72px;
+      width: 66px;
+      height: 66px;
       border-radius: 18px;
-      background: linear-gradient(180deg, #6fa8fb 0%, #5c93ea 100%);
+      background: linear-gradient(180deg, #70abff 0%, #4f88e8 100%);
       color: #fff;
-      display: grid;
-      place-items: center;
-      font-size: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 34px;
       font-weight: 800;
-      box-shadow: 0 14px 22px rgba(93, 143, 234, 0.26);
-      z-index: 4;
+      box-shadow: 0 8px 20px rgba(79, 136, 232, 0.2);
     }
 
-    .check.one {
-      top: 146px;
-      right: 84px;
+    .hero-illustration .check-1 {
+      right: 38px;
+      top: 156px;
     }
 
-    .check.two {
-      top: 184px;
-      right: 18px;
+    .hero-illustration .check-2 {
+      right: 4px;
+      top: 188px;
     }
 
-    .check.three {
-      top: 250px;
-      right: 32px;
+    .hero-illustration .check-3 {
+      right: 48px;
+      top: 258px;
     }
 
-    section {
-      padding: 28px 0;
+    /* Sections */
+    .section {
+      padding: 26px 0;
     }
 
     .section-title {
       text-align: center;
-      font-size: clamp(34px, 4vw, 58px);
-      line-height: 1.08;
+      font-size: clamp(32px, 4vw, 56px);
+      line-height: 1.1;
       margin: 0 0 34px;
-      letter-spacing: -1px;
       font-weight: 800;
+      letter-spacing: -1px;
     }
 
+    /* Steps */
     .steps-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 24px;
+      gap: 28px;
     }
 
     .step-card {
-      background: rgba(255, 255, 255, 0.7);
-      border: 1px solid #e2e8f4;
+      background: rgba(255, 255, 255, 0.62);
+      border: 1px solid rgba(219, 227, 240, 0.9);
       border-radius: 24px;
-      padding: 36px 26px 30px;
+      padding: 34px 28px;
       text-align: center;
       min-height: 330px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
     }
 
     .step-icon {
-      width: 110px;
-      height: 110px;
-      border-radius: 26px;
-      background: #e8eefb;
-      display: grid;
-      place-items: center;
-      margin: 0 auto 26px;
-      font-size: 54px;
+      width: 116px;
+      height: 116px;
+      border-radius: 28px;
+      background: var(--blue-soft);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 56px;
+      margin-bottom: 28px;
     }
 
     .step-card h3 {
       margin: 0 0 14px;
-      font-size: 21px;
+      font-size: 22px;
       line-height: 1.3;
+      font-weight: 800;
     }
 
     .step-card p {
       margin: 0;
       color: var(--muted);
-      font-size: 15px;
+      font-size: 17px;
       line-height: 1.55;
-      max-width: 260px;
-      margin-inline: auto;
+      max-width: 280px;
     }
 
+    /* Features */
     .features-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 22px;
+      gap: 24px;
       text-align: center;
+      margin-top: 8px;
     }
 
-    .feature {
-      padding: 0 10px;
+    .feature-item {
+      padding: 8px 12px;
     }
 
     .feature-icon {
-      width: 72px;
-      height: 72px;
+      width: 76px;
+      height: 76px;
       border-radius: 20px;
-      display: grid;
-      place-items: center;
       margin: 0 auto 18px;
-      background: linear-gradient(180deg, #7bb0fb 0%, #6498ec 100%);
+      background: linear-gradient(180deg, #7fb2ff 0%, #5b93eb 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
       font-size: 34px;
-      box-shadow: 0 12px 20px rgba(95, 145, 235, 0.22);
+      color: #fff;
     }
 
-    .feature h4 {
+    .feature-item h4 {
       margin: 0 0 10px;
-      font-size: 18px;
+      font-size: 20px;
+      font-weight: 800;
     }
 
-    .feature p {
+    .feature-item p {
       margin: 0;
-      font-size: 15px;
-      line-height: 1.5;
       color: var(--muted);
+      font-size: 16px;
+      line-height: 1.5;
     }
 
+    /* Testimonial */
     .testimonial {
-      margin-top: 22px;
-      background: rgba(255, 255, 255, 0.7);
-      border: 1px solid #e0e8f5;
+      background: rgba(255, 255, 255, 0.62);
+      border: 1px solid rgba(219, 227, 240, 0.9);
       border-radius: 24px;
       padding: 34px 28px 30px;
+      margin-top: 26px;
+    }
+
+    .testimonial-mark {
+      text-align: center;
+      font-size: 56px;
+      color: #a9b8d8;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .testimonial-row {
       display: grid;
-      grid-template-columns: 84px 1fr;
-      gap: 20px;
+      grid-template-columns: 80px 1fr;
+      gap: 22px;
       align-items: end;
     }
 
     .testimonial-avatar {
-      width: 76px;
-      height: 76px;
+      width: 64px;
+      height: 64px;
       border-radius: 50%;
-      background: #e8eef9;
-      display: grid;
-      place-items: center;
-      font-size: 40px;
-      align-self: end;
+      background: var(--blue-soft);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 34px;
+      align-self: center;
+      margin-left: 4px;
     }
 
-    .testimonial-content {
-      position: relative;
-      padding-top: 16px;
-    }
-
-    .quote-mark {
-      position: absolute;
-      top: -8px;
-      left: 0;
-      right: 0;
-      text-align: center;
-      font-size: 54px;
-      line-height: 1;
-      color: #b8c7e3;
-      font-weight: 700;
-    }
-
-    .testimonial p {
-      margin: 18px 0 16px;
-      color: var(--text);
-      font-size: 17px;
+    .testimonial-text p {
+      margin: 0 0 22px;
+      font-size: 18px;
       line-height: 1.6;
-      max-width: 920px;
+      color: var(--text);
+      max-width: 980px;
     }
 
     .stars {
+      color: #9fafcf;
       font-size: 22px;
-      color: #9eb1d4;
       letter-spacing: 4px;
     }
 
+    /* Bottom CTA */
     .bottom-cta {
       padding: 36px 0 70px;
       text-align: center;
     }
 
-    .bottom-cta .hero-cta {
-      min-width: 460px;
+    .bottom-cta .hero-button {
+      min-width: 420px;
       max-width: 100%;
     }
 
-    @media (max-width: 1100px) {
+    @media (max-width: 1024px) {
       .hero-grid,
       .steps-grid,
       .features-grid {
@@ -461,126 +465,148 @@
         order: 1;
       }
 
-      .hero-visual {
+      .hero-art {
         order: 2;
       }
 
-      .hero-copy h1,
-      .hero-copy p {
-        max-width: none;
+      .section-title {
+        font-size: 42px;
       }
 
       .step-card {
         min-height: auto;
       }
 
-      .feature {
-        max-width: 420px;
-        margin: 0 auto;
+      .testimonial-row {
+        grid-template-columns: 1fr;
       }
 
-      .bottom-cta .hero-cta {
-        min-width: 280px;
+      .testimonial-avatar {
+        margin-left: 0;
       }
     }
 
-    @media (max-width: 760px) {
-      .site-header .container {
+    @media (max-width: 700px) {
+      .site-header {
+        padding-top: 16px;
+      }
+
+      .header-inner {
         flex-direction: column;
         align-items: flex-start;
       }
 
       .nav {
-        gap: 12px;
+        width: 100%;
+        gap: 10px;
+      }
+
+      .nav a {
+        padding: 10px 12px;
+        font-size: 15px;
       }
 
       .hero {
-        padding-top: 8px;
+        padding-top: 18px;
       }
 
       .hero-copy h1 {
         font-size: 54px;
-        letter-spacing: -1px;
+        letter-spacing: -1.5px;
       }
 
       .hero-copy p {
         font-size: 18px;
       }
 
-      .hero-cta {
+      .hero-button,
+      .bottom-cta .hero-button {
         width: 100%;
         min-width: 0;
-        padding: 18px 22px;
-        font-size: 20px;
       }
 
-      .illustration {
+      .hero-illustration {
         max-width: 100%;
-        min-height: 380px;
+        min-height: 360px;
       }
 
-      .ill-bg-card.top {
-        left: 50%;
-        transform: translateX(-8%);
+      .hero-illustration .doc-top {
+        left: 48%;
+        top: 38px;
+        width: 110px;
+        height: 84px;
       }
 
-      .ill-bg-card.main {
+      .hero-illustration .doc-main {
         left: 42%;
-        transform: translateX(-10%);
+        top: 108px;
+        width: 170px;
+        height: 128px;
       }
 
-      .ill-person-head {
-        left: 34px;
+      .hero-illustration .person-head {
+        left: 18%;
+        top: 54px;
+        width: 72px;
+        height: 72px;
       }
 
-      .ill-person-body {
-        left: 10px;
+      .hero-illustration .person-body {
+        left: 12%;
+        top: 112px;
+        width: 138px;
+        height: 140px;
       }
 
-      .ill-person-arm {
-        left: 142px;
+      .hero-illustration .person-arm {
+        left: 31%;
+        top: 166px;
+        width: 44px;
+        height: 78px;
       }
 
-      .check.one {
-        right: 52px;
+      .hero-illustration .person-base {
+        left: 18%;
+        width: 180px;
+        height: 88px;
       }
 
-      .check.two {
-        right: 6px;
+      .hero-illustration .check {
+        width: 54px;
+        height: 54px;
+        font-size: 28px;
       }
 
-      .check.three {
-        right: 14px;
+      .hero-illustration .check-1 {
+        right: 22px;
+        top: 130px;
       }
 
-      .section-title {
-        font-size: 40px;
+      .hero-illustration .check-2 {
+        right: 0;
+        top: 168px;
       }
 
-      .testimonial {
-        grid-template-columns: 1fr;
-        text-align: left;
-      }
-
-      .testimonial-avatar {
-        align-self: start;
+      .hero-illustration .check-3 {
+        right: 28px;
+        top: 230px;
       }
     }
   </style>
 </head>
 <body>
   <header class="site-header">
-    <div class="container">
-      <a href="#" class="brand">
-        <span class="brand-icon" aria-hidden="true"></span>
+    <div class="container header-inner">
+      <a href="index.html" class="brand">
+        <span class="brand-icon"></span>
         <span>ClearMyRecord</span>
       </a>
 
       <nav class="nav">
         <a href="how-it-works.html">How It Works</a>
         <a href="eligibility.html">Eligibility</a>
-        <a href="eligibility.html" class="nav-pill">Check Eligibility</a>
-        <a href="login.html" class="nav-outline">Log In</a>
+        <a href="eligibility.html" class="nav-cta">Check Eligibility</a>
+        <a href="login.html" class="nav-login">Log In</a>
       </nav>
     </div>
   </header>
@@ -591,97 +617,104 @@
         <div class="hero-copy">
           <h1>Clear Your Criminal Record with More Confidence</h1>
           <p>
-            Find out whether you may qualify for record sealing or
-            expungement in 60 seconds or less.
+            Find out whether you may qualify for record sealing or expungement in 60 seconds or less.
           </p>
-          <a href="eligibility.html" class="hero-cta">Check Eligibility</a>
+          <a href="eligibility.html" class="hero-button">Check Eligibility</a>
           <div class="hero-note">100% Free &amp; Confidential</div>
         </div>
 
-        <div class="hero-visual">
-          <div class="illustration" aria-hidden="true">
-            <div class="ill-bg-card top"></div>
-            <div class="ill-bg-card main"></div>
-            <div class="ill-line one"></div>
-            <div class="ill-line two"></div>
-            <div class="ill-line three"></div>
-            <div class="ill-person-head"></div>
-            <div class="ill-person-body"></div>
-            <div class="ill-person-arm"></div>
-            <div class="ill-shadow"></div>
-            <div class="check one">✓</div>
-            <div class="check two">✓</div>
-            <div class="check three">✓</div>
+        <div class="hero-art">
+          <div class="hero-illustration" aria-hidden="true">
+            <div class="doc-top"></div>
+            <div class="doc-main"></div>
+            <div class="person-head"></div>
+            <div class="person-body"></div>
+            <div class="person-arm"></div>
+            <div class="person-base"></div>
+            <div class="check check-1">✓</div>
+            <div class="check check-2">✓</div>
+            <div class="check check-3">✓</div>
           </div>
         </div>
       </div>
     </section>
 
-    <section>
+    <section class="section">
       <div class="container">
         <h2 class="section-title">Simple steps to get started.</h2>
 
         <div class="steps-grid">
-          <article class="step-card">
+          <div class="step-card">
             <div class="step-icon">🔎</div>
             <h3>1. Check Eligibility</h3>
-            <p>
-              Answer a few questions about your record, charges, and case timing.
-            </p>
-          </article>
+            <p>Answer a few questions about your record, charges, and case timing.</p>
+          </div>
 
-          <article class="step-card">
+          <div class="step-card">
             <div class="step-icon">📝</div>
             <h3>2. Generate Forms</h3>
-            <p>
-              If you may qualify, ClearMyRecord helps organize the information
-              needed for court forms and packet preparation.
-            </p>
-          </article>
+            <p>If you may qualify, ClearMyRecord helps organize the information needed for court forms and packet preparation.</p>
+          </div>
 
-          <article class="step-card">
+          <div class="step-card">
             <div class="step-icon">🏛️</div>
             <h3>3. Prepare to File</h3>
-            <p>
-              Review the process, required documents, and court-specific steps
-              before filing with the court.
-            </p>
-          </article>
+            <p>Review the process, required documents, and court-specific steps before filing with the court.</p>
+          </div>
         </div>
       </div>
     </section>
 
-    <section>
+    <section class="section">
       <div class="container">
         <h2 class="section-title">What ClearMyRecord Helps With</h2>
 
         <div class="features-grid">
-          <article class="feature">
+          <div class="feature-item">
             <div class="feature-icon">⏱️</div>
             <h4>Fast Screening</h4>
             <p>Get an eligibility check in minutes, not weeks.</p>
-          </article>
+          </div>
 
-          <article class="feature">
+          <div class="feature-item">
             <div class="feature-icon">🛡️</div>
             <h4>Confidential</h4>
             <p>Your information stays private and organized.</p>
-          </article>
+          </div>
 
-          <article class="feature">
+          <div class="feature-item">
             <div class="feature-icon">📄</div>
             <h4>Form Support</h4>
             <p>Helps structure the information needed for forms and packets.</p>
-          </article>
+          </div>
 
-          <article class="feature">
+          <div class="feature-item">
             <div class="feature-icon">⚖️</div>
             <h4>Court Awareness</h4>
             <p>Some courts have extra requirements, including fingerprints.</p>
-          </article>
+          </div>
         </div>
 
         <div class="testimonial">
-          <div class="testimonial-avatar">👤</div>
+          <div class="testimonial-mark">“</div>
+          <div class="testimonial-row">
+            <div class="testimonial-avatar">👤</div>
+            <div class="testimonial-text">
+              <p>
+                ClearMyRecord helps people understand where to start, what information they need, and whether they may qualify before moving deeper into the court process.
+              </p>
+              <div class="stars">★★★★★</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-          <div class
+    <section class="bottom-cta">
+      <div class="container">
+        <a href="eligibility.html" class="hero-button">Start Your Free Eligibility Check</a>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
