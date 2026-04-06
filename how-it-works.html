@@ -4,147 +4,629 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>How It Works - ClearMyRecord</title>
-  <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #eef2f8;
+      --surface: #ffffff;
+      --text: #233d70;
+      --muted: #667796;
+      --line: #dbe3f0;
+      --blue: #6da7ff;
+      --blue-dark: #4f88e8;
+      --blue-soft: #dfe9fb;
+      --icon: #7f98c7;
+      --shadow: 0 10px 30px rgba(50, 78, 128, 0.08);
+      --radius: 24px;
+      --container: 1180px;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .container {
+      width: min(var(--container), calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .site-header {
+      padding: 20px 0 12px;
+    }
+
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      font-size: 18px;
+      color: #3b6db4;
+    }
+
+    .brand-icon {
+      width: 26px;
+      height: 32px;
+      border: 2px solid #222;
+      border-radius: 2px;
+      background: #fff;
+      position: relative;
+      flex: 0 0 auto;
+    }
+
+    .brand-icon::before {
+      content: "";
+      position: absolute;
+      left: 4px;
+      right: 4px;
+      top: 8px;
+      height: 2px;
+      background: #999;
+      box-shadow: 0 6px 0 #999, 0 12px 0 #999;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .nav a {
+      font-size: 16px;
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 14px;
+    }
+
+    .nav .nav-cta {
+      background: #e8f0fd;
+      font-weight: 700;
+      padding: 12px 18px;
+    }
+
+    .nav .nav-login {
+      background: #fff;
+      border: 1px solid #d6dfed;
+      font-weight: 700;
+      padding: 12px 18px;
+    }
+
+    .hero {
+      padding: 26px 0 26px;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.02fr 0.98fr;
+      gap: 40px;
+      align-items: center;
+    }
+
+    .hero-copy h1 {
+      margin: 0 0 18px;
+      font-size: clamp(50px, 7vw, 78px);
+      line-height: 0.98;
+      letter-spacing: -2px;
+      font-weight: 800;
+      max-width: 650px;
+    }
+
+    .hero-copy p {
+      margin: 0 0 24px;
+      font-size: 20px;
+      line-height: 1.55;
+      color: var(--muted);
+      max-width: 580px;
+    }
+
+    .hero-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 280px;
+      padding: 20px 30px;
+      border-radius: 22px;
+      background: linear-gradient(180deg, #7fb2ff 0%, #5b93eb 100%);
+      color: #fff;
+      font-size: 20px;
+      font-weight: 800;
+      box-shadow: 0 10px 22px rgba(91, 147, 235, 0.22);
+    }
+
+    .hero-art {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .hero-visual {
+      width: 100%;
+      max-width: 520px;
+      aspect-ratio: 1.05 / 0.88;
+      background: rgba(255, 255, 255, 0.24);
+      border-radius: 40px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .screen {
+      position: absolute;
+      inset: 56px 54px 52px 54px;
+      background: rgba(255, 255, 255, 0.7);
+      border: 1px solid #dde5f2;
+      border-radius: 28px;
+    }
+
+    .screen-top {
+      position: absolute;
+      top: 24px;
+      left: 28px;
+      right: 28px;
+      height: 16px;
+      border-radius: 999px;
+      background: #dbe5f8;
+    }
+
+    .screen-line {
+      position: absolute;
+      left: 28px;
+      right: 70px;
+      height: 12px;
+      border-radius: 999px;
+      background: #c7d6f1;
+    }
+
+    .line-1 { top: 70px; }
+    .line-2 { top: 98px; right: 105px; }
+    .line-3 { top: 126px; right: 52px; }
+
+    .screen-card {
+      position: absolute;
+      left: 28px;
+      right: 28px;
+      bottom: 28px;
+      height: 92px;
+      border-radius: 22px;
+      background: #eef3fc;
+      border: 1px solid #d8e2f2;
+    }
+
+    .check-badge {
+      position: absolute;
+      width: 64px;
+      height: 64px;
+      border-radius: 18px;
+      background: linear-gradient(180deg, #70abff 0%, #4f88e8 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 32px;
+      font-weight: 800;
+      box-shadow: 0 8px 20px rgba(79, 136, 232, 0.2);
+    }
+
+    .badge-1 {
+      top: 110px;
+      right: 18px;
+    }
+
+    .badge-2 {
+      bottom: 62px;
+      right: 48px;
+    }
+
+    .section {
+      padding: 28px 0;
+    }
+
+    .section-title {
+      text-align: center;
+      font-size: clamp(32px, 4vw, 54px);
+      line-height: 1.1;
+      margin: 0 0 34px;
+      font-weight: 800;
+      letter-spacing: -1px;
+    }
+
+    .section-intro {
+      text-align: center;
+      max-width: 780px;
+      margin: -8px auto 34px;
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 1.6;
+    }
+
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 28px;
+    }
+
+    .step-card {
+      background: rgba(255, 255, 255, 0.62);
+      border: 1px solid rgba(219, 227, 240, 0.9);
+      border-radius: 24px;
+      padding: 34px 28px;
+      text-align: center;
+      min-height: 350px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .step-icon {
+      width: 116px;
+      height: 116px;
+      border-radius: 28px;
+      background: var(--blue-soft);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 56px;
+      margin-bottom: 28px;
+    }
+
+    .step-card h3 {
+      margin: 0 0 14px;
+      font-size: 24px;
+      line-height: 1.25;
+      font-weight: 800;
+    }
+
+    .step-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 17px;
+      line-height: 1.6;
+      max-width: 285px;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 28px;
+      margin-top: 4px;
+    }
+
+    .detail-card {
+      background: rgba(255, 255, 255, 0.62);
+      border: 1px solid rgba(219, 227, 240, 0.9);
+      border-radius: 24px;
+      padding: 28px 26px;
+    }
+
+    .detail-card h3 {
+      margin: 0 0 14px;
+      font-size: 24px;
+      font-weight: 800;
+      line-height: 1.25;
+    }
+
+    .detail-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 17px;
+      line-height: 1.65;
+    }
+
+    .info-strip {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      margin-top: 8px;
+    }
+
+    .info-item {
+      text-align: center;
+      padding: 8px 12px;
+    }
+
+    .info-icon {
+      width: 76px;
+      height: 76px;
+      border-radius: 20px;
+      margin: 0 auto 18px;
+      background: linear-gradient(180deg, #7fb2ff 0%, #5b93eb 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 34px;
+      color: #fff;
+    }
+
+    .info-item h4 {
+      margin: 0 0 10px;
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    .info-item p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.55;
+    }
+
+    .notice-card {
+      background: rgba(255, 255, 255, 0.62);
+      border: 1px solid rgba(219, 227, 240, 0.9);
+      border-radius: 24px;
+      padding: 30px 28px;
+      text-align: center;
+      margin-top: 24px;
+    }
+
+    .notice-card h3 {
+      margin: 0 0 12px;
+      font-size: 28px;
+      font-weight: 800;
+    }
+
+    .notice-card p {
+      margin: 0 auto;
+      max-width: 860px;
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 1.65;
+    }
+
+    .bottom-cta {
+      padding: 34px 0 70px;
+      text-align: center;
+    }
+
+    .bottom-cta .hero-button {
+      min-width: 400px;
+      max-width: 100%;
+    }
+
+    @media (max-width: 1024px) {
+      .hero-grid,
+      .steps-grid,
+      .detail-grid,
+      .info-strip {
+        grid-template-columns: 1fr;
+      }
+
+      .step-card {
+        min-height: auto;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .site-header {
+        padding-top: 16px;
+      }
+
+      .header-inner {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .nav {
+        width: 100%;
+        gap: 10px;
+      }
+
+      .nav a {
+        padding: 10px 12px;
+        font-size: 15px;
+      }
+
+      .hero {
+        padding-top: 18px;
+      }
+
+      .hero-copy h1 {
+        font-size: 48px;
+        letter-spacing: -1.5px;
+      }
+
+      .hero-copy p,
+      .section-intro,
+      .notice-card p {
+        font-size: 17px;
+      }
+
+      .hero-button,
+      .bottom-cta .hero-button {
+        width: 100%;
+        min-width: 0;
+      }
+
+      .hero-visual {
+        min-height: 340px;
+      }
+
+      .screen {
+        inset: 42px 26px 42px 26px;
+      }
+    }
+  </style>
 </head>
 <body>
   <header class="site-header">
     <div class="container header-inner">
-      <a href="index.html" class="logo">
-        <span class="logo-mark"></span>
+      <a href="index.html" class="brand">
+        <span class="brand-icon"></span>
         <span>ClearMyRecord</span>
       </a>
 
-      <nav class="site-nav">
-        <a href="how-it-works.html" class="active">How It Works</a>
+      <nav class="nav">
+        <a href="how-it-works.html">How It Works</a>
         <a href="eligibility.html">Eligibility</a>
-        <a href="#" class="nav-button">Sign Up</a>
-        <a href="#" class="nav-button">Log In</a>
+        <a href="eligibility.html" class="nav-cta">Check Eligibility</a>
+        <a href="login.html" class="nav-login">Log In</a>
       </nav>
     </div>
   </header>
 
   <main>
-    <section class="how-page-hero">
-      <div class="container">
-        <h1>How It Works:<br>Automatic Criminal Record Clearing</h1>
-        <p>Clear your record fast in just 3 simple steps.</p>
+    <section class="hero">
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <h1>How ClearMyRecord Works</h1>
+          <p>
+            ClearMyRecord helps people understand whether they may qualify, what information they need, and how to get organized before filing court paperwork.
+          </p>
+          <a href="eligibility.html" class="hero-button">Check Eligibility</a>
+        </div>
+
+        <div class="hero-art">
+          <div class="hero-visual" aria-hidden="true">
+            <div class="screen">
+              <div class="screen-top"></div>
+              <div class="screen-line line-1"></div>
+              <div class="screen-line line-2"></div>
+              <div class="screen-line line-3"></div>
+              <div class="screen-card"></div>
+            </div>
+            <div class="check-badge badge-1">✓</div>
+            <div class="check-badge badge-2">✓</div>
+          </div>
+        </div>
       </div>
     </section>
 
-    <section class="how-workflow">
+    <section class="section">
       <div class="container">
+        <h2 class="section-title">Simple steps to get started.</h2>
+        <p class="section-intro">
+          The process is designed to be straightforward. You answer questions, organize case information, and prepare the details needed for forms and packet creation.
+        </p>
 
-        <div class="workflow-row">
-          <div class="workflow-left">
-            <div class="workflow-number">1</div>
-            <div class="workflow-line"></div>
+        <div class="steps-grid">
+          <div class="step-card">
+            <div class="step-icon">🔎</div>
+            <h3>1. Check Eligibility</h3>
+            <p>
+              Start with a short screening to review charges, case outcomes, and timing. This helps determine whether you may qualify to move forward.
+            </p>
           </div>
 
-          <div class="workflow-card">
-            <div class="workflow-copy">
-              <h2>1. Check Your Eligibility</h2>
-              <p>
-                Answer a few simple questions about your past charges,
-                convictions, and when they occurred. Our system instantly
-                checks if you're eligible to have your record cleared.
-              </p>
-            </div>
-
-            <div class="workflow-visual">
-              <img src="images/how-step-1.png" alt="Eligibility checklist illustration">
-            </div>
-          </div>
-        </div>
-
-        <div class="workflow-row">
-          <div class="workflow-left">
-            <div class="workflow-number">2</div>
-            <div class="workflow-line"></div>
+          <div class="step-card">
+            <div class="step-icon">📝</div>
+            <h3>2. Enter Record Details</h3>
+            <p>
+              Add case details, courts, arrest information, and related facts so everything is organized in one place for packet preparation.
+            </p>
           </div>
 
-          <div class="workflow-card">
-            <div class="workflow-copy">
-              <h2>2. We Generate Your Forms</h2>
-              <p>
-                If you qualify, we automatically generate the court forms you
-                need to clear your record. We fill in the information for you
-                to ensure everything is accurate.
-              </p>
-            </div>
-
-            <div class="workflow-visual">
-              <img src="images/how-step-2.png" alt="Court forms illustration">
-            </div>
+          <div class="step-card">
+            <div class="step-icon">🏛️</div>
+            <h3>3. Prepare to File</h3>
+            <p>
+              Review what the court may require, including signatures, attachments, filing steps, and possible fingerprint requirements in some courts.
+            </p>
           </div>
         </div>
-
-        <div class="workflow-row">
-          <div class="workflow-left">
-            <div class="workflow-number">3</div>
-            <div class="workflow-line"></div>
-          </div>
-
-          <div class="workflow-card">
-            <div class="workflow-copy">
-              <h2>3. We File with the Court</h2>
-              <p>
-                We file your completed forms with the appropriate court in your
-                county. Our legal team handles all the paperwork and
-                communication with the court on your behalf.
-              </p>
-            </div>
-
-            <div class="workflow-visual">
-              <img src="images/how-step-3.png" alt="Court filing illustration">
-            </div>
-          </div>
-        </div>
-
-        <div class="workflow-row">
-          <div class="workflow-left">
-            <div class="workflow-number">4</div>
-          </div>
-
-          <div class="workflow-card">
-            <div class="workflow-copy">
-              <h2>4. Get Your Record Cleared</h2>
-              <p>
-                Once the court approves, your criminal record will be sealed
-                or expunged. You'll receive confirmation that your record has
-                been cleared automatically.
-              </p>
-            </div>
-
-            <div class="workflow-visual">
-              <img src="images/how-step-4.png" alt="Record cleared confirmation illustration">
-            </div>
-          </div>
-        </div>
-
       </div>
     </section>
 
-    <section class="how-bottom-cta">
+    <section class="section">
       <div class="container">
-        <h2>Ready to Clear Your Record?</h2>
-        <a href="eligibility.html" class="btn btn-primary">Start Your Free Eligibility Check</a>
+        <h2 class="section-title">What the platform helps you do</h2>
+
+        <div class="detail-grid">
+          <div class="detail-card">
+            <h3>Organize case information</h3>
+            <p>
+              ClearMyRecord helps structure names, courts, case numbers, charge details, outcomes, and dates so users can gather everything needed before moving deeper into the filing process.
+            </p>
+          </div>
+
+          <div class="detail-card">
+            <h3>Prepare form-ready details</h3>
+            <p>
+              The system is built to help users collect and format the information commonly needed for court forms and filing packets, even when requirements vary by court.
+            </p>
+          </div>
+
+          <div class="detail-card">
+            <h3>Understand court requirements</h3>
+            <p>
+              Some courts require extra steps, such as fingerprints, mailing copies, attachments, or local cover sheets. The goal is to help users prepare before they get to the courthouse.
+            </p>
+          </div>
+
+          <div class="detail-card">
+            <h3>Move faster with more confidence</h3>
+            <p>
+              Instead of starting with confusion, users can begin with a structured process that makes it easier to know what to do next and what information may still be missing.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <h2 class="section-title">What ClearMyRecord Helps With</h2>
+
+        <div class="info-strip">
+          <div class="info-item">
+            <div class="info-icon">⏱️</div>
+            <h4>Fast Screening</h4>
+            <p>Get a quick starting point instead of guessing where to begin.</p>
+          </div>
+
+          <div class="info-item">
+            <div class="info-icon">🛡️</div>
+            <h4>Confidential</h4>
+            <p>Your information stays private and organized as you work.</p>
+          </div>
+
+          <div class="info-item">
+            <div class="info-icon">📄</div>
+            <h4>Form Support</h4>
+            <p>Helps structure the information needed for forms and packets.</p>
+          </div>
+
+          <div class="info-item">
+            <div class="info-icon">⚖️</div>
+            <h4>Court Awareness</h4>
+            <p>Highlights that some courts may have extra requirements.</p>
+          </div>
+        </div>
+
+        <div class="notice-card">
+          <h3>Important</h3>
+          <p>
+            ClearMyRecord helps users screen eligibility and prepare information for court paperwork. It does not currently e-file cases with the court, and users may still need to print, sign, gather fingerprints, and file documents based on local court requirements.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="bottom-cta">
+      <div class="container">
+        <a href="eligibility.html" class="hero-button">Start Your Free Eligibility Check</a>
       </div>
     </section>
   </main>
-
-  <footer class="site-footer simple-footer">
-    <div class="container">
-      <div class="simple-footer-links">
-        <a href="faq.html">FAQ</a>
-        <span>|</span>
-        <a href="about.html">About Us</a>
-        <span>|</span>
-        <a href="contact.html">Contact</a>
-      </div>
-      <div class="simple-footer-copy">
-        &copy; 2026 ClearMyRecord. All rights reserved.
-      </div>
-    </div>
-  </footer>
 </body>
 </html>
