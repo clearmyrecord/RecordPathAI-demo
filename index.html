@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ClearMyRecord</title>
+  <title>RecordPathAI</title>
+
   <style>
     * {
       box-sizing: border-box;
@@ -11,21 +12,14 @@
 
     :root {
       --bg: #eef2f8;
-      --surface: #ffffff;
       --text: #233d70;
       --muted: #667796;
-      --line: #dbe3f0;
       --blue: #6da7ff;
       --blue-dark: #4f88e8;
       --blue-soft: #dfe9fb;
-      --icon: #7f98c7;
-      --shadow: 0 10px 30px rgba(50, 78, 128, 0.08);
-      --radius: 24px;
-      --container: 1180px;
-    }
-
-    html {
-      scroll-behavior: smooth;
+      --line: #dbe3f0;
+      --radius: 20px;
+      --container: 1100px;
     }
 
     body {
@@ -36,829 +30,280 @@
     }
 
     a {
-      color: inherit;
       text-decoration: none;
+      color: inherit;
     }
 
     .container {
-      width: min(var(--container), calc(100% - 32px));
+      width: min(var(--container), calc(100% - 24px));
       margin: 0 auto;
     }
 
-    /* Header */
-    .site-header {
-      padding: 20px 0 12px;
+    /* HEADER */
+
+    .header {
+      padding: 18px 0;
     }
 
     .header-inner {
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      gap: 20px;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
     }
 
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-weight: 700;
+    .logo {
+      font-weight: 800;
       font-size: 18px;
       color: #3b6db4;
     }
 
-    .brand-icon {
-      width: 26px;
-      height: 32px;
-      border: 2px solid #222;
-      border-radius: 2px;
-      background: #fff;
-      position: relative;
-      flex: 0 0 auto;
-    }
-
-    .brand-icon::before,
-    .brand-icon::after {
-      content: "";
-      position: absolute;
-      left: 4px;
-      right: 4px;
-      height: 2px;
-      background: #999;
-    }
-
-    .brand-icon::before {
-      top: 8px;
-      box-shadow: 0 6px 0 #999, 0 12px 0 #999;
-    }
-
     .nav {
       display: flex;
-      align-items: center;
-      gap: 14px;
+      gap: 10px;
       flex-wrap: wrap;
     }
 
     .nav a {
-      font-size: 16px;
-      color: var(--text);
-      padding: 10px 12px;
-      border-radius: 14px;
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-size: 14px;
     }
 
-    .nav .nav-cta {
+    .nav .cta {
       background: #e8f0fd;
       font-weight: 700;
-      padding: 12px 18px;
     }
 
-    .nav .nav-login {
-      background: #fff;
+    .nav .login {
       border: 1px solid #d6dfed;
       font-weight: 700;
-      padding: 12px 18px;
     }
 
-    /* Hero */
+    /* HERO */
+
     .hero {
-      padding: 26px 0 44px;
+      padding: 30px 0 40px;
     }
 
     .hero-grid {
       display: grid;
-      grid-template-columns: 1.05fr 0.95fr;
-      gap: 40px;
-      align-items: center;
-    }
-
-    .hero-copy h1 {
-      margin: 0 0 18px;
-      font-size: clamp(54px, 8vw, 84px);
-      line-height: 0.95;
-      letter-spacing: -2px;
-      font-weight: 800;
-      max-width: 620px;
-    }
-
-    .hero-copy p {
-      margin: 0 0 28px;
-      font-size: 20px;
-      line-height: 1.5;
-      color: var(--muted);
-      max-width: 560px;
-    }
-
-    .hero-button {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 290px;
-      padding: 22px 34px;
-      border-radius: 22px;
-      background: linear-gradient(180deg, #7fb2ff 0%, #5b93eb 100%);
-      color: #fff;
-      font-size: 20px;
-      font-weight: 800;
-      box-shadow: 0 10px 22px rgba(91, 147, 235, 0.22);
-    }
-
-    .hero-note {
-      margin-top: 24px;
-      font-size: 16px;
-      color: var(--text);
-    }
-
-    .hero-art {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .hero-illustration {
-      width: 100%;
-      max-width: 520px;
-      aspect-ratio: 1.15 / 0.9;
-      background: rgba(255, 255, 255, 0.2);
-      border-radius: 42px;
-      position: relative;
-    }
-
-    .hero-illustration .doc-top {
-      position: absolute;
-      top: 56px;
-      left: 210px;
-      width: 150px;
-      height: 110px;
-      background: #f4f4f1;
-      border-radius: 18px;
-      border: 1px solid #d8dde8;
-    }
-
-    .hero-illustration .doc-main {
-      position: absolute;
-      top: 140px;
-      left: 185px;
-      width: 215px;
-      height: 160px;
-      background: #f2f1ee;
-      border-radius: 18px;
-      border: 1px solid #d8dde8;
-    }
-
-    .hero-illustration .doc-main::before,
-    .hero-illustration .doc-main::after {
-      content: "";
-      position: absolute;
-      left: 26px;
-      right: 50px;
-      height: 10px;
-      border-radius: 8px;
-      background: #c9d7f3;
-    }
-
-    .hero-illustration .doc-main::before {
-      top: 28px;
-      box-shadow: 0 32px 0 #c9d7f3, 0 64px 0 #c9d7f3;
-    }
-
-    .hero-illustration .person-head {
-      position: absolute;
-      top: 58px;
-      left: 92px;
-      width: 88px;
-      height: 88px;
-      background: var(--icon);
-      border-radius: 50%;
-    }
-
-    .hero-illustration .person-body {
-      position: absolute;
-      top: 128px;
-      left: 58px;
-      width: 172px;
-      height: 170px;
-      background: linear-gradient(180deg, #7f98c7 0%, #708ab7 100%);
-      border-radius: 90px 90px 40px 40px;
-    }
-
-    .hero-illustration .person-arm {
-      position: absolute;
-      top: 196px;
-      left: 168px;
-      width: 58px;
-      height: 98px;
-      background: #d6deef;
-      border-radius: 30px;
-      transform: rotate(18deg);
-      z-index: 3;
-    }
-
-    .hero-illustration .person-base {
-      position: absolute;
-      bottom: 22px;
-      left: 86px;
-      width: 232px;
-      height: 118px;
-      background: rgba(214, 222, 239, 0.7);
-      border-radius: 80px 80px 28px 28px;
-    }
-
-    .hero-illustration .check {
-      position: absolute;
-      width: 66px;
-      height: 66px;
-      border-radius: 18px;
-      background: linear-gradient(180deg, #70abff 0%, #4f88e8 100%);
-      color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 34px;
-      font-weight: 800;
-      box-shadow: 0 8px 20px rgba(79, 136, 232, 0.2);
-    }
-
-    .hero-illustration .check-1 {
-      right: 38px;
-      top: 156px;
-    }
-
-    .hero-illustration .check-2 {
-      right: 4px;
-      top: 188px;
-    }
-
-    .hero-illustration .check-3 {
-      right: 48px;
-      top: 258px;
-    }
-
-    /* Sections */
-    .section {
-      padding: 26px 0;
-    }
-
-    .section-title {
-      text-align: center;
-      font-size: clamp(32px, 4vw, 56px);
-      line-height: 1.1;
-      margin: 0 0 34px;
-      font-weight: 800;
-      letter-spacing: -1px;
-    }
-
-    /* Steps */
-    .steps-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 28px;
-    }
-
-    .step-card {
-      background: rgba(255, 255, 255, 0.62);
-      border: 1px solid rgba(219, 227, 240, 0.9);
-      border-radius: 24px;
-      padding: 34px 28px;
-      text-align: center;
-      min-height: 330px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-    }
-
-    .step-icon {
-      width: 116px;
-      height: 116px;
-      border-radius: 28px;
-      background: var(--blue-soft);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 56px;
-      margin-bottom: 28px;
-    }
-
-    .step-card h3 {
-      margin: 0 0 14px;
-      font-size: 22px;
-      line-height: 1.3;
-      font-weight: 800;
-    }
-
-    .step-card p {
-      margin: 0;
-      color: var(--muted);
-      font-size: 17px;
-      line-height: 1.55;
-      max-width: 280px;
-    }
-
-    /* Features */
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: 1fr;
       gap: 24px;
-      text-align: center;
-      margin-top: 8px;
     }
 
-    .feature-item {
-      padding: 8px 12px;
-    }
-
-    .feature-icon {
-      width: 76px;
-      height: 76px;
-      border-radius: 20px;
-      margin: 0 auto 18px;
-      background: linear-gradient(180deg, #7fb2ff 0%, #5b93eb 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 34px;
-      color: #fff;
-    }
-
-    .feature-item h4 {
-      margin: 0 0 10px;
-      font-size: 20px;
+    .hero h1 {
+      font-size: clamp(34px, 10vw, 52px);
+      line-height: 1;
+      margin-bottom: 14px;
       font-weight: 800;
     }
 
-    .feature-item p {
-      margin: 0;
-      color: var(--muted);
-      font-size: 16px;
+    .hero p {
+      font-size: 17px;
       line-height: 1.5;
+      color: var(--muted);
+      margin-bottom: 20px;
     }
 
-    /* Testimonial */
-    .testimonial {
-      background: rgba(255, 255, 255, 0.62);
-      border: 1px solid rgba(219, 227, 240, 0.9);
-      border-radius: 24px;
-      padding: 34px 28px 30px;
-      margin-top: 26px;
-    }
-
-    .testimonial-mark {
+    .button {
+      display: inline-block;
+      width: 100%;
       text-align: center;
-      font-size: 56px;
-      color: #a9b8d8;
-      line-height: 1;
-      margin-bottom: 8px;
+      padding: 16px;
+      border-radius: 16px;
+      background: linear-gradient(180deg, #7fb2ff 0%, #5b93eb 100%);
+      color: white;
+      font-weight: 800;
+      font-size: 16px;
     }
 
-    .testimonial-row {
+    .note {
+      margin-top: 12px;
+      font-size: 14px;
+    }
+
+    /* SECTION */
+
+    .section {
+      padding: 30px 0;
+    }
+
+    .section h2 {
+      text-align: center;
+      font-size: clamp(28px, 7vw, 40px);
+      margin-bottom: 20px;
+    }
+
+    /* STEPS */
+
+    .grid {
       display: grid;
-      grid-template-columns: 80px 1fr;
-      gap: 22px;
-      align-items: end;
+      grid-template-columns: 1fr;
+      gap: 16px;
     }
 
-    .testimonial-avatar {
-      width: 64px;
-      height: 64px;
-      border-radius: 50%;
-      background: var(--blue-soft);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 34px;
-      align-self: center;
-      margin-left: 4px;
-    }
-
-    .testimonial-text p {
-      margin: 0 0 22px;
-      font-size: 18px;
-      line-height: 1.6;
-      color: var(--text);
-      max-width: 980px;
-    }
-
-    .stars {
-      color: #9fafcf;
-      font-size: 22px;
-      letter-spacing: 4px;
-    }
-
-    /* Bottom CTA */
-    .bottom-cta {
-      padding: 36px 0 70px;
+    .card {
+      background: rgba(255,255,255,0.7);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 20px;
       text-align: center;
     }
 
-    .bottom-cta .hero-button {
-      min-width: 420px;
-      max-width: 100%;
+    .card h3 {
+      margin-bottom: 10px;
     }
 
-    @media (max-width: 1024px) {
-      .hero-grid,
-      .steps-grid,
-      .features-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .hero-copy {
-        order: 1;
-      }
-
-      .hero-art {
-        order: 2;
-      }
-
-      .section-title {
-        font-size: 42px;
-      }
-
-      .step-card {
-        min-height: auto;
-      }
-
-      .testimonial-row {
-        grid-template-columns: 1fr;
-      }
-
-      .testimonial-avatar {
-        margin-left: 0;
-      }
+    .card p {
+      color: var(--muted);
+      font-size: 15px;
     }
 
-    @media (max-width: 700px) {
-      .container {
-        width: min(var(--container), calc(100% - 24px));
-      }
+    /* FEATURES */
 
-      .site-header {
-        padding: 14px 0 8px;
-      }
+    .feature {
+      text-align: center;
+      padding: 10px;
+    }
 
-      .header-inner {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 14px;
-      }
+    .feature h4 {
+      margin-bottom: 6px;
+    }
 
-      .brand {
-        font-size: 17px;
-      }
+    .feature p {
+      font-size: 14px;
+      color: var(--muted);
+    }
 
-      .nav {
-        width: 100%;
-        gap: 10px;
-      }
+    /* CTA */
 
-      .nav a {
-        padding: 10px 12px;
-        font-size: 14px;
-      }
+    .cta-section {
+      padding: 30px 0 50px;
+      text-align: center;
+    }
 
-      .hero {
-        padding: 14px 0 30px;
-      }
+    /* DESKTOP */
 
+    @media (min-width: 768px) {
       .hero-grid {
-        gap: 22px;
+        grid-template-columns: 1fr 1fr;
+        align-items: center;
       }
 
-      .hero-copy h1 {
-        font-size: clamp(38px, 12vw, 52px);
-        line-height: 0.98;
-        letter-spacing: -1.2px;
-        max-width: 100%;
-        margin-bottom: 14px;
+      .grid-3 {
+        grid-template-columns: repeat(3, 1fr);
       }
 
-      .hero-copy p {
-        font-size: 17px;
-        line-height: 1.45;
-        margin-bottom: 20px;
-        max-width: 100%;
+      .grid-4 {
+        grid-template-columns: repeat(4, 1fr);
       }
 
-      .hero-button,
-      .bottom-cta .hero-button {
-        width: 100%;
-        min-width: 0;
-        padding: 18px 20px;
-        font-size: 18px;
-        border-radius: 18px;
-      }
-
-      .hero-note {
-        margin-top: 16px;
-        font-size: 15px;
-      }
-
-      .hero-illustration {
-        max-width: 100%;
-        min-height: 320px;
-        border-radius: 30px;
-      }
-
-      .hero-illustration .doc-top {
-        left: 52%;
-        top: 36px;
-        width: 96px;
-        height: 72px;
-      }
-
-      .hero-illustration .doc-main {
-        left: 43%;
-        top: 98px;
-        width: 156px;
-        height: 118px;
-      }
-
-      .hero-illustration .doc-main::before,
-      .hero-illustration .doc-main::after {
-        left: 20px;
-        right: 30px;
-        height: 8px;
-      }
-
-      .hero-illustration .doc-main::before {
-        top: 22px;
-        box-shadow: 0 24px 0 #c9d7f3, 0 48px 0 #c9d7f3;
-      }
-
-      .hero-illustration .person-head {
-        left: 18%;
-        top: 50px;
-        width: 64px;
-        height: 64px;
-      }
-
-      .hero-illustration .person-body {
-        left: 12%;
-        top: 104px;
-        width: 128px;
-        height: 126px;
-      }
-
-      .hero-illustration .person-arm {
-        left: 30%;
-        top: 154px;
-        width: 40px;
-        height: 72px;
-      }
-
-      .hero-illustration .person-base {
-        left: 16%;
-        bottom: 18px;
-        width: 166px;
-        height: 78px;
-      }
-
-      .hero-illustration .check {
-        width: 48px;
-        height: 48px;
-        font-size: 24px;
-        border-radius: 14px;
-      }
-
-      .hero-illustration .check-1 {
-        right: 18px;
-        top: 114px;
-      }
-
-      .hero-illustration .check-2 {
-        right: 0;
-        top: 146px;
-      }
-
-      .hero-illustration .check-3 {
-        right: 22px;
-        top: 204px;
-      }
-
-      .section {
-        padding: 22px 0;
-      }
-
-      .section-title {
-        font-size: clamp(30px, 8vw, 38px);
-        line-height: 1.08;
-        margin-bottom: 22px;
-      }
-
-      .steps-grid,
-      .features-grid {
-        gap: 18px;
-      }
-
-      .step-card {
-        padding: 24px 18px;
-        border-radius: 20px;
-      }
-
-      .step-icon {
-        width: 92px;
-        height: 92px;
-        border-radius: 22px;
-        font-size: 42px;
-        margin-bottom: 20px;
-      }
-
-      .step-card h3 {
-        font-size: 22px;
-      }
-
-      .step-card p {
-        font-size: 16px;
-        line-height: 1.5;
-        max-width: 100%;
-      }
-
-      .feature-item {
-        padding: 4px 8px;
-      }
-
-      .feature-icon {
-        width: 68px;
-        height: 68px;
-        border-radius: 18px;
-        margin-bottom: 14px;
-        font-size: 30px;
-      }
-
-      .feature-item h4 {
-        font-size: 21px;
-      }
-
-      .feature-item p {
-        font-size: 16px;
-        line-height: 1.5;
-      }
-
-      .testimonial {
-        padding: 24px 18px 22px;
-        margin-top: 20px;
-      }
-
-      .testimonial-mark {
-        font-size: 44px;
-      }
-
-      .testimonial-text p {
-        font-size: 16px;
-        line-height: 1.55;
-        margin-bottom: 16px;
-      }
-
-      .stars {
-        font-size: 20px;
-        letter-spacing: 3px;
-      }
-
-      .bottom-cta {
-        padding: 28px 0 44px;
-      }
-    }
-
-    @media (max-width: 420px) {
-      .hero-copy h1 {
-        font-size: clamp(34px, 11vw, 44px);
-      }
-
-      .hero-copy p {
-        font-size: 16px;
-      }
-
-      .nav a {
-        font-size: 13px;
-        padding: 9px 10px;
-      }
-
-      .brand {
-        font-size: 16px;
+      .button {
+        width: auto;
+        padding: 18px 28px;
       }
     }
   </style>
 </head>
+
 <body>
-  <header class="site-header">
+
+  <!-- HEADER -->
+  <header class="header">
     <div class="container header-inner">
-      <a href="index.html" class="brand">
-        <span class="brand-icon"></span>
-        <span>ClearMyRecord</span>
-      </a>
+      <div class="logo">RecordPathAI</div>
 
       <nav class="nav">
         <a href="how-it-works.html">How It Works</a>
         <a href="eligibility.html">Eligibility</a>
-        <a href="eligibility.html" class="nav-cta">Check Eligibility</a>
-        <a href="login.html" class="nav-login">Log In</a>
+        <a href="eligibility.html" class="cta">Check Eligibility</a>
+        <a href="login.html" class="login">Log In</a>
       </nav>
     </div>
   </header>
 
-  <main>
-    <section class="hero">
-      <div class="container hero-grid">
-        <div class="hero-copy">
-          <h1>Clear Your Criminal Record with More Confidence</h1>
-          <p>
-            Find out whether you may qualify for record sealing or expungement in 60 seconds or less.
-          </p>
-          <a href="eligibility.html" class="hero-button">Check Eligibility</a>
-          <div class="hero-note">100% Free &amp; Confidential</div>
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container hero-grid">
+      <div>
+        <h1>Clear Your Record with Confidence</h1>
+        <p>
+          RecordPathAI helps you find out if you qualify for record sealing or expungement in minutes — and prepares you to move forward with the court.
+        </p>
+
+        <a href="eligibility.html" class="button">Check Eligibility</a>
+        <div class="note">100% Free & Confidential</div>
+      </div>
+
+      <div>
+        <!-- keep your illustration here if needed -->
+      </div>
+    </div>
+  </section>
+
+  <!-- STEPS -->
+  <section class="section">
+    <div class="container">
+      <h2>Simple steps to get started</h2>
+
+      <div class="grid grid-3">
+        <div class="card">
+          <h3>1. Check Eligibility</h3>
+          <p>Answer a few questions about your record and timing.</p>
         </div>
 
-        <div class="hero-art">
-          <div class="hero-illustration" aria-hidden="true">
-            <div class="doc-top"></div>
-            <div class="doc-main"></div>
-            <div class="person-head"></div>
-            <div class="person-body"></div>
-            <div class="person-arm"></div>
-            <div class="person-base"></div>
-            <div class="check check-1">✓</div>
-            <div class="check check-2">✓</div>
-            <div class="check check-3">✓</div>
-          </div>
+        <div class="card">
+          <h3>2. Build Your Record Profile</h3>
+          <p>Enter your case details so everything is structured correctly.</p>
+        </div>
+
+        <div class="card">
+          <h3>3. Prepare Your Filing Packet</h3>
+          <p>Get the documents and guidance you need to move forward.</p>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <section class="section">
-      <div class="container">
-        <h2 class="section-title">Simple steps to get started.</h2>
+  <!-- FEATURES -->
+  <section class="section">
+    <div class="container">
+      <h2>What RecordPathAI Helps With</h2>
 
-        <div class="steps-grid">
-          <div class="step-card">
-            <div class="step-icon">🔎</div>
-            <h3>1. Check Eligibility</h3>
-            <p>Answer a few questions about your record, charges, and case timing.</p>
-          </div>
-
-          <div class="step-card">
-            <div class="step-icon">📝</div>
-            <h3>2. Generate Forms</h3>
-            <p>If you may qualify, ClearMyRecord helps organize the information needed for court forms and packet preparation.</p>
-          </div>
-
-          <div class="step-card">
-            <div class="step-icon">🏛️</div>
-            <h3>3. Prepare to File</h3>
-            <p>Review the process, required documents, and court-specific steps before filing with the court.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="section">
-      <div class="container">
-        <h2 class="section-title">What ClearMyRecord Helps With</h2>
-
-        <div class="features-grid">
-          <div class="feature-item">
-            <div class="feature-icon">⏱️</div>
-            <h4>Fast Screening</h4>
-            <p>Get an eligibility check in minutes, not weeks.</p>
-          </div>
-
-          <div class="feature-item">
-            <div class="feature-icon">🛡️</div>
-            <h4>Confidential</h4>
-            <p>Your information stays private and organized.</p>
-          </div>
-
-          <div class="feature-item">
-            <div class="feature-icon">📄</div>
-            <h4>Form Support</h4>
-            <p>Helps structure the information needed for forms and packets.</p>
-          </div>
-
-          <div class="feature-item">
-            <div class="feature-icon">⚖️</div>
-            <h4>Court Awareness</h4>
-            <p>Some courts have extra requirements, including fingerprints.</p>
-          </div>
+      <div class="grid grid-4">
+        <div class="feature">
+          <h4>Fast Screening</h4>
+          <p>Check eligibility in minutes.</p>
         </div>
 
-        <div class="testimonial">
-          <div class="testimonial-mark">“</div>
-          <div class="testimonial-row">
-            <div class="testimonial-avatar">👤</div>
-            <div class="testimonial-text">
-              <p>
-                ClearMyRecord helps people understand where to start, what information they need, and whether they may qualify before moving deeper into the court process.
-              </p>
-              <div class="stars">★★★★★</div>
-            </div>
-          </div>
+        <div class="feature">
+          <h4>Private & Secure</h4>
+          <p>Your information stays confidential.</p>
+        </div>
+
+        <div class="feature">
+          <h4>Structured Packets</h4>
+          <p>Organize everything needed for filing.</p>
+        </div>
+
+        <div class="feature">
+          <h4>Court Awareness</h4>
+          <p>Understand requirements that vary by court.</p>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <section class="bottom-cta">
-      <div class="container">
-        <a href="eligibility.html" class="hero-button">Start Your Free Eligibility Check</a>
-      </div>
-    </section>
-  </main>
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="container">
+      <a href="eligibility.html" class="button">
+        Start Your Free Eligibility Check
+      </a>
+    </div>
+  </section>
+
 </body>
 </html>
