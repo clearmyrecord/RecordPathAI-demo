@@ -30,6 +30,11 @@
       text-decoration: none;
     }
 
+    code {
+      font-family: Consolas, Monaco, monospace;
+      font-size: 0.95em;
+    }
+
     .container {
       width: min(var(--container), calc(100% - 32px));
       margin: 0 auto;
@@ -357,6 +362,73 @@
   </style>
 </head>
 <body>
+  <datalist id="chargeNameSuggestions">
+    <option value="Possession of Drugs"></option>
+    <option value="Drug Abuse"></option>
+    <option value="Theft"></option>
+    <option value="Petty Theft"></option>
+    <option value="Receiving Stolen Property"></option>
+    <option value="Assault"></option>
+    <option value="Domestic Violence"></option>
+    <option value="Disorderly Conduct"></option>
+    <option value="Driving Under Suspension"></option>
+    <option value="Operating Vehicle Under Influence"></option>
+    <option value="Criminal Damaging"></option>
+    <option value="Trespass"></option>
+  </datalist>
+
+  <datalist id="offenseCodeSuggestions">
+    <option value="2925.11(A)"></option>
+    <option value="2913.02"></option>
+    <option value="2913.51"></option>
+    <option value="2903.13"></option>
+    <option value="2917.11"></option>
+    <option value="4510.11"></option>
+    <option value="4511.19"></option>
+    <option value="2909.06"></option>
+    <option value="2911.21"></option>
+  </datalist>
+
+  <datalist id="chargeLevelSuggestions">
+    <option value="Misdemeanor 1st Degree"></option>
+    <option value="Misdemeanor 2nd Degree"></option>
+    <option value="Misdemeanor 3rd Degree"></option>
+    <option value="Misdemeanor 4th Degree"></option>
+    <option value="Minor Misdemeanor"></option>
+    <option value="Felony 5th Degree"></option>
+    <option value="Felony 4th Degree"></option>
+    <option value="Felony 3rd Degree"></option>
+    <option value="Felony 2nd Degree"></option>
+    <option value="Felony 1st Degree"></option>
+  </datalist>
+
+  <datalist id="dispositionSuggestions">
+    <option value="Guilty"></option>
+    <option value="No Contest"></option>
+    <option value="Dismissed"></option>
+    <option value="Not Guilty"></option>
+    <option value="Amended Charge"></option>
+    <option value="Convicted"></option>
+  </datalist>
+
+  <datalist id="courtSuggestions">
+    <option value="Wood County Court of Common Pleas"></option>
+    <option value="Toledo Municipal Court"></option>
+    <option value="Franklin County Court of Common Pleas"></option>
+    <option value="Cuyahoga County Court of Common Pleas"></option>
+    <option value="Hamilton County Court of Common Pleas"></option>
+    <option value="Los Angeles Superior Court"></option>
+  </datalist>
+
+  <datalist id="countySuggestions">
+    <option value="Wood County"></option>
+    <option value="Lucas County"></option>
+    <option value="Franklin County"></option>
+    <option value="Cuyahoga County"></option>
+    <option value="Hamilton County"></option>
+    <option value="Los Angeles County"></option>
+  </datalist>
+
   <header class="site-header">
     <div class="container header-inner">
       <a href="index.html" class="brand">
@@ -379,7 +451,7 @@
         <div class="rd-header">
           <h1>Enter Your Record Details</h1>
           <p>
-            Add each offense with the actual criminal offense code, court, and case details so RecordPathAI can prepare the filing packet correctly.
+            Add each offense with the exact criminal offense code, conviction date, and probation completion date so RecordPathAI can prepare the filing packet correctly.
           </p>
         </div>
 
@@ -433,17 +505,19 @@
         });
       }
 
-      function makeField(label, name, placeholder, type = "text", full = false) {
+      function makeField(label, name, placeholder, type = "text", full = false, helper = "", listId = "") {
         const wrap = document.createElement("div");
         wrap.className = `rd-field${full ? " rd-field-full" : ""}`;
 
+        const listAttr = listId ? ` list="${listId}"` : "";
         const input = type === "textarea"
           ? `<textarea name="${name}" placeholder="${placeholder || ""}"></textarea>`
-          : `<input type="${type}" name="${name}" placeholder="${placeholder || ""}" />`;
+          : `<input type="${type}" name="${name}" placeholder="${placeholder || ""}"${listAttr} />`;
 
         wrap.innerHTML = `
           <label>${label}</label>
           ${input}
+          ${helper ? `<div class="rd-helper">${helper}</div>` : ""}
         `;
         return wrap;
       }
@@ -475,18 +549,19 @@
 
         const grid = card.querySelector(".rd-grid");
 
-        grid.appendChild(makeField("Charge Name", `charge_name_${index}`, "Example: Possession of Drugs"));
-        grid.appendChild(makeField("Offense Code", `offense_code_${index}`, "Example: 2925.11(A)"));
+        grid.appendChild(makeField("Charge Name", `charge_name_${index}`, "Example: Possession of Drugs", "text", false, "", "chargeNameSuggestions"));
+        grid.appendChild(makeField("Offense Code", `offense_code_${index}`, "Example: 2925.11(A)", "text", false, "Use the exact criminal statute or ordinance code.", "offenseCodeSuggestions"));
 
-        grid.appendChild(makeField("Charge Level", `charge_level_${index}`, "Example: Felony 3rd Degree"));
-        grid.appendChild(makeField("Disposition", `disposition_${index}`, "Example: Guilty"));
+        grid.appendChild(makeField("Charge Level", `charge_level_${index}`, "Example: Felony 3rd Degree", "text", false, "", "chargeLevelSuggestions"));
+        grid.appendChild(makeField("Disposition", `disposition_${index}`, "Example: Guilty", "text", false, "", "dispositionSuggestions"));
 
         grid.appendChild(makeField("Case Number", `case_number_${index}`, "Case number"));
-        grid.appendChild(makeField("Arrest / Case Date", `arrest_date_${index}`, "", "date"));
+        grid.appendChild(makeField("Date of Conviction", `conviction_date_${index}`, "", "date"));
 
-        grid.appendChild(makeField("Court", `court_${index}`, "Example: Wood County Court of Common Pleas"));
-        grid.appendChild(makeField("County", `county_${index}`, "Example: Wood County"));
+        grid.appendChild(makeField("Date Probation Completed", `probation_completed_date_${index}`, "", "date"));
+        grid.appendChild(makeField("Court", `court_${index}`, "Example: Wood County Court of Common Pleas", "text", false, "", "courtSuggestions"));
 
+        grid.appendChild(makeField("County", `county_${index}`, "Example: Wood County", "text", false, "", "countySuggestions"));
         grid.appendChild(makeStateField(`state_${index}`));
 
         grid.appendChild(makeField(
@@ -535,12 +610,14 @@
         }
 
         const first = data[0];
-        const firstKey = Object.keys(first).find((k) => k.startsWith("charge_name_"));
+        const chargeKey = Object.keys(first).find((k) => k.startsWith("charge_name_"));
         const codeKey = Object.keys(first).find((k) => k.startsWith("offense_code_"));
         const courtKey = Object.keys(first).find((k) => k.startsWith("court_"));
+        const convictionKey = Object.keys(first).find((k) => k.startsWith("conviction_date_"));
+        const probationKey = Object.keys(first).find((k) => k.startsWith("probation_completed_date_"));
 
-        if (!first[firstKey] || !first[codeKey] || !first[courtKey]) {
-          alert("Please complete at least the charge name, offense code, and court for the first offense.");
+        if (!first[chargeKey] || !first[codeKey] || !first[courtKey] || !first[convictionKey] || !first[probationKey]) {
+          alert("Please complete the charge name, offense code, court, date of conviction, and date probation completed for the first offense.");
           return;
         }
 
