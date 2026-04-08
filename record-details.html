@@ -3,24 +3,21 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Record Details - ClearMyRecord</title>
+  <title>Record Details | RecordPathAI</title>
   <link rel="stylesheet" href="css/styles.css" />
   <style>
     :root {
       --rd-bg: #eef2f8;
       --rd-surface: #ffffff;
-      --rd-surface-soft: #f8faff;
+      --rd-surface-soft: #f8fbff;
       --rd-text: #233d70;
       --rd-muted: #667796;
-      --rd-border: #dbe4f1;
-      --rd-border-strong: #cfd9e8;
-      --rd-primary: #76a9f7;
-      --rd-primary-dark: #5d95ec;
-      --rd-primary-light: #dce9fd;
-      --rd-shadow: 0 10px 30px rgba(61, 92, 152, 0.08);
-      --rd-radius: 18px;
-      --rd-radius-lg: 24px;
-      --rd-container: 980px;
+      --rd-line: #dbe4f1;
+      --rd-line-strong: #cfd9e8;
+      --rd-blue: #76a9f7;
+      --rd-blue-dark: #5d95ec;
+      --rd-blue-soft: #e7f0ff;
+      --rd-shadow: 0 10px 30px rgba(78, 110, 167, 0.12);
     }
 
     * {
@@ -32,186 +29,187 @@
       color: var(--rd-text);
     }
 
-    .rd-page {
-      padding: 28px 16px 72px;
-    }
-
     .rd-shell {
-      width: min(var(--rd-container), 100%);
-      margin: 0 auto;
+      width: min(980px, 92%);
+      margin: 28px auto 60px;
     }
 
     .rd-card {
       background: var(--rd-surface);
-      border: 1px solid var(--rd-border);
-      border-radius: 32px;
+      border: 1px solid var(--rd-line);
+      border-radius: 24px;
       box-shadow: var(--rd-shadow);
-      padding: 34px 32px 28px;
+      padding: 36px;
     }
 
     .rd-header {
       margin-bottom: 26px;
     }
 
-    .rd-title {
+    .rd-header h1 {
       margin: 0 0 10px;
-      font-size: clamp(36px, 5vw, 64px);
-      line-height: 0.98;
-      letter-spacing: -1.5px;
-      font-weight: 800;
-      color: var(--rd-text);
+      color: #26457a;
+      font-size: clamp(38px, 5vw, 64px);
+      line-height: 1.02;
+      letter-spacing: -0.04em;
+      font-weight: 700;
     }
 
-    .rd-subtitle {
+    .rd-header p {
       margin: 0;
+      color: #60708d;
+      font-size: 17px;
+      line-height: 1.6;
       max-width: 760px;
-      font-size: clamp(18px, 2.2vw, 28px);
-      line-height: 1.35;
-      color: var(--rd-muted);
     }
 
     .rd-toolbar {
       display: flex;
       align-items: center;
-      justify-content: flex-start;
+      justify-content: space-between;
       gap: 14px;
-      margin: 8px 0 24px;
       flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .rd-status {
+      color: #6a7894;
+      font-size: 14px;
+      line-height: 1.5;
     }
 
     .rd-btn {
-      appearance: none;
-      border: 0;
-      border-radius: 18px;
-      font: inherit;
-      font-weight: 700;
-      cursor: pointer;
-      transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      min-height: 58px;
+      padding: 16px 24px;
+      border-radius: 16px;
+      font-size: 17px;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
       text-decoration: none;
-      white-space: nowrap;
+      transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
     }
 
     .rd-btn:hover {
       transform: translateY(-1px);
     }
 
-    .rd-btn:active {
-      transform: translateY(0);
+    .rd-btn-primary {
+      background: linear-gradient(180deg, #86b7fb 0%, #5d91e6 100%);
+      color: #ffffff;
+      box-shadow: 0 10px 30px rgba(78, 110, 167, 0.12);
     }
 
     .rd-btn-secondary {
-      background: #e7ebf1;
-      color: #3f5b8f;
-      padding: 18px 28px;
-      min-height: 64px;
-      box-shadow: none;
+      background: #ffffff;
+      color: #3c557d;
+      border: 1px solid #d5e0ef;
     }
 
-    .rd-btn-primary {
-      background: linear-gradient(180deg, var(--rd-primary) 0%, var(--rd-primary-dark) 100%);
-      color: #fff;
-      padding: 18px 34px;
-      min-height: 64px;
-      box-shadow: 0 10px 22px rgba(93, 149, 236, 0.2);
+    .rd-btn-soft {
+      background: #eaf1fb;
+      color: #406199;
     }
 
-    .rd-btn-small {
-      min-height: 50px;
-      padding: 12px 18px;
-      border-radius: 14px;
-      font-size: 15px;
-    }
-
-    .rd-offenses {
+    .rd-list {
       display: grid;
       gap: 18px;
-      margin-bottom: 26px;
+    }
+
+    .rd-empty {
+      border: 1px dashed #d5e0ef;
+      border-radius: 18px;
+      background: #fbfdff;
+      padding: 20px;
+      color: #6a7894;
+      font-size: 15px;
+      line-height: 1.6;
+      text-align: center;
     }
 
     .rd-offense {
       background: var(--rd-surface-soft);
-      border: 1px solid var(--rd-border);
+      border: 1px solid var(--rd-line);
       border-radius: 22px;
       padding: 22px;
     }
 
-    .rd-offense-top {
+    .rd-offense-head {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 14px;
+      gap: 12px;
       margin-bottom: 18px;
     }
 
-    .rd-offense-title {
+    .rd-offense-head h2 {
       margin: 0;
+      color: #26457a;
       font-size: 22px;
       line-height: 1.2;
-      font-weight: 800;
-      color: var(--rd-text);
-    }
-
-    .rd-remove-btn {
-      background: #eef2f8;
-      color: #516a95;
-      border: 1px solid var(--rd-border);
+      font-weight: 700;
     }
 
     .rd-grid {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 18px 16px;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
     }
 
     .rd-field {
       position: relative;
+      display: block;
     }
 
     .rd-field-full {
       grid-column: 1 / -1;
     }
 
-    .rd-label {
+    .rd-field label {
       display: block;
-      margin-bottom: 8px;
-      font-size: 14px;
-      line-height: 1.3;
-      font-weight: 700;
-      color: #48608b;
-    }
-
-    .rd-input,
-    .rd-textarea {
-      width: 100%;
-      border: 1px solid var(--rd-border-strong);
-      border-radius: 14px;
-      background: #fff;
-      color: var(--rd-text);
-      font: inherit;
+      margin-bottom: 9px;
+      color: #3f5a87;
       font-size: 15px;
-      line-height: 1.4;
-      padding: 14px 14px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .rd-field input,
+    .rd-field textarea {
+      width: 100%;
+      min-height: 58px;
+      padding: 16px 18px;
+      border: 1px solid #d5e0ef;
+      border-radius: 16px;
+      background: #ffffff;
+      color: #243755;
+      font-size: 17px;
+      line-height: 1.2;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
       outline: none;
-      transition: border-color 0.12s ease, box-shadow 0.12s ease;
+      font-family: Arial, Helvetica, sans-serif;
     }
 
-    .rd-textarea {
-      min-height: 108px;
+    .rd-field textarea {
+      min-height: 110px;
       resize: vertical;
+      line-height: 1.5;
     }
 
-    .rd-input:focus,
-    .rd-textarea:focus {
-      border-color: var(--rd-primary-dark);
-      box-shadow: 0 0 0 4px rgba(118, 169, 247, 0.16);
+    .rd-field input:focus,
+    .rd-field textarea:focus {
+      border-color: #7eaef3;
+      box-shadow: 0 0 0 4px rgba(126, 174, 243, 0.15);
     }
 
-    .rd-input::placeholder,
-    .rd-textarea::placeholder {
-      color: #90a0bc;
+    .rd-helper {
+      margin-top: 7px;
+      color: #7a89a3;
+      font-size: 13px;
+      line-height: 1.5;
     }
 
     .rd-suggestions {
@@ -219,169 +217,150 @@
       top: calc(100% + 6px);
       left: 0;
       right: 0;
-      z-index: 20;
-      display: none;
-      background: #fff;
-      border: 1px solid var(--rd-border);
+      background: #ffffff;
+      border: 1px solid #d5e0ef;
       border-radius: 14px;
-      box-shadow: 0 14px 28px rgba(42, 63, 109, 0.12);
+      box-shadow: 0 12px 26px rgba(42, 63, 109, 0.12);
+      overflow: hidden;
+      z-index: 30;
+      display: none;
       max-height: 240px;
       overflow-y: auto;
     }
 
-    .rd-suggestions.is-open {
-      display: block;
-    }
-
     .rd-suggestion {
       padding: 12px 14px;
+      color: #243755;
       font-size: 15px;
       line-height: 1.35;
-      color: var(--rd-text);
       cursor: pointer;
       border-bottom: 1px solid #edf2f8;
+      background: #ffffff;
     }
 
     .rd-suggestion:last-child {
-      border-bottom: 0;
+      border-bottom: none;
     }
 
     .rd-suggestion:hover,
-    .rd-suggestion.is-active {
+    .rd-suggestion.active {
       background: #f3f7fe;
-    }
-
-    .rd-helper {
-      margin-top: 6px;
-      font-size: 12px;
-      line-height: 1.35;
-      color: #8797b4;
-    }
-
-    .rd-empty {
-      background: #f7f9fd;
-      border: 1px dashed var(--rd-border);
-      border-radius: 18px;
-      padding: 18px;
-      color: var(--rd-muted);
-      font-size: 15px;
-      line-height: 1.45;
     }
 
     .rd-actions {
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      margin-top: 22px;
+      gap: 14px;
       flex-wrap: wrap;
+      margin-top: 32px;
     }
 
-    .rd-actions-left,
-    .rd-actions-right {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
+    .rd-actions .rd-btn-primary {
+      flex: 1 1 220px;
     }
 
-    .rd-status {
+    .rd-note {
+      margin-top: 18px;
+      color: #6a7894;
       font-size: 14px;
-      line-height: 1.4;
-      color: var(--rd-muted);
+      line-height: 1.6;
     }
 
-    @media (max-width: 860px) {
+    @media (max-width: 700px) {
+      .rd-shell {
+        width: min(92%, 980px);
+        margin-top: 18px;
+      }
+
       .rd-card {
-        padding: 26px 20px 22px;
-        border-radius: 26px;
+        padding: 26px 20px 24px;
+        border-radius: 20px;
+      }
+
+      .rd-header h1 {
+        font-size: 34px;
+        line-height: 1.04;
+      }
+
+      .rd-header p {
+        font-size: 15px;
       }
 
       .rd-grid {
         grid-template-columns: 1fr;
+        gap: 16px;
       }
 
       .rd-offense {
         padding: 18px;
       }
-    }
 
-    @media (max-width: 560px) {
-      .rd-page {
-        padding: 18px 12px 44px;
+      .rd-offense-head {
+        align-items: flex-start;
+        flex-direction: column;
       }
 
-      .rd-card {
-        padding: 22px 16px 20px;
-        border-radius: 22px;
+      .rd-field input,
+      .rd-field textarea {
+        min-height: 56px;
+        font-size: 16px;
       }
 
-      .rd-toolbar {
-        margin-bottom: 18px;
-      }
-
-      .rd-btn-secondary,
-      .rd-btn-primary {
-        min-height: 58px;
-        padding: 16px 22px;
-      }
-
+      .rd-toolbar,
       .rd-actions {
+        flex-direction: column;
         align-items: stretch;
       }
 
-      .rd-actions-left,
-      .rd-actions-right {
+      .rd-btn {
         width: 100%;
-      }
-
-      .rd-actions-right .rd-btn,
-      .rd-actions-left .rd-btn {
-        flex: 1 1 auto;
-      }
-
-      .rd-offense-top {
-        align-items: flex-start;
-        flex-direction: column;
       }
     }
   </style>
 </head>
 <body>
-  <main class="rd-page">
-    <div class="rd-shell">
-      <section class="rd-card">
-        <header class="rd-header">
-          <h1 class="rd-title">Enter Your Record Details</h1>
-          <p class="rd-subtitle">
-            Add each offense so we can determine eligibility and generate your forms.
+  <header class="site-header">
+    <div class="container nav-wrap">
+      <a href="index.html" class="brand">
+        <span class="brand-icon">📄</span>
+        <span class="brand-text">RecordPathAI</span>
+      </a>
+
+      <nav class="main-nav">
+        <a href="how-it-works.html">How It Works</a>
+        <a href="eligibility.html">Eligibility</a>
+        <a href="eligibility.html" class="nav-btn nav-btn-light">Check Eligibility</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="rd-shell">
+      <div class="rd-card">
+        <div class="rd-header">
+          <h1>Enter Your Record Details</h1>
+          <p>
+            Add each offense so RecordPathAI can organize your information and prepare your filing packet.
           </p>
-        </header>
+        </div>
 
         <div class="rd-toolbar">
-          <button type="button" class="rd-btn rd-btn-secondary" id="addOffenseBtn">
-            + Add Offense
-          </button>
+          <button type="button" class="rd-btn rd-btn-soft" id="addOffenseBtn">+ Add Offense</button>
+          <div class="rd-status" id="recordStatus">1 offense added</div>
         </div>
 
-        <div id="offenseList" class="rd-offenses"></div>
-
-        <div id="emptyState" class="rd-empty" hidden>
-          No offenses added yet. Tap <strong>+ Add Offense</strong> to begin.
-        </div>
+        <div class="rd-list" id="offenseList"></div>
+        <div class="rd-empty" id="emptyState" hidden>No offenses added yet.</div>
 
         <div class="rd-actions">
-          <div class="rd-actions-left">
-            <button type="button" class="rd-btn rd-btn-secondary" id="backBtn">Back</button>
-          </div>
-
-          <div class="rd-actions-right">
-            <div class="rd-status" id="recordStatus">1 offense added</div>
-            <button type="button" class="rd-btn rd-btn-primary" id="continueBtn">Continue</button>
-          </div>
+          <a href="eligibility.html" class="rd-btn rd-btn-secondary">Back</a>
+          <button type="button" id="continueBtn" class="rd-btn rd-btn-primary">Continue</button>
         </div>
-      </section>
-    </div>
+
+        <p class="rd-note">
+          Start typing in charge-related fields to see suggestions from your charge library.
+        </p>
+      </div>
+    </section>
   </main>
 
   <script src="js/charges.js"></script>
