@@ -3,28 +3,32 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sealing Packet - ClearMyRecord</title>
-
-  <script src="js/court-form-configs.js"></script>
-  <script src="js/pdf-generator.js"></script>
-
+  <title>Your Filing Packet | RecordPathAI</title>
+  <link rel="stylesheet" href="css/styles.css" />
   <style>
     * {
       box-sizing: border-box;
     }
 
     :root {
-      --blue: #123d8f;
-      --blue-dark: #0d2f71;
-      --bg: #f3f7fc;
-      --card: #ffffff;
-      --line: #d9e2ec;
-      --text: #1b2430;
-      --muted: #5b6b7f;
-      --soft-blue: #eef4ff;
-      --green: #1f7a3e;
-      --yellow: #8a6d1f;
-      --red: #a12626;
+      --bg: #eef2f8;
+      --surface: #ffffff;
+      --surface-soft: #f6f9ff;
+      --text: #233d70;
+      --muted: #667796;
+      --line: #dbe3f0;
+      --line-strong: #cfd9ea;
+      --blue: #6da7ff;
+      --blue-dark: #4f88e8;
+      --blue-soft: #e8f0fd;
+      --green: #258344;
+      --green-soft: #e8f6ed;
+      --shadow: 0 10px 30px rgba(50, 78, 128, 0.08);
+      --container: 1180px;
+    }
+
+    html {
+      scroll-behavior: smooth;
     }
 
     body {
@@ -34,380 +38,562 @@
       color: var(--text);
     }
 
-    .topbar {
-      background: var(--blue);
-      color: white;
-      padding: 18px 0;
+    a {
+      color: inherit;
+      text-decoration: none;
     }
 
-    .topbar-inner {
-      width: min(1100px, 92%);
+    .container {
+      width: min(var(--container), calc(100% - 32px));
       margin: 0 auto;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 12px;
     }
 
-    .logo {
-      font-size: 22px;
-      font-weight: 800;
+    .site-header {
+      padding: 20px 0 12px;
+    }
+
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      font-size: 18px;
+      color: #3b6db4;
+    }
+
+    .brand-icon {
+      width: 26px;
+      height: 32px;
+      border: 2px solid #222;
+      border-radius: 2px;
+      background: #fff;
+      position: relative;
+      flex: 0 0 auto;
+    }
+
+    .brand-icon::before {
+      content: "";
+      position: absolute;
+      left: 4px;
+      right: 4px;
+      top: 8px;
+      height: 2px;
+      background: #999;
+      box-shadow: 0 6px 0 #999, 0 12px 0 #999;
     }
 
     .nav {
       display: flex;
-      gap: 18px;
+      align-items: center;
+      gap: 14px;
       flex-wrap: wrap;
     }
 
     .nav a {
-      color: white;
-      text-decoration: none;
+      font-size: 16px;
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 14px;
+    }
+
+    .nav .nav-cta {
+      background: #e8f0fd;
       font-weight: 700;
+      padding: 12px 18px;
     }
 
-    .page {
-      width: min(1100px, 92%);
-      margin: 28px auto 60px;
+    .nav .nav-login {
+      background: #fff;
+      border: 1px solid #d6dfed;
+      font-weight: 700;
+      padding: 12px 18px;
     }
 
-    .card {
-      background: var(--card);
+    .packet-shell {
+      width: min(980px, 100%);
+      margin: 24px auto 64px;
+    }
+
+    .packet-stack {
+      display: grid;
+      gap: 22px;
+    }
+
+    .packet-card {
+      background: var(--surface);
       border: 1px solid var(--line);
-      border-radius: 16px;
-      padding: 24px;
-      margin-bottom: 18px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      padding: 30px;
     }
 
-    .title {
-      margin: 0 0 10px;
-      font-size: 30px;
-      color: var(--blue-dark);
+    .packet-title {
+      margin: 0 0 12px;
+      font-size: clamp(40px, 5vw, 64px);
+      line-height: 1.02;
+      letter-spacing: -0.04em;
+      font-weight: 800;
+      color: #26457a;
     }
 
-    .subtitle {
-      margin: 0 0 14px;
-      color: var(--muted);
+    .packet-subtitle {
+      margin: 0;
+      color: #60708d;
+      font-size: 18px;
       line-height: 1.6;
+      max-width: 760px;
     }
 
     .section-title {
-      font-size: 20px;
-      margin-bottom: 10px;
-      color: var(--blue-dark);
+      margin: 0 0 18px;
+      color: #26457a;
+      font-size: clamp(28px, 3vw, 44px);
+      line-height: 1.08;
+      letter-spacing: -0.03em;
+      font-weight: 800;
     }
 
-    .highlight-box {
-      background: var(--soft-blue);
-      border: 1px solid var(--line);
-      border-left: 5px solid var(--blue);
-      padding: 14px;
-      border-radius: 10px;
-      line-height: 1.6;
-    }
-
-    .grid-2 {
+    .date-grid {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-top: 20px;
+    }
+
+    .date-box {
+      border: 2px solid #d7e2f1;
+      border-radius: 22px;
+      background: #fbfdff;
+      padding: 24px 24px 22px;
+    }
+
+    .date-label {
+      margin: 0 0 10px;
+      color: #5c6f8f;
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .date-value {
+      margin: 0;
+      font-size: clamp(34px, 4vw, 52px);
+      line-height: 1.05;
+      font-weight: 800;
+      color: #1f2f4d;
+    }
+
+    .eligibility-result {
+      margin: 24px 0 0;
+      color: var(--green);
+      font-size: clamp(26px, 3vw, 44px);
+      line-height: 1.15;
+      font-weight: 800;
+    }
+
+    .callout {
+      background: #eef4ff;
+      border: 1px solid #d8e3f4;
+      border-left: 8px solid #1f4ca5;
+      border-radius: 22px;
+      padding: 24px;
+      color: #23344f;
+      font-size: 17px;
+      line-height: 1.7;
+      margin: 10px 0 22px;
+    }
+
+    .button-stack {
+      display: grid;
       gap: 16px;
     }
 
-    .stat {
-      border: 1px solid var(--line);
-      border-radius: 10px;
-      padding: 14px;
-      background: #fafcff;
-    }
-
-    .stat-label {
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--muted);
-      text-transform: uppercase;
-      margin-bottom: 6px;
-    }
-
-    .stat-value {
-      font-size: 22px;
+    .packet-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 76px;
+      padding: 18px 26px;
+      border-radius: 20px;
+      border: none;
+      cursor: pointer;
+      font-size: clamp(20px, 2.2vw, 26px);
       font-weight: 800;
+      text-align: center;
+      transition: transform 0.12s ease, box-shadow 0.12s ease, opacity 0.12s ease;
     }
 
-    ul {
-      padding-left: 18px;
+    .packet-btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .packet-btn-primary {
+      background: #17459c;
+      color: #fff;
+      box-shadow: 0 10px 24px rgba(23, 69, 156, 0.18);
+    }
+
+    .packet-btn-secondary {
+      background: #e8edf6;
+      color: #22314d;
+    }
+
+    .instructions-list {
+      display: grid;
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .instruction-item {
+      background: var(--surface-soft);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 18px 18px;
+    }
+
+    .instruction-item h3 {
+      margin: 0 0 8px;
+      font-size: 18px;
+      font-weight: 800;
+      color: #294578;
+    }
+
+    .instruction-item p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 16px;
       line-height: 1.6;
     }
 
-    li {
-      margin-bottom: 6px;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 12px;
-    }
-
-    th, td {
-      border: 1px solid var(--line);
-      padding: 10px;
-      text-align: left;
+    .meta-note {
+      margin-top: 18px;
+      color: #6a7894;
       font-size: 14px;
+      line-height: 1.6;
     }
 
-    th {
-      background: #f4f8ff;
-      font-weight: 800;
-    }
-
-    .actions {
+    .bottom-actions {
       display: flex;
-      gap: 12px;
+      gap: 14px;
       flex-wrap: wrap;
-      margin-top: 14px;
+      margin-top: 4px;
     }
 
-    .btn {
+    .nav-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 58px;
+      padding: 16px 24px;
+      border-radius: 16px;
+      font-size: 17px;
+      font-weight: 700;
       border: none;
-      border-radius: 10px;
-      padding: 12px 16px;
-      font-size: 15px;
-      font-weight: 800;
       cursor: pointer;
       text-decoration: none;
-      display: inline-block;
     }
 
-    .btn-primary {
-      background: var(--blue);
-      color: white;
+    .nav-button-secondary {
+      background: #ffffff;
+      color: #3c557d;
+      border: 1px solid #d5e0ef;
+      flex: 0 0 auto;
     }
 
-    .btn-secondary {
-      background: #e8eef7;
-      color: var(--text);
+    .nav-button-primary {
+      background: linear-gradient(180deg, #86b7fb 0%, #5d91e6 100%);
+      color: #ffffff;
+      box-shadow: 0 10px 30px rgba(78, 110, 167, 0.12);
+      flex: 1 1 220px;
     }
 
-    .status {
-      font-weight: 800;
-    }
-
-    .status.green { color: var(--green); }
-    .status.yellow { color: var(--yellow); }
-    .status.red { color: var(--red); }
-
-    @media (max-width: 760px) {
-      .grid-2 {
+    @media (max-width: 800px) {
+      .date-grid {
         grid-template-columns: 1fr;
       }
+    }
 
-      .actions {
+    @media (max-width: 700px) {
+      .container {
+        width: min(var(--container), calc(100% - 24px));
+      }
+
+      .site-header {
+        padding-top: 14px;
+        padding-bottom: 8px;
+      }
+
+      .header-inner {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 14px;
+      }
+
+      .nav {
+        width: 100%;
+        gap: 10px;
+      }
+
+      .nav a {
+        padding: 10px 12px;
+        font-size: 14px;
+      }
+
+      .packet-shell {
+        margin-top: 18px;
+        margin-bottom: 44px;
+      }
+
+      .packet-card {
+        padding: 24px 18px;
+        border-radius: 22px;
+      }
+
+      .packet-title {
+        font-size: 34px;
+        line-height: 1.04;
+      }
+
+      .packet-subtitle,
+      .callout,
+      .instruction-item p {
+        font-size: 15px;
+      }
+
+      .date-box {
+        padding: 20px 18px;
+      }
+
+      .packet-btn {
+        min-height: 68px;
+        font-size: 18px;
+        border-radius: 18px;
+      }
+
+      .bottom-actions {
         flex-direction: column;
       }
 
-      .btn {
+      .nav-button {
         width: 100%;
-        text-align: center;
-      }
-    }
-
-    @media print {
-      @page {
-        margin: 0.6in;
-      }
-
-      body {
-        background: white !important;
-      }
-
-      .topbar,
-      .actions {
-        display: none !important;
-      }
-
-      .page {
-        width: 100% !important;
-        margin: 0 !important;
-      }
-
-      .card {
-        box-shadow: none !important;
-        border-radius: 0 !important;
-        page-break-inside: avoid;
       }
     }
   </style>
 </head>
 <body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="brand">
+        <span class="brand-icon" aria-hidden="true"></span>
+        <span>RecordPathAI</span>
+      </a>
 
-  <header class="topbar">
-    <div class="topbar-inner">
-      <div class="logo">ClearMyRecord</div>
       <nav class="nav">
-        <a href="index.html">Home</a>
-        <a href="record-details.html">Record Details</a>
-        <a href="results.html">Results</a>
+        <a href="how-it-works.html">How It Works</a>
+        <a href="eligibility.html">Eligibility</a>
+        <a href="eligibility.html" class="nav-cta">Check Eligibility</a>
+        <a href="login.html" class="nav-login">Log In</a>
       </nav>
     </div>
   </header>
 
-  <main class="page">
+  <main>
+    <section class="packet-shell">
+      <div class="packet-stack">
+        <section class="packet-card">
+          <h1 class="packet-title">Your Filing Packet</h1>
+          <p class="packet-subtitle">
+            Based on the information you entered, RecordPathAI can help you review eligibility dates,
+            prepare packet information, and move forward with the court.
+          </p>
+        </section>
 
-    <section class="card">
-      <h1 class="title">Your Filing Packet</h1>
-      <p class="subtitle">
-        This page turns your results into a real-world action plan: what to file, when to file, and what documents to prepare.
-      </p>
-    </section>
+        <section class="packet-card">
+          <h2 class="section-title">Eligibility Overview</h2>
 
-    <section class="card">
-      <h2 class="section-title">Eligibility Overview</h2>
-      <div class="grid-2">
-        <div class="stat">
-          <div class="stat-label">Sealing</div>
-          <div class="stat-value" id="sealDate">—</div>
-        </div>
-        <div class="stat">
-          <div class="stat-label">Expungement</div>
-          <div class="stat-value" id="expDate">—</div>
-        </div>
+          <div class="date-grid">
+            <div class="date-box">
+              <p class="date-label">Sealing</p>
+              <p class="date-value" id="sealingDate">2011-12-03</p>
+            </div>
+
+            <div class="date-box">
+              <p class="date-label">Expungement</p>
+              <p class="date-value" id="expungementDate">2021-12-03</p>
+            </div>
+          </div>
+
+          <p class="eligibility-result" id="eligibilityResult">
+            Eligible now for sealing and expungement
+          </p>
+        </section>
+
+        <section class="packet-card">
+          <h2 class="section-title">Your Packet Options</h2>
+
+          <div class="callout">
+            RecordPathAI prepares structured packet information based on your record details.
+            Review everything carefully before printing, signing, and submitting to the court,
+            since filing requirements can vary by county and court.
+          </div>
+
+          <div class="button-stack">
+            <button type="button" class="packet-btn packet-btn-primary" id="generateSealingBtn">
+              Download Sealing Packet
+            </button>
+
+            <button type="button" class="packet-btn packet-btn-secondary" id="generateExpungementBtn">
+              Download Expungement Packet
+            </button>
+          </div>
+
+          <p class="meta-note">
+            Packet downloads are placeholders right now. Connect your PDF generation flow here when ready.
+          </p>
+        </section>
+
+        <section class="packet-card">
+          <h2 class="section-title">Filing Instructions</h2>
+
+          <div class="instructions-list">
+            <div class="instruction-item">
+              <h3>1. Review your packet</h3>
+              <p>Confirm names, dates, charges, and court details before submitting anything.</p>
+            </div>
+
+            <div class="instruction-item">
+              <h3>2. Print and sign if required</h3>
+              <p>Some courts require original signatures and paper copies before filing.</p>
+            </div>
+
+            <div class="instruction-item">
+              <h3>3. Check local court requirements</h3>
+              <p>Depending on the court, you may need additional documents, fingerprints, or local forms.</p>
+            </div>
+
+            <div class="instruction-item">
+              <h3>4. File with the court</h3>
+              <p>Submit by mail, in person, or through any process your court accepts.</p>
+            </div>
+          </div>
+
+          <p class="meta-note">
+            RecordPathAI helps you prepare to file. Final filing requirements are determined by the court.
+          </p>
+        </section>
+
+        <section class="packet-card">
+          <div class="bottom-actions">
+            <a href="record-details.html" class="nav-button nav-button-secondary">Back</a>
+            <a href="index.html" class="nav-button nav-button-primary">Finish</a>
+          </div>
+        </section>
       </div>
-
-      <div id="statusText" style="margin-top:12px;"></div>
     </section>
-
-    <section class="card">
-      <h2 class="section-title">Court-Ready PDF Forms</h2>
-      <div class="highlight-box">
-        ClearMyRecord can now generate a completed court-form PDF using your stored record data. This works best when you upload the exact official court template and map its fields or coordinates in the court form config file.
-      </div>
-
-      <div class="actions">
-        <button class="btn btn-primary" onclick="generateCourtReadyPdf('ohio_generic_sealing_application')">
-          Generate Sealing PDF
-        </button>
-        <button class="btn btn-secondary" onclick="generateCourtReadyPdf('ohio_generic_expungement_application')">
-          Generate Expungement PDF
-        </button>
-      </div>
-    </section>
-
-    <section class="card">
-      <h2 class="section-title">Filing Instructions</h2>
-      <div id="instructions"></div>
-    </section>
-
-    <section class="card">
-      <h2 class="section-title">Documents You Need</h2>
-      <ul id="documents"></ul>
-    </section>
-
-    <section class="card">
-      <h2 class="section-title">Offense Breakdown</h2>
-      <div id="offenseTable"></div>
-    </section>
-
-    <section class="card">
-      <h2 class="section-title">Next Steps</h2>
-      <ul id="nextSteps"></ul>
-
-      <div class="actions">
-        <button class="btn btn-primary" onclick="window.print()">Print Packet</button>
-        <a class="btn btn-secondary" href="results.html">Back to Results</a>
-        <a class="btn btn-secondary" href="record-details.html">Edit Record</a>
-      </div>
-    </section>
-
   </main>
 
   <script>
-    function getResult() {
+    function readStoredData() {
       try {
-        return JSON.parse(localStorage.getItem("cmrResults")) || null;
-      } catch {
-        return null;
+        return {
+          user: JSON.parse(localStorage.getItem("cmr_user") || "{}"),
+          recordDetails: JSON.parse(sessionStorage.getItem("recordPath_recordDetails") || "[]")
+        };
+      } catch (error) {
+        return { user: {}, recordDetails: [] };
       }
     }
 
-    function renderPacket() {
-      const result = getResult();
-      if (!result) return;
+    function formatDateString(dateString) {
+      if (!dateString) return null;
+      const date = new Date(dateString);
+      if (Number.isNaN(date.getTime())) return null;
 
-      document.getElementById("sealDate").textContent =
-        result.sealingAvailable ? result.sealingEligibilityDate : "Blocked";
-
-      document.getElementById("expDate").textContent =
-        result.expungementAvailable ? result.expungementEligibilityDate : "Blocked";
-
-      let status = "";
-      if (result.eligible) {
-        status = `<div class="status green">${result.statusText}</div>`;
-      } else if (result.sealingAvailable || result.expungementAvailable) {
-        status = `<div class="status yellow">${result.statusText}</div>`;
-      } else {
-        status = `<div class="status red">${result.reason}</div>`;
-      }
-
-      document.getElementById("statusText").innerHTML = status;
-
-      let instructions = "";
-      if (result.sealingAvailable) {
-        instructions += `<p><strong>Sealing:</strong> File an Application for Sealing of Record in the court where the case was handled after ${result.sealingEligibilityDate}.</p>`;
-      }
-      if (result.expungementAvailable) {
-        instructions += `<p><strong>Expungement:</strong> File an Application for Expungement after ${result.expungementEligibilityDate}.</p>`;
-      }
-      if (!instructions) {
-        instructions = "<p>No filing path available based on current data.</p>";
-      }
-
-      document.getElementById("instructions").innerHTML = instructions;
-
-      document.getElementById("documents").innerHTML = `
-        <li>Case numbers for each offense</li>
-        <li>Discharge documentation (proof sentence completed)</li>
-        <li>Payment receipts for sentence fines and fees</li>
-        <li>Photo identification</li>
-        <li>The exact court name and county for each filing</li>
-      `;
-
-      if (result.offenseResults?.length) {
-        const rows = result.offenseResults.map((o, i) => `
-          <tr>
-            <td>${i + 1}</td>
-            <td>${o.chargeLabel || ""}</td>
-            <td>${o.level || ""}</td>
-            <td>${o.sealingDate || ""}</td>
-            <td>${o.expungementDate || ""}</td>
-          </tr>
-        `).join("");
-
-        document.getElementById("offenseTable").innerHTML = `
-          <table>
-            <tr>
-              <th>#</th>
-              <th>Charge</th>
-              <th>Level</th>
-              <th>Sealing</th>
-              <th>Expungement</th>
-            </tr>
-            ${rows}
-          </table>
-        `;
-      }
-
-      document.getElementById("nextSteps").innerHTML = `
-        <li>Confirm all case details are accurate</li>
-        <li>Verify discharge completion dates</li>
-        <li>Confirm the correct court and county</li>
-        <li>Generate the matching court-ready PDF form</li>
-        <li>Review the completed form before filing</li>
-      `;
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
     }
 
-    renderPacket();
+    function addYears(dateString, years) {
+      const date = new Date(dateString);
+      if (Number.isNaN(date.getTime())) return null;
+      date.setFullYear(date.getFullYear() + years);
+      return formatDateString(date);
+    }
+
+    function updateEligibilityOverview() {
+      const { recordDetails } = readStoredData();
+      const firstOffense = Array.isArray(recordDetails) && recordDetails.length ? recordDetails[0] : null;
+
+      if (!firstOffense) return;
+
+      const arrestDateKey = Object.keys(firstOffense).find((key) => key.startsWith("arrest_date_"));
+      const arrestDate = arrestDateKey ? firstOffense[arrestDateKey] : "";
+
+      if (!arrestDate) return;
+
+      const sealing = addYears(arrestDate, 3);
+      const expungement = addYears(arrestDate, 10);
+
+      if (sealing) document.getElementById("sealingDate").textContent = sealing;
+      if (expungement) document.getElementById("expungementDate").textContent = expungement;
+
+      const today = new Date();
+      const sealingDate = sealing ? new Date(sealing) : null;
+      const expungementDate = expungement ? new Date(expungement) : null;
+
+      let message = "Eligibility dates calculated from your record details.";
+
+      if (sealingDate && expungementDate) {
+        if (today >= expungementDate) {
+          message = "Eligible now for sealing and expungement";
+        } else if (today >= sealingDate) {
+          message = "Eligible now for sealing";
+        } else {
+          message = "Review your dates to determine when you may qualify";
+        }
+      }
+
+      document.getElementById("eligibilityResult").textContent = message;
+    }
+
+    function mockDownload(filename, label) {
+      const blob = new Blob(
+        [
+          `${label}\n\n`,
+          `Generated by RecordPathAI.\n`,
+          `This is a placeholder file for your packet workflow.\n`
+        ],
+        { type: "text/plain" }
+      );
+
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(link.href);
+    }
+
+    document.getElementById("generateSealingBtn").addEventListener("click", function () {
+      mockDownload("recordpathai-sealing-packet.txt", "Sealing Packet");
+    });
+
+    document.getElementById("generateExpungementBtn").addEventListener("click", function () {
+      mockDownload("recordpathai-expungement-packet.txt", "Expungement Packet");
+    });
+
+    updateEligibilityOverview();
   </script>
-
 </body>
 </html>
