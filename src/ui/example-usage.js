@@ -1,0 +1,52 @@
+import { createNewCase } from "../core/case-schema.js";
+import { processCase } from "../core/workflow-engine.js";
+import { buildPacketDefinition } from "../core/packet-engine.js";
+import { getStateModule } from "../core/state-registry.js";
+
+const caseFile = createNewCase("OH");
+
+caseFile.county = "Wood";
+caseFile.court = "Wood County Court of Common Pleas";
+caseFile.caseNumber = "2006CR0387";
+caseFile.filingType = "sealing";
+
+caseFile.person.firstName = "Matt";
+caseFile.person.lastName = "Tunstall";
+caseFile.person.fullName = "Matt Tunstall";
+caseFile.person.email = "unitedpaintersww@gmail.com";
+caseFile.person.phone = "8668219810";
+caseFile.person.address1 = "231 W Horizon Ridge Parkway";
+caseFile.person.city = "Henderson";
+caseFile.person.state = "NV";
+caseFile.person.zip = "89012";
+
+caseFile.charges = [
+  {
+    id: crypto.randomUUID(),
+    chargeName: "Possession of Drugs",
+    statute: "2925.11",
+    level: "Felony 3",
+    disposition: "Guilty",
+    arrestDate: "2006-01-01",
+    convictionDate: "2007-05-04",
+    sentencingDate: "2007-05-04",
+    probationCompletedDate: "2010-05-07",
+    jailCompletedDate: "",
+    finePaid: true,
+    restitutionPaid: true,
+    victimInvolved: false,
+    dismissed: false,
+    sealedBefore: false
+  }
+];
+
+const stateModule = getStateModule(caseFile.state);
+console.log("Available courts:", stateModule.listCourts(caseFile.county));
+
+const result = processCase(caseFile);
+console.log("Process result:", result);
+
+if (result.ok) {
+  const packetDefinition = buildPacketDefinition(caseFile);
+  console.log("Packet definition:", packetDefinition);
+}
