@@ -613,7 +613,7 @@
           <h2 class="section-title">Generate Packet</h2>
 
           <div class="callout">
-            This page generates the Wood County sealing packet from the PDF saved in your project at <code>./assets/wood-county-application-for-sealing-295332-conviction.pdf</code>.
+            This page generates the Wood County sealing packet from the PDF saved in your project at <code>./assets/wood-county-application-for-sealing-295332-conviction.pdf.pdf</code>.
           </div>
 
           <div class="sig-row">
@@ -671,18 +671,18 @@
 
   <script>
     document.addEventListener("DOMContentLoaded", function () {
-      const TEMPLATE_URL = "./assets/wood-county-application-for-sealing-295332-conviction.pdf";
+      const TEMPLATE_URL = "./assets/wood-county-application-for-sealing-295332-conviction.pdf.pdf";
 
       const WOOD_DEFAULTS = {
         caseNumber: "2006CR0387",
         judge: "Robert Pollex",
-        convictionDate: "2007-05-04",
-        probationCompletedDate: "2010-05-07",
+        convictionDate: "2007-05-03",
+        probationCompletedDate: "2010-05-06",
         offenseCode: "2925.11(A)",
         offenseName: "Possession of Drugs",
         offenseDegree: "Felony 3rd Degree",
         apartment: "428",
-        phone: "855-412-9810"
+        phone: "8565219810"
       };
 
       let signatureImageBytes = null;
@@ -761,16 +761,16 @@
         const { user, recordDetails } = readStoredData();
         const offense = getFirstOffense(recordDetails);
 
-        const fullName = `${safe(user.firstName)} ${safe(user.lastName)}`.trim() || "Matthew Tunstall";
+        const fullName = `${safe(user.firstName)} ${safe(user.lastName)}`.trim() || "mattt tunstall";
 
         return {
           fullName,
-          street: safe(user.street, "231 W Horizon Ridge Parkway"),
+          street: safe(user.street, "231 w horizon ridge parkway"),
           apartment: WOOD_DEFAULTS.apartment,
           city: safe(user.city, "Henderson"),
           state: safe(offense.stateFromRecord || user.state, "Ohio"),
           zip: safe(user.zip, "89012"),
-          email: safe(user.email, "Matt@unitedpaintersnv.com"),
+          email: safe(user.email, "unitedpaintersww@gmail.com"),
           phone: safe(user.phone, WOOD_DEFAULTS.phone),
           caseNumber: safe(offense.caseNumber, WOOD_DEFAULTS.caseNumber),
           chargeName: safe(offense.chargeName, WOOD_DEFAULTS.offenseName),
@@ -1051,33 +1051,33 @@
           drawFit(addressPage, data.zip, 105, 260, 150, 12, helvetica);
           drawFit(addressPage, data.email, 145, 224, 325, 12, helvetica);
 
-          drawFit(applicationPage, data.caseNumber, 470, 678, 120, 12, helvetica);
-          drawFit(applicationPage, WOOD_DEFAULTS.judge, 470, 651, 120, 12, helvetica);
+          drawFit(applicationPage, data.caseNumber, 470, 676, 120, 12, helvetica);
+          drawFit(applicationPage, WOOD_DEFAULTS.judge, 470, 649, 120, 12, helvetica);
 
-          drawFit(applicationPage, data.fullName, 175, 563, 240, 12, helvetica);
-          drawFit(applicationPage, `${data.street} #${data.apartment}`, 178, 536, 245, 12, helvetica);
-          drawFit(applicationPage, `${data.city}, ${data.state} ${data.zip}`, 205, 510, 220, 12, helvetica);
-          drawFit(applicationPage, data.phone, 185, 484, 240, 12, helvetica);
-          drawFit(applicationPage, data.email, 165, 458, 260, 12, helvetica);
+          drawFit(applicationPage, data.fullName, 245, 563, 170, 12, helvetica);
+          drawFit(applicationPage, data.street, 175, 535, 240, 12, helvetica);
+          drawFit(applicationPage, `${data.city}, ${data.state} ${data.zip}`, 205, 508, 210, 12, helvetica);
+          drawFit(applicationPage, data.phone, 175, 480, 240, 12, helvetica);
+          drawFit(applicationPage, data.email, 165, 452, 250, 12, helvetica);
 
-          drawFit(applicationPage, data.fullName, 145, 421, 185, 12, helvetica);
-          draw(applicationPage, formatDateForCourt(data.convictionDate), 72, 386, 12, helveticaBold);
+          drawFit(applicationPage, data.fullName, 145, 420, 170, 12, helvetica);
+          draw(applicationPage, formatDateForCourt(data.convictionDate), 95, 389, 12, helveticaBold);
 
-          drawFit(applicationPage, data.chargeName, 52, 346, 185, 12, helvetica);
-          drawFit(applicationPage, data.offenseCode, 265, 346, 110, 12, helvetica);
-          drawFit(applicationPage, data.chargeLevel, 425, 346, 130, 12, helvetica);
+          drawFit(applicationPage, data.chargeName, 70, 326, 220, 12, helvetica);
+          drawFit(applicationPage, data.offenseCode, 355, 326, 120, 12, helvetica);
+          drawFit(applicationPage, data.chargeLevel, 505, 326, 135, 12, helvetica);
 
-          draw(applicationPage, formatDateForCourt(data.probationCompletedDate), 262, 241, 12, helveticaBold);
+          draw(applicationPage, formatDateForCourt(data.probationCompletedDate), 340, 214, 12, helveticaBold);
 
           const sigDims = sigImage.scale(0.32);
           applicationPage.drawImage(sigImage, {
-            x: 382,
-            y: 76,
+            x: 420,
+            y: 73,
             width: sigDims.width,
             height: sigDims.height
           });
 
-          drawFit(applicationPage, data.fullName, 88, 44, 210, 12, helvetica);
+          drawFit(applicationPage, data.fullName, 95, 44, 210, 12, helvetica);
 
           setStatus("Saving PDF...");
 
