@@ -3,437 +3,136 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Check Eligibility | RecordPathAI</title>
-  <style>
-    :root {
-      --bg: #eef2f8;
-      --surface: #ffffff;
-      --text: #233d70;
-      --muted: #667796;
-      --line: #dbe4f1;
-      --shadow: 0 10px 30px rgba(78, 110, 167, 0.12);
-      --container: 1180px;
-    }
-
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      font-family: Arial, Helvetica, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-    }
-
-    a {
-      color: inherit;
-      text-decoration: none;
-    }
-
-    .container {
-      width: min(var(--container), calc(100% - 32px));
-      margin: 0 auto;
-    }
-
-    .site-header {
-      padding: 20px 0 12px;
-    }
-
-    .header-inner {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 20px;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-weight: 700;
-      font-size: 18px;
-      color: #3b6db4;
-    }
-
-    .brand-icon {
-      width: 26px;
-      height: 32px;
-      border: 2px solid #222;
-      border-radius: 2px;
-      background: #fff;
-      position: relative;
-      flex: 0 0 auto;
-    }
-
-    .brand-icon::before {
-      content: "";
-      position: absolute;
-      left: 4px;
-      right: 4px;
-      top: 8px;
-      height: 2px;
-      background: #999;
-      box-shadow: 0 6px 0 #999, 0 12px 0 #999;
-    }
-
-    .nav {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      flex-wrap: wrap;
-    }
-
-    .nav a {
-      font-size: 16px;
-      color: var(--text);
-      padding: 10px 12px;
-      border-radius: 14px;
-    }
-
-    .nav .nav-cta {
-      background: #e8f0fd;
-      font-weight: 700;
-      padding: 12px 18px;
-    }
-
-    .nav .nav-login {
-      background: #fff;
-      border: 1px solid #d6dfed;
-      font-weight: 700;
-      padding: 12px 18px;
-    }
-
-    .eligibility-shell {
-      width: min(760px, 92%);
-      margin: 28px auto 60px;
-    }
-
-    .eligibility-card {
-      background: #ffffff;
-      border: 1px solid #e2e9f5;
-      border-radius: 24px;
-      box-shadow: var(--shadow);
-      padding: 36px;
-    }
-
-    .eligibility-header {
-      margin-bottom: 28px;
-    }
-
-    .eligibility-header h1 {
-      margin: 0 0 10px;
-      color: #26457a;
-      font-size: clamp(38px, 5vw, 64px);
-      line-height: 1.02;
-      letter-spacing: -0.04em;
-      font-weight: 700;
-    }
-
-    .eligibility-header p {
-      margin: 0;
-      color: #60708d;
-      font-size: 17px;
-      line-height: 1.6;
-    }
-
-    .eligibility-section {
-      margin-top: 30px;
-    }
-
-    .eligibility-section:first-of-type {
-      margin-top: 0;
-    }
-
-    .eligibility-section-title {
-      margin: 0 0 18px;
-      color: #3b5685;
-      font-size: 16px;
-      line-height: 1.2;
-      font-weight: 700;
-      letter-spacing: 0.01em;
-      text-transform: uppercase;
-    }
-
-    .eligibility-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 18px;
-    }
-
-    .eligibility-field {
-      display: block;
-    }
-
-    .eligibility-field-full {
-      grid-column: 1 / -1;
-    }
-
-    .eligibility-field label {
-      display: block;
-      margin-bottom: 9px;
-      color: #3f5a87;
-      font-size: 15px;
-      font-weight: 700;
-      line-height: 1.2;
-    }
-
-    .eligibility-field input {
-      width: 100%;
-      min-height: 58px;
-      padding: 16px 18px;
-      border: 1px solid #d5e0ef;
-      border-radius: 16px;
-      background: #ffffff;
-      color: #243755;
-      font-size: 17px;
-      line-height: 1.2;
-      transition: border-color 0.15s ease, box-shadow 0.15s ease;
-      outline: none;
-    }
-
-    .eligibility-field input:focus {
-      border-color: #7eaef3;
-      box-shadow: 0 0 0 4px rgba(126, 174, 243, 0.15);
-    }
-
-    .eligibility-actions {
-      display: flex;
-      gap: 14px;
-      flex-wrap: wrap;
-      margin-top: 32px;
-    }
-
-    .eligibility-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 58px;
-      padding: 16px 24px;
-      border-radius: 16px;
-      font-size: 17px;
-      font-weight: 700;
-      border: none;
-      cursor: pointer;
-      text-decoration: none;
-    }
-
-    .eligibility-btn-primary {
-      background: linear-gradient(180deg, #86b7fb 0%, #5d91e6 100%);
-      color: #ffffff;
-      box-shadow: 0 10px 30px rgba(78, 110, 167, 0.12);
-      flex: 1 1 220px;
-    }
-
-    .eligibility-btn-secondary {
-      background: #ffffff;
-      color: #3c557d;
-      border: 1px solid #d5e0ef;
-      flex: 0 0 auto;
-    }
-
-    .eligibility-note {
-      margin-top: 18px;
-      color: #6a7894;
-      font-size: 14px;
-      line-height: 1.6;
-    }
-
-    @media (max-width: 700px) {
-      .container {
-        width: min(var(--container), calc(100% - 24px));
-      }
-
-      .site-header {
-        padding-top: 14px;
-        padding-bottom: 8px;
-      }
-
-      .header-inner {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 14px;
-      }
-
-      .nav {
-        width: 100%;
-        gap: 10px;
-      }
-
-      .nav a {
-        padding: 10px 12px;
-        font-size: 14px;
-      }
-
-      .eligibility-shell {
-        width: min(92%, 760px);
-        margin-top: 18px;
-      }
-
-      .eligibility-card {
-        padding: 26px 20px 24px;
-        border-radius: 20px;
-      }
-
-      .eligibility-header {
-        margin-bottom: 22px;
-      }
-
-      .eligibility-header h1 {
-        font-size: 34px;
-        line-height: 1.04;
-      }
-
-      .eligibility-header p {
-        font-size: 15px;
-      }
-
-      .eligibility-grid {
-        grid-template-columns: 1fr;
-        gap: 16px;
-      }
-
-      .eligibility-field input {
-        min-height: 56px;
-        font-size: 16px;
-      }
-
-      .eligibility-actions {
-        flex-direction: column;
-      }
-
-      .eligibility-btn {
-        width: 100%;
-      }
-    }
-  </style>
+  <title>Eligibility - ClearMyRecord</title>
+  <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
-  <header class="site-header">
-    <div class="container header-inner">
-      <a href="index.html" class="brand">
-        <span class="brand-icon" aria-hidden="true"></span>
-        <span>RecordPathAI</span>
-      </a>
+  <main class="container">
+    <section class="card">
+      <h1>Eligibility Check</h1>
+      <p>Use the state where the case was filed, not where the user currently lives.</p>
 
-      <nav class="nav">
-        <a href="how-it-works.html">How It Works</a>
-        <a href="eligibility.html">Eligibility</a>
-        <a href="eligibility.html" class="nav-cta">Check Eligibility</a>
-        <a href="login.html" class="nav-login">Log In</a>
-      </nav>
-    </div>
-  </header>
-
-  <main>
-    <section class="eligibility-shell">
-      <div class="eligibility-card">
-        <div class="eligibility-header">
-          <h1>Check Your Eligibility</h1>
-          <p>Enter your contact information to begin your eligibility flow.</p>
+      <form id="eligibility-form" class="form-grid">
+        <div>
+          <label>Case State</label>
+          <select name="caseState" required>
+            <option value="">Select</option>
+            <option value="OH">Ohio</option>
+            <option value="NV">Nevada</option>
+          </select>
         </div>
 
-        <div class="eligibility-section">
-          <h2 class="eligibility-section-title">Contact Information</h2>
-
-          <div class="eligibility-grid">
-            <div class="eligibility-field">
-              <label for="firstName">First Name</label>
-              <input type="text" id="firstName" placeholder="First name" />
-            </div>
-
-            <div class="eligibility-field">
-              <label for="lastName">Last Name</label>
-              <input type="text" id="lastName" placeholder="Last name" />
-            </div>
-
-            <div class="eligibility-field eligibility-field-full">
-              <label for="email">Email Address</label>
-              <input type="email" id="email" placeholder="Email address" />
-            </div>
-
-            <div class="eligibility-field eligibility-field-full">
-              <label for="phone">Phone Number</label>
-              <input type="text" id="phone" placeholder="Phone number" />
-            </div>
-          </div>
+        <div>
+          <label>Filing Court Name</label>
+          <input type="text" name="filingCourtName" placeholder="Franklin County Municipal Court" />
         </div>
 
-        <div class="eligibility-section">
-          <h2 class="eligibility-section-title">Mailing Address</h2>
-
-          <div class="eligibility-grid">
-            <div class="eligibility-field eligibility-field-full">
-              <label for="street">Street Address</label>
-              <input type="text" id="street" placeholder="Street address" />
-            </div>
-
-            <div class="eligibility-field">
-              <label for="city">City</label>
-              <input type="text" id="city" placeholder="City" />
-            </div>
-
-            <div class="eligibility-field">
-              <label for="state">State</label>
-              <input type="text" id="state" placeholder="State" />
-            </div>
-
-            <div class="eligibility-field eligibility-field-full">
-              <label for="zip">ZIP Code</label>
-              <input type="text" id="zip" placeholder="ZIP code" />
-            </div>
-          </div>
+        <div>
+          <label>Filing County</label>
+          <input type="text" name="filingCounty" placeholder="Franklin" />
         </div>
 
-        <div class="eligibility-actions">
-          <a href="index.html" class="eligibility-btn eligibility-btn-secondary">Back</a>
-          <button type="button" id="nextBtn" class="eligibility-btn eligibility-btn-primary">Continue</button>
+        <div>
+          <label>Case Number</label>
+          <input type="text" name="caseNumber" />
         </div>
 
-        <p class="eligibility-note">
-          Your information is saved and carried into the next steps, including record details and packet generation.
-        </p>
-      </div>
+        <div>
+          <label>Charge Name</label>
+          <input type="text" name="chargeName" />
+        </div>
+
+        <div>
+          <label>Statute</label>
+          <input type="text" name="statute" placeholder="e.g. ORC 2919.25" />
+        </div>
+
+        <div>
+          <label>Degree</label>
+          <select name="degree">
+            <option value="">Select</option>
+            <option value="MM">Minor Misdemeanor</option>
+            <option value="M">Misdemeanor</option>
+            <option value="F5">F5</option>
+            <option value="F4">F4</option>
+            <option value="F3">F3</option>
+          </select>
+        </div>
+
+        <div>
+          <label>Outcome</label>
+          <select name="outcome">
+            <option value="">Select</option>
+            <option value="dismissed">Dismissed</option>
+            <option value="not guilty">Not Guilty</option>
+            <option value="acquitted">Acquitted</option>
+            <option value="no bill">No Bill</option>
+            <option value="pardon">Pardon</option>
+            <option value="intervention in lieu">Intervention in Lieu</option>
+            <option value="convicted">Convicted</option>
+          </select>
+        </div>
+
+        <div>
+          <label>Discharge / Case Closed Date</label>
+          <input type="date" name="dischargeDate" />
+        </div>
+
+        <div class="checkbox-row">
+          <label><input type="checkbox" name="pendingCharges" /> Pending charges anywhere?</label>
+        </div>
+
+        <h2>Ohio Flags</h2>
+
+        <div class="checkbox-row"><label><input type="checkbox" name="isTraffic" /> Traffic conviction</label></div>
+        <div class="checkbox-row"><label><input type="checkbox" name="isTheftInOffice" /> Theft in office</label></div>
+        <div class="checkbox-row"><label><input type="checkbox" name="isFirstOrSecondDegreeFelony" /> 1st or 2nd degree felony</label></div>
+        <div class="checkbox-row"><label><input type="checkbox" name="isSexOffenseRegistry" /> Subject to sex offender registry</label></div>
+        <div class="checkbox-row"><label><input type="checkbox" name="victimUnder13" /> Victim under 13</label></div>
+        <div class="checkbox-row"><label><input type="checkbox" name="isFelonyViolenceNonSex" /> Felony violence non-sex offense</label></div>
+        <div class="checkbox-row"><label><input type="checkbox" name="isDomesticViolenceConviction" /> Domestic violence conviction</label></div>
+        <div class="checkbox-row"><label><input type="checkbox" name="dvMisdemeanorSealable" /> DV falls in limited sealable misdemeanor bucket</label></div>
+
+        <div>
+          <label>Total felony convictions</label>
+          <input type="number" name="totalFelonies" min="0" value="0" />
+        </div>
+
+        <div>
+          <label>Total F3 convictions</label>
+          <input type="number" name="totalF3" min="0" value="0" />
+        </div>
+
+        <h2>Nevada Flags</h2>
+
+        <div>
+          <label>Nevada category</label>
+          <select name="nvCategory">
+            <option value="">Select</option>
+            <option value="standard_misdemeanor">Standard misdemeanor</option>
+            <option value="listed_misdemeanor">Listed misdemeanor</option>
+            <option value="dui_or_dv">DUI / domestic violence bucket</option>
+            <option value="felony">General felony</option>
+            <option value="violent_or_category_a">Violent / Category A bucket</option>
+          </select>
+        </div>
+
+        <div class="checkbox-row"><label><input type="checkbox" name="isCrimeAgainstChild" /> Crime against child</label></div>
+        <div class="checkbox-row"><label><input type="checkbox" name="isSexOffense" /> Sex offense</label></div>
+        <div class="checkbox-row"><label><input type="checkbox" name="isFelonyDUI" /> Felony DUI</label></div>
+        <div class="checkbox-row"><label><input type="checkbox" name="isHomeInvasionDeadlyWeapon" /> Home invasion with deadly weapon</label></div>
+
+        <div class="button-row">
+          <button type="submit">Save Eligibility</button>
+          <button type="button" id="eligibility-continue">Save and Continue</button>
+        </div>
+      </form>
+
+      <div id="eligibility-result" class="result-box"></div>
     </section>
   </main>
 
-  <script>
-    function loadSavedUserData() {
-      try {
-        const saved = JSON.parse(localStorage.getItem("cmr_user") || "{}");
-
-        if (saved.firstName) document.getElementById("firstName").value = saved.firstName;
-        if (saved.lastName) document.getElementById("lastName").value = saved.lastName;
-        if (saved.email) document.getElementById("email").value = saved.email;
-        if (saved.phone) document.getElementById("phone").value = saved.phone;
-        if (saved.street) document.getElementById("street").value = saved.street;
-        if (saved.city) document.getElementById("city").value = saved.city;
-        if (saved.state) document.getElementById("state").value = saved.state;
-        if (saved.zip) document.getElementById("zip").value = saved.zip;
-      } catch (error) {}
-    }
-
-    function saveAndContinue() {
-      const data = {
-        firstName: document.getElementById("firstName").value.trim(),
-        lastName: document.getElementById("lastName").value.trim(),
-        email: document.getElementById("email").value.trim(),
-        phone: document.getElementById("phone").value.trim(),
-        street: document.getElementById("street").value.trim(),
-        city: document.getElementById("city").value.trim(),
-        state: document.getElementById("state").value.trim(),
-        zip: document.getElementById("zip").value.trim()
-      };
-
-      if (!data.firstName || !data.lastName || !data.email) {
-        alert("Please complete your first name, last name, and email address.");
-        return;
-      }
-
-      localStorage.setItem("cmr_user", JSON.stringify(data));
-      window.location.href = "record-details.html";
-    }
-
-    document.getElementById("nextBtn").addEventListener("click", saveAndContinue);
-    loadSavedUserData();
-  </script>
+  <script src="js/rules.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>
