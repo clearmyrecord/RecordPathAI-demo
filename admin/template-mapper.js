@@ -11,6 +11,13 @@ const els = {
   matchMode: document.getElementById("matchMode"),
   active: document.getElementById("active"),
 
+  pdfUpload: document.getElementById("pdfUpload"),
+  pdfFileName: document.getElementById("pdfFileName"),
+  extractPdfFieldsBtn: document.getElementById("extractPdfFieldsBtn"),
+  clearPdfFieldsBtn: document.getElementById("clearPdfFieldsBtn"),
+  pdfStatus: document.getElementById("pdfStatus"),
+  pdfFieldList: document.getElementById("pdfFieldList"),
+
   sampleCaseJson: document.getElementById("sampleCaseJson"),
   casePathList: document.getElementById("casePathList"),
   mappingTableBody: document.getElementById("mappingTableBody"),
@@ -30,6 +37,8 @@ const els = {
 
 let currentSampleCase = null;
 let currentPaths = [];
+let currentPdfFields = [];
+let currentPdfBytes = null;
 
 function getDemoCase() {
   return {
@@ -170,6 +179,20 @@ function formatPreview(value) {
   return String(value);
 }
 
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function setPdfStatus(message, type = "muted") {
+  els.pdfStatus.className = `status-box ${type}`;
+  els.pdfStatus.textContent = message;
+}
+
 function renderPathList(paths) {
   if (!paths.length) {
     els.casePathList.className = "path-list empty-state";
@@ -198,6 +221,38 @@ function renderPathList(paths) {
   });
 }
 
+function renderPdfFieldList(fields) {
+  if (!fields.length) {
+    els.pdfFieldList.className = "path-list empty-state";
+    els.pdfFieldList.textContent = "No PDF fields detected.";
+    return;
+  }
+
+  els.pdfFieldList.className = "path-list";
+  els.pdfFieldList.innerHTML = "";
+
+  fields.forEach((fieldName) => {
+    const row = document.createElement("div");
+    row.className = "pdf-field-item";
+
+    const name = document.createElement("div");
+    name.className = "pdf-field-name";
+    name.textContent = fieldName;
+
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "add-field-btn";
+    button.textContent = "Add to Mapping";
+    button.addEventListener("click", () => {
+      createMappingRow(fieldName, guessCasePathForPdfField(fieldName));
+    });
+
+    row.appendChild(name);
+    row.appendChild(button);
+    els.pdfFieldList.appendChild(row);
+  });
+}
+
 function getPathOptionsHtml(selectedValue = "") {
   const options = [`<option value="">Select path</option>`];
 
@@ -214,9 +269,10 @@ function getPathOptionsHtml(selectedValue = "") {
 function createMappingRow(pdfFieldName = "", sourcePath = "") {
   const tr = document.createElement("tr");
 
-  const previewValue = sourcePath && currentSampleCase
-    ? formatPreview(getValueByPath(currentSampleCase, sourcePath))
-    : "";
+  const previewValue =
+    sourcePath && currentSampleCase
+      ? formatPreview(getValueByPath(currentSampleCase, sourcePath))
+      : "";
 
   tr.innerHTML = `
     <td>
@@ -433,13 +489,147 @@ function copyText(value, label) {
     .catch(() => alert(`Could not copy ${label}.`));
 }
 
-function escapeHtml(value) {
-  return String(value ?? "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
+function guessCasePathForPdfField(fieldName) {
+  const value = String(fieldName || "").toLowerCase().trim();
+
+  const guessMap = [
+    { includes: ["full_name", "fullname", "full name", "name_full"], path: "person.fullName" },
+    { includes: ["first_name", "firstname", "first name"], path: "person.firstName" },
+    { includes: ["last_name", "lastname", "last name"], path: "person.lastName" },
+    { includes: ["email"], path: "person.email" },
+    { includes: ["phone", "telephone"], path: "person.phone" },
+    { includes: ["address_1", "address1", "street", "mailing_address"], path: "person.address1" },
+    { includes: ["address_2", "address2", "apt", "unit"], path: "person.address2" },
+    { includes: ["city"], path: "person.city" },
+    { includes: ["zip", "zipcode", "postal"], path: "person.zip" },
+    { includes: ["county"], path: "county" },
+    { includes: ["court"], path: "court" },
+    { includes: ["case_number", "case no", "case_no", "casenumber"], path: "caseNumber" },
+    { includes: ["charge_1_name", "charge", "offense"], path: "charges[0].chargeName" },
+    { includes: ["statute", "code_section"], path: "charges[0].statute" },
+    { includes: ["level", "degree"], path: "charges[0].level" },
+    { includes: ["disposition"], path: "charges[0].disposition" },
+    { includes: ["conviction_date"], path: "charges[0].convictionDate" },
+    { includes: ["sentencing_date"], path: "charges[0].sentencingDate" },
+    { includes: ["probation_completed_date", "sentence_completed_date"], path: "charges[0].probationCompletedDate" }
+  ];
+
+  const match = guessMap.find((entry) =>
+    entry.includes.some((token) => value.includes(token))
+  );
+
+  return match ? match.path : "";
+}
+
+function dedupeAndSortFields(fields) {
+  return [...new Set(fields.filter(Boolean).map((name) => String(name).trim()))].sort(
+    (a, b) => a.localeCompare(b)
+  );
+}
+
+async function extractPdfFieldsFromBytes(bytes) {
+  const { PDFDocument } = window.PDFLib;
+
+  const pdfDoc = await PDFDocument.load(bytes, {
+    ignoreEncryption: true,
+    updateMetadata: false
+  });
+
+  let form;
+  try {
+    form = pdfDoc.getForm();
+  } catch (error) {
+    return {
+      ok: false,
+      reason: "This PDF does not expose a readable AcroForm."
+    };
+  }
+
+  let fields = [];
+  try {
+    fields = form.getFields().map((field) => field.getName());
+  } catch (error) {
+    return {
+      ok: false,
+      reason: "Could not read fields from this PDF."
+    };
+  }
+
+  const cleaned = dedupeAndSortFields(fields);
+
+  if (!cleaned.length) {
+    return {
+      ok: false,
+      reason:
+        "No fillable AcroForm fields were found. The PDF may be flat, scanned, or XFA-based."
+    };
+  }
+
+  return {
+    ok: true,
+    fields: cleaned
+  };
+}
+
+async function handleExtractPdfFields() {
+  if (!currentPdfBytes) {
+    alert("Upload a PDF first.");
+    return;
+  }
+
+  if (!window.PDFLib) {
+    setPdfStatus("pdf-lib did not load. Check your internet connection or bundle it locally.", "error");
+    return;
+  }
+
+  setPdfStatus("Analyzing PDF fields...", "muted");
+
+  try {
+    const result = await extractPdfFieldsFromBytes(currentPdfBytes);
+
+    if (!result.ok) {
+      currentPdfFields = [];
+      renderPdfFieldList([]);
+      setPdfStatus(result.reason, "warning");
+      return;
+    }
+
+    currentPdfFields = result.fields;
+    renderPdfFieldList(currentPdfFields);
+    setPdfStatus(`Detected ${currentPdfFields.length} PDF field(s).`, "success");
+  } catch (error) {
+    currentPdfFields = [];
+    renderPdfFieldList([]);
+    setPdfStatus(
+      `Could not analyze PDF. ${error?.message || "Unknown error."}`,
+      "error"
+    );
+  }
+}
+
+function clearPdfFields() {
+  currentPdfFields = [];
+  currentPdfBytes = null;
+  els.pdfUpload.value = "";
+  els.pdfFileName.value = "";
+  renderPdfFieldList([]);
+  setPdfStatus("PDF selection cleared.", "muted");
+}
+
+async function handlePdfUploadChange(event) {
+  const file = event.target.files?.[0];
+
+  if (!file) {
+    currentPdfBytes = null;
+    els.pdfFileName.value = "";
+    return;
+  }
+
+  els.pdfFileName.value = file.name;
+
+  const buffer = await file.arrayBuffer();
+  currentPdfBytes = buffer;
+  setPdfStatus("PDF loaded. Click Extract PDF Fields to inspect it.", "muted");
 }
 
 els.autoGenerateIdsBtn.addEventListener("click", autoGenerateIds);
@@ -458,8 +648,13 @@ els.copyFieldMapBtn.addEventListener("click", () => {
   copyText(els.fieldMapOutput.value, "Field map");
 });
 
+els.pdfUpload.addEventListener("change", handlePdfUploadChange);
+els.extractPdfFieldsBtn.addEventListener("click", handleExtractPdfFields);
+els.clearPdfFieldsBtn.addEventListener("click", clearPdfFields);
+
 renderDefaultRows();
 els.sampleCaseJson.value = JSON.stringify(getDemoCase(), null, 2);
 loadSampleCase();
 buildTemplateRecord();
 buildFieldMap();
+renderPdfFieldList([]);
