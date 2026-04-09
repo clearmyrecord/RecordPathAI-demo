@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Record Details | RecordPathAI</title>
+  <title>Record Details | ClearMyRecord</title>
   <style>
     :root {
       --bg: #eef2f8;
@@ -294,6 +294,17 @@
       line-height: 1.6;
     }
 
+    .case-banner {
+      background: #eef4ff;
+      border: 1px solid #d7e3fb;
+      border-radius: 18px;
+      padding: 18px;
+      margin-bottom: 20px;
+      color: #355486;
+      line-height: 1.6;
+      font-size: 14px;
+    }
+
     @media (max-width: 700px) {
       .container {
         width: min(var(--container), calc(100% - 24px));
@@ -390,25 +401,23 @@
   </datalist>
 
   <datalist id="chargeLevelSuggestions">
-    <option value="Misdemeanor 1st Degree"></option>
-    <option value="Misdemeanor 2nd Degree"></option>
-    <option value="Misdemeanor 3rd Degree"></option>
-    <option value="Misdemeanor 4th Degree"></option>
-    <option value="Minor Misdemeanor"></option>
-    <option value="Felony 5th Degree"></option>
-    <option value="Felony 4th Degree"></option>
-    <option value="Felony 3rd Degree"></option>
-    <option value="Felony 2nd Degree"></option>
-    <option value="Felony 1st Degree"></option>
+    <option value="MM"></option>
+    <option value="M"></option>
+    <option value="F5"></option>
+    <option value="F4"></option>
+    <option value="F3"></option>
+    <option value="F2"></option>
+    <option value="F1"></option>
   </datalist>
 
   <datalist id="dispositionSuggestions">
-    <option value="Guilty"></option>
-    <option value="No Contest"></option>
-    <option value="Dismissed"></option>
-    <option value="Not Guilty"></option>
-    <option value="Amended Charge"></option>
-    <option value="Convicted"></option>
+    <option value="convicted"></option>
+    <option value="dismissed"></option>
+    <option value="not guilty"></option>
+    <option value="acquitted"></option>
+    <option value="no bill"></option>
+    <option value="pardon"></option>
+    <option value="intervention in lieu"></option>
   </datalist>
 
   <datalist id="courtSuggestions">
@@ -417,7 +426,6 @@
     <option value="Franklin County Court of Common Pleas"></option>
     <option value="Cuyahoga County Court of Common Pleas"></option>
     <option value="Hamilton County Court of Common Pleas"></option>
-    <option value="Los Angeles Superior Court"></option>
   </datalist>
 
   <datalist id="countySuggestions">
@@ -426,14 +434,13 @@
     <option value="Franklin County"></option>
     <option value="Cuyahoga County"></option>
     <option value="Hamilton County"></option>
-    <option value="Los Angeles County"></option>
   </datalist>
 
   <header class="site-header">
     <div class="container header-inner">
       <a href="index.html" class="brand">
         <span class="brand-icon" aria-hidden="true"></span>
-        <span>RecordPathAI</span>
+        <span>ClearMyRecord</span>
       </a>
 
       <nav class="nav">
@@ -451,8 +458,12 @@
         <div class="rd-header">
           <h1>Enter Your Record Details</h1>
           <p>
-            Add each offense with the exact criminal offense code, conviction date, and probation completion date so RecordPathAI can prepare the filing packet correctly.
+            Add each offense with the exact charge, statute, court, and case state. The packet must follow the state where the case was filed, not where you currently live.
           </p>
+        </div>
+
+        <div class="case-banner">
+          <strong>Important:</strong> If you live in Nevada but the case is in Ohio, choose <strong>Ohio</strong> as the case state for that offense.
         </div>
 
         <div class="rd-toolbar">
@@ -464,11 +475,11 @@
 
         <div class="rd-actions">
           <a href="eligibility.html" class="rd-btn rd-btn-secondary">Back</a>
-          <button type="button" id="continueBtn" class="rd-btn rd-btn-primary">Continue</button>
+          <button type="button" id="continueBtn" class="rd-btn rd-btn-primary">Save & Continue</button>
         </div>
 
         <p class="rd-note">
-          Include the exact offense code when possible, for example: <code>2925.11(A)</code>.
+          Use short codes when possible for the rules engine, like <code>OH</code>, <code>NV</code>, <code>F3</code>, <code>M</code>, and outcomes like <code>convicted</code> or <code>dismissed</code>.
         </p>
       </div>
     </section>
@@ -481,17 +492,20 @@
       const continueBtn = document.getElementById("continueBtn");
       const recordStatus = document.getElementById("recordStatus");
 
-      const states = [
-        "Alabama","Alaska","Arizona","Arkansas","California","Colorado","Connecticut","Delaware",
-        "Florida","Georgia","Hawaii","Idaho","Illinois","Indiana","Iowa","Kansas","Kentucky",
-        "Louisiana","Maine","Maryland","Massachusetts","Michigan","Minnesota","Mississippi",
-        "Missouri","Montana","Nebraska","Nevada","New Hampshire","New Jersey","New Mexico",
-        "New York","North Carolina","North Dakota","Ohio","Oklahoma","Oregon","Pennsylvania",
-        "Rhode Island","South Carolina","South Dakota","Tennessee","Texas","Utah","Vermont",
-        "Virginia","Washington","West Virginia","Wisconsin","Wyoming"
+      const STATE_OPTIONS = [
+        { code: "OH", label: "Ohio" },
+        { code: "NV", label: "Nevada" },
+        { code: "CA", label: "California" },
+        { code: "AZ", label: "Arizona" },
+        { code: "TX", label: "Texas" },
+        { code: "FL", label: "Florida" }
       ];
 
       let offenseCounter = 0;
+
+      function safe(value, fallback = "") {
+        return (value ?? "").toString().trim() || fallback;
+      }
 
       function updateStatus() {
         const count = offenseList.querySelectorAll(".rd-offense").length;
@@ -526,11 +540,12 @@
         const wrap = document.createElement("div");
         wrap.className = "rd-field";
         wrap.innerHTML = `
-          <label>State</label>
+          <label>Case State</label>
           <select name="${name}">
-            <option value="">Select state</option>
-            ${states.map(state => `<option value="${state}">${state}</option>`).join("")}
+            <option value="">Select case state</option>
+            ${STATE_OPTIONS.map(state => `<option value="${state.code}">${state.label} (${state.code})</option>`).join("")}
           </select>
+          <div class="rd-helper">Use the state where this case was filed.</div>
         `;
         return wrap;
       }
@@ -550,15 +565,15 @@
         const grid = card.querySelector(".rd-grid");
 
         grid.appendChild(makeField("Charge Name", `charge_name_${index}`, "Example: Possession of Drugs", "text", false, "", "chargeNameSuggestions"));
-        grid.appendChild(makeField("Offense Code", `offense_code_${index}`, "Example: 2925.11(A)", "text", false, "Use the exact criminal statute or ordinance code.", "offenseCodeSuggestions"));
+        grid.appendChild(makeField("Offense Code / Statute", `offense_code_${index}`, "Example: 2925.11(A)", "text", false, "Use the exact criminal statute or ordinance code when possible.", "offenseCodeSuggestions"));
 
-        grid.appendChild(makeField("Charge Level", `charge_level_${index}`, "Example: Felony 3rd Degree", "text", false, "", "chargeLevelSuggestions"));
-        grid.appendChild(makeField("Disposition", `disposition_${index}`, "Example: Guilty", "text", false, "", "dispositionSuggestions"));
+        grid.appendChild(makeField("Charge Level", `charge_level_${index}`, "Example: F3 or M", "text", false, "Use short values like MM, M, F5, F4, F3.", "chargeLevelSuggestions"));
+        grid.appendChild(makeField("Disposition / Outcome", `disposition_${index}`, "Example: convicted", "text", false, "Use values like convicted, dismissed, not guilty, acquitted, no bill.", "dispositionSuggestions"));
 
         grid.appendChild(makeField("Case Number", `case_number_${index}`, "Case number"));
-        grid.appendChild(makeField("Date of Conviction", `conviction_date_${index}`, "", "date"));
+        grid.appendChild(makeField("Disposition Date", `conviction_date_${index}`, "", "date"));
 
-        grid.appendChild(makeField("Date Probation Completed", `probation_completed_date_${index}`, "", "date"));
+        grid.appendChild(makeField("Case Closed / Discharge Date", `probation_completed_date_${index}`, "", "date"));
         grid.appendChild(makeField("Court", `court_${index}`, "Example: Wood County Court of Common Pleas", "text", false, "", "courtSuggestions"));
 
         grid.appendChild(makeField("County", `county_${index}`, "Example: Wood County", "text", false, "", "countySuggestions"));
@@ -582,14 +597,23 @@
         return card;
       }
 
-      function addOffense() {
+      function addOffense(prefill = null) {
         const card = buildOffenseCard(offenseCounter);
         offenseCounter += 1;
         offenseList.appendChild(card);
+
+        if (prefill) {
+          card.querySelectorAll("input, textarea, select").forEach((field) => {
+            if (prefill[field.name] != null) {
+              field.value = prefill[field.name];
+            }
+          });
+        }
+
         updateStatus();
       }
 
-      function collectData() {
+      function collectLegacyRows() {
         return Array.from(offenseList.querySelectorAll(".rd-offense")).map((card) => {
           const row = {};
           card.querySelectorAll("input, textarea, select").forEach((field) => {
@@ -599,34 +623,210 @@
         });
       }
 
-      addOffenseBtn.addEventListener("click", addOffense);
+      function normalizeDegree(raw) {
+        const value = safe(raw).toUpperCase();
+
+        if (!value) return "";
+        if (["MM", "M", "F5", "F4", "F3", "F2", "F1"].includes(value)) return value;
+        if (value.includes("MINOR")) return "MM";
+        if (value.includes("MISDEMEANOR")) return "M";
+        if (value.includes("FELONY 5")) return "F5";
+        if (value.includes("FELONY 4")) return "F4";
+        if (value.includes("FELONY 3")) return "F3";
+        if (value.includes("FELONY 2")) return "F2";
+        if (value.includes("FELONY 1")) return "F1";
+
+        return value;
+      }
+
+      function normalizeOutcome(raw) {
+        const value = safe(raw).toLowerCase();
+
+        if (!value) return "";
+        if (value === "guilty") return "convicted";
+        if (value === "no contest") return "convicted";
+        if (value === "convicted") return "convicted";
+        if (value === "dismissed") return "dismissed";
+        if (value === "not guilty") return "not guilty";
+        if (value === "acquitted") return "acquitted";
+        if (value === "no bill") return "no bill";
+        if (value === "pardon") return "pardon";
+        if (value === "intervention in lieu") return "intervention in lieu";
+
+        return value;
+      }
+
+      function buildModernAppState(legacyRows) {
+        const existingRaw = localStorage.getItem("cmr_app_state_v2");
+        let existing = null;
+
+        try {
+          existing = existingRaw ? JSON.parse(existingRaw) : null;
+        } catch (err) {
+          existing = null;
+        }
+
+        const base = existing && typeof existing === "object"
+          ? existing
+          : {
+              user: {
+                firstName: "",
+                lastName: "",
+                email: "",
+                phone: "",
+                address1: "",
+                address2: "",
+                city: "",
+                residenceState: "",
+                zip: ""
+              },
+              records: [],
+              currentRecordId: null
+            };
+
+        const mappedRecords = legacyRows.map((row, index) => {
+          const chargeName = safe(row[`charge_name_${index}`]);
+          const statute = safe(row[`offense_code_${index}`]);
+          const degree = normalizeDegree(row[`charge_level_${index}`]);
+          const outcome = normalizeOutcome(row[`disposition_${index}`]);
+          const caseNumber = safe(row[`case_number_${index}`]);
+          const dispositionDate = safe(row[`conviction_date_${index}`]);
+          const dischargeDate = safe(row[`probation_completed_date_${index}`]);
+          const filingCourtName = safe(row[`court_${index}`]);
+          const filingCounty = safe(row[`county_${index}`]);
+          const caseState = safe(row[`state_${index}`]).toUpperCase();
+          const notes = safe(row[`notes_${index}`]);
+
+          return {
+            id: `rec_${Date.now()}_${index}_${Math.random().toString(36).slice(2, 7)}`,
+            caseState,
+            filingCourtName,
+            filingCounty,
+            caseNumber,
+            chargeName,
+            statute,
+            degree,
+            outcome,
+            dispositionDate,
+            dischargeDate,
+            notes,
+
+            pendingCharges: false,
+
+            isTraffic: false,
+            isTheftInOffice: false,
+            isFirstOrSecondDegreeFelony: degree === "F1" || degree === "F2",
+            isSexOffenseRegistry: false,
+            victimUnder13: false,
+            isFelonyViolenceNonSex: false,
+            isDomesticViolenceConviction: chargeName.toLowerCase().includes("domestic violence"),
+            dvMisdemeanorSealable: false,
+            totalFelonies: ["F1", "F2", "F3", "F4", "F5"].includes(degree) ? 1 : 0,
+            totalF3: degree === "F3" ? 1 : 0,
+
+            nvCategory: "",
+            isCrimeAgainstChild: false,
+            isSexOffense: false,
+            isFelonyDUI: false,
+            isHomeInvasionDeadlyWeapon: false,
+
+            eligibility: null
+          };
+        });
+
+        base.records = mappedRecords;
+        base.currentRecordId = mappedRecords[0]?.id || null;
+
+        return base;
+      }
+
+      function validate(rows) {
+        if (!rows.length) {
+          alert("Please add at least one offense.");
+          return false;
+        }
+
+        const first = rows[0];
+        const firstIndex = 0;
+
+        const required = [
+          `charge_name_${firstIndex}`,
+          `offense_code_${firstIndex}`,
+          `court_${firstIndex}`,
+          `county_${firstIndex}`,
+          `state_${firstIndex}`,
+          `conviction_date_${firstIndex}`,
+          `probation_completed_date_${firstIndex}`
+        ];
+
+        const missing = required.filter((key) => !safe(first[key]));
+
+        if (missing.length) {
+          alert("Please complete the charge name, offense code, court, county, case state, disposition date, and case closed/discharge date for the first offense.");
+          return false;
+        }
+
+        return true;
+      }
+
+      function loadExistingData() {
+        try {
+          const appState = JSON.parse(localStorage.getItem("cmr_app_state_v2") || "null");
+
+          if (appState && Array.isArray(appState.records) && appState.records.length) {
+            appState.records.forEach((record, index) => {
+              addOffense({
+                [`charge_name_${index}`]: safe(record.chargeName),
+                [`offense_code_${index}`]: safe(record.statute || record.offenseCode),
+                [`charge_level_${index}`]: safe(record.degree),
+                [`disposition_${index}`]: safe(record.outcome),
+                [`case_number_${index}`]: safe(record.caseNumber),
+                [`conviction_date_${index}`]: safe(record.dispositionDate || record.convictionDate),
+                [`probation_completed_date_${index}`]: safe(record.dischargeDate || record.probationCompletedDate),
+                [`court_${index}`]: safe(record.filingCourtName || record.court),
+                [`county_${index}`]: safe(record.filingCounty || record.county),
+                [`state_${index}`]: safe(record.caseState).toUpperCase(),
+                [`notes_${index}`]: safe(record.notes)
+              });
+            });
+
+            updateStatus();
+            return;
+          }
+        } catch (err) {}
+
+        try {
+          const legacy = JSON.parse(sessionStorage.getItem("recordPath_recordDetails") || "[]");
+
+          if (Array.isArray(legacy) && legacy.length) {
+            legacy.forEach((row) => addOffense(row));
+            updateStatus();
+            return;
+          }
+        } catch (err) {}
+
+        addOffense();
+        updateStatus();
+      }
+
+      addOffenseBtn.addEventListener("click", function () {
+        addOffense();
+      });
 
       continueBtn.addEventListener("click", function () {
-        const data = collectData();
+        const legacyRows = collectLegacyRows();
 
-        if (!data.length) {
-          alert("Please add at least one offense.");
-          return;
-        }
+        if (!validate(legacyRows)) return;
 
-        const first = data[0];
-        const chargeKey = Object.keys(first).find((k) => k.startsWith("charge_name_"));
-        const codeKey = Object.keys(first).find((k) => k.startsWith("offense_code_"));
-        const courtKey = Object.keys(first).find((k) => k.startsWith("court_"));
-        const convictionKey = Object.keys(first).find((k) => k.startsWith("conviction_date_"));
-        const probationKey = Object.keys(first).find((k) => k.startsWith("probation_completed_date_"));
+        sessionStorage.setItem("recordPath_recordDetails", JSON.stringify(legacyRows));
 
-        if (!first[chargeKey] || !first[codeKey] || !first[courtKey] || !first[convictionKey] || !first[probationKey]) {
-          alert("Please complete the charge name, offense code, court, date of conviction, and date probation completed for the first offense.");
-          return;
-        }
+        const modernState = buildModernAppState(legacyRows);
+        localStorage.setItem("cmr_app_state_v2", JSON.stringify(modernState));
 
-        sessionStorage.setItem("recordPath_recordDetails", JSON.stringify(data));
         window.location.href = "packet.html";
       });
 
-      addOffense();
-      updateStatus();
+      loadExistingData();
     })();
   </script>
 </body>
