@@ -1,307 +1,247 @@
-* {
-  box-sizing: border-box;
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ClearMyRecord - Admin Template Mapper</title>
+  <link rel="stylesheet" href="./template-mapper.css" />
+</head>
+<body>
+  <div class="page-shell">
+    <header class="topbar">
+      <div class="topbar-inner">
+        <div>
+          <div class="eyebrow">Admin Tool</div>
+          <h1>Template Mapper</h1>
+          <p class="subtext">
+            Upload a fillable PDF, extract field names, and map them to normalized case paths.
+          </p>
+        </div>
+      </div>
+    </header>
 
-:root {
-  --bg: #f4f7fc;
-  --surface: #ffffff;
-  --surface-soft: #f8fbff;
-  --text: #1e2a3a;
-  --muted: #66758a;
-  --border: #dbe4f0;
-  --primary: #123d8f;
-  --primary-dark: #0d2f6f;
-  --shadow: 0 10px 30px rgba(18, 61, 143, 0.08);
-  --radius: 18px;
-  --container: 1180px;
-}
+    <main class="main-content">
+      <section class="panel">
+        <div class="panel-head">
+          <h2>Template Details</h2>
+          <p>Define the packet record that will be saved into your template registry.</p>
+        </div>
 
-html,
-body {
-  margin: 0;
-  padding: 0;
-  background: var(--bg);
-  color: var(--text);
-  font-family: Arial, Helvetica, sans-serif;
-}
+        <div class="form-grid two-col">
+          <label class="field">
+            <span>Template ID</span>
+            <input id="templateId" type="text" placeholder="oh-wood-sealing-conviction" />
+          </label>
 
-.page-shell {
-  min-height: 100vh;
-}
+          <label class="field">
+            <span>Field Map ID</span>
+            <input id="fieldMapId" type="text" placeholder="oh-wood-sealing-conviction-v1" />
+          </label>
 
-.topbar {
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.03);
-}
+          <label class="field">
+            <span>State</span>
+            <select id="state">
+              <option value="">Select state</option>
+              <option value="OH">Ohio</option>
+              <option value="NV">Nevada</option>
+            </select>
+          </label>
 
-.topbar-inner {
-  width: min(var(--container), 92%);
-  margin: 0 auto;
-  padding: 28px 0 24px;
-}
+          <label class="field">
+            <span>County</span>
+            <input id="county" type="text" placeholder="Wood" />
+          </label>
 
-.eyebrow {
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--primary);
-  margin-bottom: 10px;
-}
+          <label class="field">
+            <span>Court</span>
+            <input id="court" type="text" placeholder="Wood County Court of Common Pleas" />
+          </label>
 
-h1,
-h2,
-h3,
-p {
-  margin: 0;
-}
+          <label class="field">
+            <span>Filing Type</span>
+            <select id="filingType">
+              <option value="sealing">Sealing</option>
+              <option value="expungement">Expungement</option>
+            </select>
+          </label>
 
-h1 {
-  font-size: 38px;
-  line-height: 1.1;
-}
+          <label class="field">
+            <span>PDF Path</span>
+            <input id="pdfPath" type="text" placeholder="/assets/oh/wood/sealing-conviction.pdf" />
+          </label>
 
-.subtext {
-  margin-top: 10px;
-  color: var(--muted);
-  font-size: 16px;
-}
+          <label class="field">
+            <span>Version</span>
+            <input id="version" type="text" value="1.0" />
+          </label>
 
-.main-content {
-  width: min(var(--container), 92%);
-  margin: 28px auto 40px;
-  display: grid;
-  gap: 24px;
-}
+          <label class="field">
+            <span>Priority</span>
+            <input id="priority" type="number" value="100" />
+          </label>
 
-.panel {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  padding: 24px;
-}
+          <label class="field">
+            <span>Match Mode</span>
+            <select id="matchMode">
+              <option value="all">all</option>
+              <option value="state_filing">state_filing</option>
+            </select>
+          </label>
 
-.panel-head {
-  margin-bottom: 18px;
-}
+          <label class="field checkbox-field">
+            <input id="active" type="checkbox" checked />
+            <span>Active Template</span>
+          </label>
+        </div>
 
-.panel-head h2 {
-  font-size: 28px;
-  margin-bottom: 8px;
-}
+        <div class="button-row">
+          <button id="autoGenerateIdsBtn" class="btn btn-secondary" type="button">
+            Auto Generate IDs
+          </button>
+          <button id="buildTemplateBtn" class="btn btn-primary" type="button">
+            Build Template Record
+          </button>
+        </div>
+      </section>
 
-.panel-head p {
-  color: var(--muted);
-  line-height: 1.5;
-}
+      <section class="panel">
+        <div class="panel-head">
+          <h2>PDF Field Extraction</h2>
+          <p>
+            Upload a fillable PDF. If the file contains AcroForm fields, they will be extracted automatically.
+          </p>
+        </div>
 
-.form-grid {
-  display: grid;
-  gap: 16px;
-}
+        <div class="form-grid two-col">
+          <label class="field">
+            <span>Upload Fillable PDF</span>
+            <input id="pdfUpload" type="file" accept="application/pdf,.pdf" />
+          </label>
 
-.two-col {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
+          <label class="field">
+            <span>Detected PDF File</span>
+            <input id="pdfFileName" type="text" readonly placeholder="No PDF loaded" />
+          </label>
+        </div>
 
-.output-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px;
-}
+        <div class="button-row">
+          <button id="extractPdfFieldsBtn" class="btn btn-primary" type="button">
+            Extract PDF Fields
+          </button>
+          <button id="clearPdfFieldsBtn" class="btn btn-secondary" type="button">
+            Clear Detected Fields
+          </button>
+        </div>
 
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
+        <div id="pdfStatus" class="status-box muted">
+          No PDF analyzed yet.
+        </div>
+      </section>
 
-.field > span {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--text);
-}
+      <section class="panel">
+        <div class="panel-head">
+          <h2>Detected PDF Fields</h2>
+          <p>
+            These are the actual field names found in the uploaded fillable PDF.
+          </p>
+        </div>
 
-input,
-select,
-textarea,
-button {
-  font: inherit;
-}
+        <div id="pdfFieldList" class="path-list empty-state">
+          Upload and extract a fillable PDF to see field names.
+        </div>
+      </section>
 
-input,
-select,
-textarea {
-  width: 100%;
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 14px 14px;
-  background: #fff;
-  color: var(--text);
-  outline: none;
-}
+      <section class="panel">
+        <div class="panel-head">
+          <h2>Sample Case JSON</h2>
+          <p>Paste a normalized case object so the mapper can discover available paths.</p>
+        </div>
 
-input:focus,
-select:focus,
-textarea:focus {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(18, 61, 143, 0.12);
-}
+        <label class="field">
+          <span>Sample Case JSON</span>
+          <textarea id="sampleCaseJson" rows="16" spellcheck="false"></textarea>
+        </label>
 
-textarea {
-  resize: vertical;
-  min-height: 120px;
-  line-height: 1.5;
-}
+        <div class="button-row">
+          <button id="loadSampleBtn" class="btn btn-primary" type="button">Load Sample Case</button>
+          <button id="loadDemoBtn" class="btn btn-secondary" type="button">Load Demo Case</button>
+        </div>
+      </section>
 
-.checkbox-field {
-  flex-direction: row;
-  align-items: center;
-  gap: 12px;
-  padding-top: 34px;
-}
+      <section class="panel">
+        <div class="panel-head">
+          <h2>Discovered Case Paths</h2>
+          <p>These are the available paths from your sample case object.</p>
+        </div>
 
-.checkbox-field input {
-  width: auto;
-  transform: scale(1.15);
-}
+        <div id="casePathList" class="path-list empty-state">
+          Load a sample case to see available mapping paths.
+        </div>
+      </section>
 
-.button-row {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  margin-top: 18px;
-}
+      <section class="panel">
+        <div class="panel-head">
+          <h2>PDF Field Mapping</h2>
+          <p>
+            Add extracted PDF fields or manual field names, then map them to case paths.
+          </p>
+        </div>
 
-.btn {
-  border: 0;
-  border-radius: 12px;
-  padding: 13px 18px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: transform 0.08s ease, opacity 0.2s ease;
-}
+        <div class="button-row">
+          <button id="addMappingRowBtn" class="btn btn-secondary" type="button">
+            Add Manual Mapping Row
+          </button>
+          <button id="buildFieldMapBtn" class="btn btn-primary" type="button">
+            Build Field Map
+          </button>
+        </div>
 
-.btn:hover {
-  transform: translateY(-1px);
-}
+        <div class="mapping-table-wrap">
+          <table class="mapping-table">
+            <thead>
+              <tr>
+                <th>PDF Field Name</th>
+                <th>Source Case Path</th>
+                <th>Preview Value</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="mappingTableBody"></tbody>
+          </table>
+        </div>
+      </section>
 
-.btn-primary {
-  background: var(--primary);
-  color: #fff;
-}
+      <section class="panel">
+        <div class="panel-head">
+          <h2>Output</h2>
+          <p>Copy these directly into your registry and field-map files.</p>
+        </div>
 
-.btn-primary:hover {
-  background: var(--primary-dark);
-}
+        <div class="output-grid">
+          <label class="field">
+            <span>Template Record JSON</span>
+            <textarea id="templateOutput" rows="14" spellcheck="false" readonly></textarea>
+          </label>
 
-.btn-secondary {
-  background: var(--surface-soft);
-  color: var(--text);
-  border: 1px solid var(--border);
-}
+          <label class="field">
+            <span>Field Map JSON</span>
+            <textarea id="fieldMapOutput" rows="14" spellcheck="false" readonly></textarea>
+          </label>
+        </div>
 
-.path-list {
-  background: var(--surface-soft);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 16px;
-  min-height: 100px;
-  display: grid;
-  gap: 8px;
-}
+        <div class="button-row">
+          <button id="copyTemplateBtn" class="btn btn-secondary" type="button">
+            Copy Template Record
+          </button>
+          <button id="copyFieldMapBtn" class="btn btn-secondary" type="button">
+            Copy Field Map
+          </button>
+        </div>
+      </section>
+    </main>
+  </div>
 
-.path-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 14px;
-  border: 1px solid var(--border);
-  background: #fff;
-  border-radius: 12px;
-  padding: 10px 12px;
-}
-
-.path-name {
-  font-family: Consolas, Monaco, monospace;
-  font-size: 13px;
-  word-break: break-word;
-}
-
-.path-value {
-  color: var(--muted);
-  font-size: 13px;
-  text-align: right;
-  max-width: 42%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.empty-state {
-  color: var(--muted);
-}
-
-.mapping-table-wrap {
-  overflow-x: auto;
-  margin-top: 18px;
-}
-
-.mapping-table {
-  width: 100%;
-  border-collapse: collapse;
-  min-width: 780px;
-}
-
-.mapping-table th,
-.mapping-table td {
-  border-bottom: 1px solid var(--border);
-  padding: 12px 10px;
-  text-align: left;
-  vertical-align: top;
-}
-
-.mapping-table th {
-  font-size: 13px;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-.mapping-table td input,
-.mapping-table td select {
-  min-width: 180px;
-}
-
-.preview-cell {
-  color: var(--muted);
-  font-size: 13px;
-  max-width: 260px;
-  word-break: break-word;
-}
-
-.icon-btn {
-  border: 1px solid var(--border);
-  background: #fff;
-  border-radius: 10px;
-  padding: 10px 12px;
-  cursor: pointer;
-  font-weight: 700;
-}
-
-.icon-btn:hover {
-  background: var(--surface-soft);
-}
-
-@media (max-width: 900px) {
-  .two-col,
-  .output-grid {
-    grid-template-columns: 1fr;
-  }
-
-  h1 {
-    font-size: 32px;
-  }
-}
+  <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+  <script src="./template-mapper.js"></script>
+</body>
+</html>
