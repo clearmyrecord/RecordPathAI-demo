@@ -49,6 +49,16 @@ let currentScale = 1.5;
 let overlayItems = [];
 let selectedOverlayId = null;
 
+let pointerState = {
+  mode: null, // "drag" | "resize" | null
+  overlayId: null,
+  startClientX: 0,
+  startClientY: 0,
+  startX: 0,
+  startY: 0,
+  startWidth: 0
+};
+
 function getDemoCase() {
   return {
     id: "demo-case-1",
@@ -188,6 +198,23 @@ function flattenObject(obj, prefix = "", output = []) {
   return output;
 }
 
+function round2(value) {
+  return Math.round(Number(value || 0) * 100) / 100;
+}
+
+function clamp(value, min, max) {
+  return Math.min(Math.max(value, min), max);
+}
+
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
 function renderPathList(paths) {
   if (!paths.length) {
     els.casePathList.className = "path-list empty-state";
@@ -225,15 +252,6 @@ function getPathOptionsHtml(selected = "") {
   });
 
   return options.join("");
-}
-
-function escapeHtml(value) {
-  return String(value ?? "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
 }
 
 function loadSampleCase() {
@@ -344,12 +362,12 @@ function deleteSelectedOverlay() {
   renderOverlayMarkers();
 }
 
-function round2(value) {
-  return Math.round(Number(value || 0) * 100) / 100;
-}
-
 function getCurrentPageOverlays() {
   return overlayItems.filter((item) => item.page === currentPageNumber);
+}
+
+function getOverlayById(id) {
+  return overlayItems.find((item) => item.id === id) || null;
 }
 
 function renderOverlayMarkers() {
@@ -358,22 +376,45 @@ function renderOverlayMarkers() {
   [...els.pageCanvasContainer.querySelectorAll(".overlay-marker")].forEach((node) => node.remove());
 
   const pageHeight = currentViewport.height;
+  const pageWidth = currentViewport.width;
 
   getCurrentPageOverlays().forEach((item) => {
     const marker = document.createElement("div");
     marker.className = `overlay-marker${item.id === selectedOverlayId ? " selected" : ""}`;
     marker.dataset.overlayId = item.id;
 
-    const left = item.x * currentScale;
-    const top = pageHeight - (item.y * currentScale) - (item.fontSize * currentScale) - 2;
+    const left = clamp(item.x * currentScale, 0, pageWidth - 10);
+    const top = clamp(
+      pageHeight - (item.y * currentScale) - (item.fontSize * currentScale) - 4,
+      0,
+      pageHeight - 10
+    );
     const width = Math.max(item.width * currentScale, 36);
-    const height = Math.max(item.fontSize * currentScale + 8, 18);
+    const height = Math.max(item.fontSize * currentScale + 10, 20);
 
     marker.style.left = `${left}px`;
-    marker.style.top = `${Math.max(top, 0)}px`;
+    marker.style.top = `${top}px`;
     marker.style.width = `${width}px`;
     marker.style.height = `${height}px`;
-    marker.textContent = item.name || item.sourcePath || "field";
+
+    const label = document.createElement("div");
+    label.className = "overlay-label";
+    label.textContent = item.name || item.sourcePath || "field";
+
+    const handle = document.createElement("div");
+    handle.className = "overlay-resize-handle";
+
+    marker.appendChild(label);
+    marker.appendChild(handle);
+
+    marker.addEventListener("pointerdown", (event) => {
+      if (event.target === handle) return;
+      startDrag(event, item.id);
+    });
+
+    handle.addEventListener("pointerdown", (event) => {
+      startResize(event, item.id);
+    });
 
     marker.addEventListener("click", (event) => {
       event.stopPropagation();
@@ -427,31 +468,41 @@ function renderOverlayTable() {
 
     const bind = (selector, key, parser = (v) => v) => {
       const input = row.querySelector(selector);
-      input.addEventListener("input", () => {
+
+      const sync = () => {
         item[key] = parser(input.value);
+
+        if (key === "page") {
+          item.page = Math.max(1, Number(item.page || 1));
+        }
+
+        if (key === "width") {
+          item.width = Math.max(20, Number(item.width || 20));
+        }
+
+        if (key === "fontSize") {
+          item.fontSize = Math.max(6, Number(item.fontSize || 6));
+        }
+
         renderOverlayMarkers();
+
         if (selector === ".ov-source") {
           row.querySelector(".preview-cell").textContent = formatPreview(
             getValueByPath(currentSampleCase, item.sourcePath)
           );
         }
-      });
-      input.addEventListener("change", () => {
-        item[key] = parser(input.value);
-        renderOverlayMarkers();
-        if (selector === ".ov-page") {
+
+        if (key === "page") {
           updatePageIndicator();
         }
-        if (selector === ".ov-source") {
-          row.querySelector(".preview-cell").textContent = formatPreview(
-            getValueByPath(currentSampleCase, item.sourcePath)
-          );
-        }
-      });
+      };
+
+      input.addEventListener("input", sync);
+      input.addEventListener("change", sync);
     };
 
     bind(".ov-name", "name", (v) => v);
-    bind(".ov-page", "page", (v) => Math.max(1, Number(v || 1)));
+    bind(".ov-page", "page", (v) => Number(v || 1));
     bind(".ov-x", "x", (v) => round2(v));
     bind(".ov-y", "y", (v) => round2(v));
     bind(".ov-width", "width", (v) => round2(v));
@@ -517,7 +568,10 @@ async function renderPdf() {
     pdfDoc = await pdfjsLib.getDocument({ data: pdfBytes }).promise;
     currentPageNumber = 1;
     await renderCurrentPage();
-    setPdfStatus(`Rendered PDF with ${pdfDoc.numPages} page(s). Click on the page to place overlays.`, "success");
+    setPdfStatus(
+      `Rendered PDF with ${pdfDoc.numPages} page(s). Drag boxes to move them. Drag the right handle to resize width.`,
+      "success"
+    );
   } catch (error) {
     setPdfStatus(`Could not render PDF. ${error?.message || "Unknown error."}`, "error");
   }
@@ -555,6 +609,8 @@ async function renderCurrentPage() {
 function handleCanvasClick(event) {
   if (!currentViewport || !currentCanvas) return;
 
+  if (pointerState.mode) return;
+
   const rect = currentCanvas.getBoundingClientRect();
   const canvasX = event.clientX - rect.left;
   const canvasY = event.clientY - rect.top;
@@ -571,6 +627,16 @@ function clearPdf() {
   currentPageNumber = 1;
   currentViewport = null;
   currentCanvas = null;
+  pointerState = {
+    mode: null,
+    overlayId: null,
+    startClientX: 0,
+    startClientY: 0,
+    startX: 0,
+    startY: 0,
+    startWidth: 0
+  };
+
   els.pdfUpload.value = "";
   els.pdfFileName.value = "";
   els.pageCanvasContainer.className = "page-canvas-container empty-canvas";
@@ -594,6 +660,89 @@ async function goNextPage() {
   if (!pdfDoc || currentPageNumber >= pdfDoc.numPages) return;
   currentPageNumber += 1;
   await renderCurrentPage();
+}
+
+function startDrag(event, overlayId) {
+  event.preventDefault();
+  event.stopPropagation();
+
+  const item = getOverlayById(overlayId);
+  if (!item) return;
+
+  selectedOverlayId = overlayId;
+
+  pointerState.mode = "drag";
+  pointerState.overlayId = overlayId;
+  pointerState.startClientX = event.clientX;
+  pointerState.startClientY = event.clientY;
+  pointerState.startX = item.x;
+  pointerState.startY = item.y;
+  pointerState.startWidth = item.width;
+
+  window.addEventListener("pointermove", onPointerMove);
+  window.addEventListener("pointerup", stopPointerAction, { once: true });
+
+  renderOverlayTable();
+  renderOverlayMarkers();
+}
+
+function startResize(event, overlayId) {
+  event.preventDefault();
+  event.stopPropagation();
+
+  const item = getOverlayById(overlayId);
+  if (!item) return;
+
+  selectedOverlayId = overlayId;
+
+  pointerState.mode = "resize";
+  pointerState.overlayId = overlayId;
+  pointerState.startClientX = event.clientX;
+  pointerState.startClientY = event.clientY;
+  pointerState.startX = item.x;
+  pointerState.startY = item.y;
+  pointerState.startWidth = item.width;
+
+  window.addEventListener("pointermove", onPointerMove);
+  window.addEventListener("pointerup", stopPointerAction, { once: true });
+
+  renderOverlayTable();
+  renderOverlayMarkers();
+}
+
+function onPointerMove(event) {
+  if (!pointerState.mode || !currentViewport) return;
+
+  const item = getOverlayById(pointerState.overlayId);
+  if (!item) return;
+
+  const deltaXCanvas = event.clientX - pointerState.startClientX;
+  const deltaYCanvas = event.clientY - pointerState.startClientY;
+
+  const deltaXPdf = deltaXCanvas / currentScale;
+  const deltaYPdf = deltaYCanvas / currentScale;
+
+  if (pointerState.mode === "drag") {
+    const pageWidthPdf = currentViewport.width / currentScale;
+    const pageHeightPdf = currentViewport.height / currentScale;
+
+    item.x = round2(clamp(pointerState.startX + deltaXPdf, 0, Math.max(pageWidthPdf - 5, 0)));
+    item.y = round2(clamp(pointerState.startY - deltaYPdf, 0, Math.max(pageHeightPdf - 5, 0)));
+  }
+
+  if (pointerState.mode === "resize") {
+    item.width = round2(Math.max(20, pointerState.startWidth + deltaXPdf));
+  }
+
+  renderOverlayMarkers();
+  renderOverlayTable();
+}
+
+function stopPointerAction() {
+  window.removeEventListener("pointermove", onPointerMove);
+
+  pointerState.mode = null;
+  pointerState.overlayId = null;
 }
 
 els.autoGenerateBtn.addEventListener("click", autoGenerateIds);
