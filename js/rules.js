@@ -4,8 +4,11 @@
 
   function toDate(value) {
     if (!value) return null;
-    const d = new Date(value);
-    return Number.isNaN(d.getTime()) ? null : d;
+    const d = new Date(`${value}T12:00:00`);
+    if (!Number.isNaN(d.getTime())) return d;
+
+    const fallback = new Date(value);
+    return Number.isNaN(fallback.getTime()) ? null : fallback;
   }
 
   function elapsedSince(dateValue) {
@@ -47,11 +50,14 @@
 
   function formatDateISO(date) {
     if (!(date instanceof Date) || Number.isNaN(date.getTime())) return null;
-    return date.toISOString().split("T")[0];
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
   }
 
-  function futureDateFromDischarge(dischargeDate, years = 0, months = 0) {
-    const d = toDate(dischargeDate);
+  function addToDate(baseDateValue, years = 0, months = 0) {
+    const d = toDate(baseDateValue);
     if (!d) return null;
     const copy = new Date(d.getTime());
     copy.setFullYear(copy.getFullYear() + years);
@@ -65,6 +71,19 @@
 
   function normalizeDegree(value) {
     return (value || "").trim().toUpperCase();
+  }
+
+  function normalizeState(value) {
+    const v = (value || "").trim().toUpperCase();
+    const map = {
+      OHIO: "OH",
+      NEVADA: "NV",
+      CALIFORNIA: "CA",
+      ARIZONA: "AZ",
+      TEXAS: "TX",
+      FLORIDA: "FL"
+    };
+    return map[v] || v;
   }
 
   function isOhioNonConviction(outcome) {
@@ -85,18 +104,44 @@
       "dismissal",
       "not guilty",
       "acquitted",
-      "decriminalized"
+      "decriminalized",
+      "no bill"
     ].includes(normalizeOutcome(outcome));
+  }
+
+  function inferArizonaClass(record) {
+    const raw = [
+      record.azClass,
+      record.azOffenseClass,
+      record.degree,
+      record.chargeLevel,
+      record.notes
+    ]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase();
+
+    if (raw.includes("class 2 felony")) return "AZ_F2";
+    if (raw.includes("class 3 felony")) return "AZ_F3";
+    if (raw.includes("class 4 felony")) return "AZ_F4";
+    if (raw.includes("class 5 felony")) return "AZ_F5";
+    if (raw.includes("class 6 felony")) return "AZ_F6";
+    if (raw.includes("class 1 misdemeanor")) return "AZ_M1";
+    if (raw.includes("class 2 misdemeanor")) return "AZ_M2";
+    if (raw.includes("class 3 misdemeanor")) return "AZ_M3";
+
+    return "";
   }
 
   function evaluateOhio(record) {
     const reasons = [];
     const outcome = normalizeOutcome(record.outcome);
     const degree = normalizeDegree(record.degree);
-    const dischargeElapsed = elapsedSince(record.dischargeDate);
+    const dischargeDate = record.dischargeDate || record.dispositionDate;
+    const dischargeElapsed = elapsedSince(dischargeDate);
 
     if (record.pendingCharges) {
-      addReason(reasons, "Ohio blocks sealing/expungement while any criminal charge is still pending.");
+      addReason(reasons, "Ohio blocks sealing or expungement while any criminal charge is still pending.");
       return buildResult({
         eligible: false,
         status: "not_eligible_yet",
@@ -107,8 +152,9 @@
     }
 
     if (outcome === "no bill") {
-      const waitYears = 2;
-      const eligible = dischargeElapsed.years >= waitYears;
+      const eligibleDate = addToDate(record.dispositionDate || record.dischargeDate, 2, 0);
+      const eligible = dischargeElapsed.years >= 2;
+
       addReason(
         reasons,
         eligible
@@ -123,18 +169,20 @@
         reliefType: "seal_or_expunge_non_conviction",
         reasons,
         waitingPeriod: "2 years from no-bill date",
-        earliestEligibleDate: eligible ? formatDateISO(new Date()) : futureDateFromDischarge(record.dischargeDate, 2)
+        earliestEligibleDate: eligibleDate
       });
     }
 
     if (["dismissed", "dismissal", "not guilty", "acquitted", "pardon", "intervention in lieu"].includes(outcome)) {
       addReason(reasons, "Ohio non-conviction path appears available now, subject to court-specific review and exclusions.");
+
       return buildResult({
         eligible: true,
         status: "likely_eligible",
         state: "OH",
         reliefType: "seal_or_expunge_non_conviction",
-        reasons
+        reasons,
+        earliestEligibleDate: record.dispositionDate || record.dischargeDate || null
       });
     }
 
@@ -151,7 +199,7 @@
     }
 
     if (record.isTraffic) {
-      addReason(reasons, "Ohio traffic convictions are excluded from standard sealing/expungement.");
+      addReason(reasons, "Ohio traffic convictions are excluded from standard sealing or expungement.");
       return buildResult({
         eligible: false,
         status: "ineligible",
@@ -162,7 +210,7 @@
     }
 
     if (record.isTheftInOffice) {
-      addReason(reasons, "Ohio theft-in-office convictions are excluded from standard sealing/expungement.");
+      addReason(reasons, "Ohio theft-in-office convictions are excluded from standard sealing or expungement.");
       return buildResult({
         eligible: false,
         status: "ineligible",
@@ -173,7 +221,7 @@
     }
 
     if (record.isFirstOrSecondDegreeFelony) {
-      addReason(reasons, "Ohio 1st- and 2nd-degree felonies are excluded from standard sealing/expungement.");
+      addReason(reasons, "Ohio 1st- and 2nd-degree felonies are excluded from standard sealing or expungement.");
       return buildResult({
         eligible: false,
         status: "ineligible",
@@ -184,7 +232,7 @@
     }
 
     if (record.isSexOffenseRegistry) {
-      addReason(reasons, "Ohio registry-related sexually oriented offenses are excluded from standard sealing/expungement.");
+      addReason(reasons, "Ohio registry-related sexually oriented offenses are excluded from standard sealing or expungement.");
       return buildResult({
         eligible: false,
         status: "ineligible",
@@ -230,6 +278,7 @@
     let waitYears = 0;
     let waitMonths = 0;
     let waitingPeriodLabel = "";
+    let reliefType = "conviction";
 
     if (degree === "MM") {
       waitMonths = 6;
@@ -238,10 +287,17 @@
       waitYears = 1;
       waitingPeriodLabel = "1 year after discharge";
     } else if (degree === "F4" || degree === "F5") {
-      waitYears = record.isTheftInOffice ? 7 : 1;
-      waitingPeriodLabel = record.isTheftInOffice ? "7 years after discharge" : "1 year after discharge";
+      if ((record.reliefType || "").toLowerCase() === "expungement") {
+        waitYears = 11;
+        waitingPeriodLabel = "11 years after discharge";
+        reliefType = "expungement";
+      } else {
+        waitYears = 1;
+        waitingPeriodLabel = "1 year after discharge";
+        reliefType = "sealing";
+      }
     } else if (degree === "F3") {
-      if (record.totalFelonies > 2) {
+      if (Number(record.totalFelonies || 0) > 2) {
         addReason(reasons, "Ohio third-degree felony count appears to exceed standard eligibility.");
         return buildResult({
           eligible: false,
@@ -252,10 +308,17 @@
         });
       }
 
-      waitYears = 3;
-      waitingPeriodLabel = "3 years after discharge";
+      if ((record.reliefType || "").toLowerCase() === "expungement") {
+        waitYears = 13;
+        waitingPeriodLabel = "13 years after discharge";
+        reliefType = "expungement";
+      } else {
+        waitYears = 3;
+        waitingPeriodLabel = "3 years after discharge";
+        reliefType = "sealing";
+      }
 
-      if (record.totalF3 >= 1) {
+      if (Number(record.totalF3 || 0) >= 1) {
         addReason(reasons, "Ohio third-degree felony cases may require clumping analysis or manual review.");
       }
     } else {
@@ -272,6 +335,7 @@
 
     const requiredMs = waitYears * YEAR_MS + waitMonths * MONTH_MS;
     const eligible = dischargeElapsed.ms >= requiredMs;
+    const eligibleDate = addToDate(dischargeDate, waitYears, waitMonths);
 
     addReason(
       reasons,
@@ -284,12 +348,10 @@
       eligible,
       status: eligible ? "likely_eligible" : "not_eligible_yet",
       state: "OH",
-      reliefType: "conviction",
+      reliefType,
       reasons,
       waitingPeriod: waitingPeriodLabel,
-      earliestEligibleDate: eligible
-        ? formatDateISO(new Date())
-        : futureDateFromDischarge(record.dischargeDate, waitYears, waitMonths),
+      earliestEligibleDate: eligibleDate,
       manualReview: degree === "F3"
     });
   }
@@ -297,7 +359,8 @@
   function evaluateNevada(record) {
     const reasons = [];
     const outcome = normalizeOutcome(record.outcome);
-    const dischargeElapsed = elapsedSince(record.dischargeDate);
+    const dischargeDate = record.dischargeDate || record.dispositionDate;
+    const dischargeElapsed = elapsedSince(dischargeDate);
 
     if (isNevadaNonConviction(outcome)) {
       addReason(reasons, "Nevada non-conviction matters are generally immediately sealable.");
@@ -306,7 +369,8 @@
         status: "likely_eligible",
         state: "NV",
         reliefType: "seal_non_conviction",
-        reasons
+        reasons,
+        earliestEligibleDate: record.dispositionDate || record.dischargeDate || null
       });
     }
 
@@ -364,6 +428,7 @@
     }
 
     const eligible = dischargeElapsed.years >= waitYears;
+    const eligibleDate = addToDate(dischargeDate, waitYears, 0);
 
     addReason(
       reasons,
@@ -379,12 +444,209 @@
       reliefType: "conviction",
       reasons,
       waitingPeriod: waitingPeriodLabel,
-      earliestEligibleDate: eligible ? formatDateISO(new Date()) : futureDateFromDischarge(record.dischargeDate, waitYears)
+      earliestEligibleDate: eligibleDate
+    });
+  }
+
+  function evaluateArizona(record) {
+    const reasons = [];
+    const outcome = normalizeOutcome(record.outcome);
+    const dischargeDate = record.dischargeDate || record.dispositionDate;
+    const dischargeElapsed = elapsedSince(dischargeDate);
+    const azClass = inferArizonaClass(record);
+
+    if (record.pendingCharges) {
+      addReason(reasons, "Arizona set-aside timing is not clean while other matters may still be pending.");
+      return buildResult({
+        eligible: false,
+        status: "needs_review",
+        state: "AZ",
+        reliefType: "set_aside",
+        reasons,
+        manualReview: true
+      });
+    }
+
+    if (["dismissed", "dismissal", "not guilty", "acquitted", "no bill"].includes(outcome)) {
+      addReason(reasons, "Arizona non-conviction matters may be addressed without the conviction waiting period.");
+      return buildResult({
+        eligible: true,
+        status: "likely_eligible",
+        state: "AZ",
+        reliefType: "non_conviction_relief",
+        reasons,
+        earliestEligibleDate: record.dispositionDate || record.dischargeDate || null,
+        manualReview: true
+      });
+    }
+
+    if (outcome !== "convicted" && outcome !== "guilty") {
+      addReason(reasons, "Outcome not recognized. Manual review needed.");
+      return buildResult({
+        eligible: false,
+        status: "needs_review",
+        state: "AZ",
+        reliefType: "unknown",
+        reasons,
+        manualReview: true
+      });
+    }
+
+    if (!azClass) {
+      addReason(reasons, "Arizona offense class is missing. Exact waiting period cannot be calculated.");
+      return buildResult({
+        eligible: false,
+        status: "needs_review",
+        state: "AZ",
+        reliefType: "set_aside",
+        reasons,
+        manualReview: true
+      });
+    }
+
+    let waitYears = 0;
+    let waitingPeriodLabel = "";
+
+    if (azClass === "AZ_F2" || azClass === "AZ_F3") {
+      waitYears = 10;
+      waitingPeriodLabel = "10 years after sentence completion";
+    } else if (azClass === "AZ_F4" || azClass === "AZ_F5" || azClass === "AZ_F6") {
+      waitYears = 5;
+      waitingPeriodLabel = "5 years after sentence completion";
+    } else if (azClass === "AZ_M1") {
+      waitYears = 3;
+      waitingPeriodLabel = "3 years after sentence completion";
+    } else if (azClass === "AZ_M2" || azClass === "AZ_M3") {
+      waitYears = 2;
+      waitingPeriodLabel = "2 years after sentence completion";
+    }
+
+    const eligible = dischargeElapsed.years >= waitYears;
+    const eligibleDate = addToDate(dischargeDate, waitYears, 0);
+
+    addReason(
+      reasons,
+      eligible
+        ? `Arizona waiting period appears satisfied (${waitingPeriodLabel}).`
+        : `Arizona waiting period not yet satisfied (${waitingPeriodLabel}).`
+    );
+
+    return buildResult({
+      eligible,
+      status: eligible ? "likely_eligible" : "not_eligible_yet",
+      state: "AZ",
+      reliefType: "set_aside",
+      reasons,
+      waitingPeriod: waitingPeriodLabel,
+      earliestEligibleDate: eligibleDate,
+      manualReview: true
+    });
+  }
+
+  function evaluateCalifornia(record) {
+    const reasons = [];
+    const outcome = normalizeOutcome(record.outcome);
+    const dischargeDate = record.dischargeDate || record.dispositionDate;
+    const dischargeElapsed = elapsedSince(dischargeDate);
+
+    if (record.pendingCharges) {
+      addReason(reasons, "California relief generally requires no active pending criminal matters.");
+      return buildResult({
+        eligible: false,
+        status: "not_eligible_yet",
+        state: "CA",
+        reliefType: "dismissal_or_reduction",
+        reasons
+      });
+    }
+
+    if (["dismissed", "dismissal", "not guilty", "acquitted"].includes(outcome)) {
+      addReason(reasons, "California non-conviction relief may be available now.");
+      return buildResult({
+        eligible: true,
+        status: "likely_eligible",
+        state: "CA",
+        reliefType: "non_conviction_relief",
+        reasons,
+        earliestEligibleDate: record.dispositionDate || record.dischargeDate || null,
+        manualReview: true
+      });
+    }
+
+    if (outcome !== "convicted" && outcome !== "guilty") {
+      addReason(reasons, "Outcome not recognized. Manual review needed.");
+      return buildResult({
+        eligible: false,
+        status: "needs_review",
+        state: "CA",
+        reliefType: "unknown",
+        reasons,
+        manualReview: true
+      });
+    }
+
+    if (record.caReliefTrack === "1203.42") {
+      const eligible = dischargeElapsed.years >= 2;
+      const eligibleDate = addToDate(dischargeDate, 2, 0);
+
+      addReason(
+        reasons,
+        eligible
+          ? "California 1203.42 timing appears satisfied."
+          : "California 1203.42 typically requires 2 years after sentence completion."
+      );
+
+      return buildResult({
+        eligible,
+        status: eligible ? "likely_eligible" : "not_eligible_yet",
+        state: "CA",
+        reliefType: "1203.42",
+        reasons,
+        waitingPeriod: "2 years after sentence completion",
+        earliestEligibleDate: eligibleDate,
+        manualReview: true
+      });
+    }
+
+    if (record.caNoProbation === true) {
+      const baseDate = record.dispositionDate || record.dischargeDate;
+      const elapsed = elapsedSince(baseDate);
+      const eligible = elapsed.years >= 1;
+      const eligibleDate = addToDate(baseDate, 1, 0);
+
+      addReason(
+        reasons,
+        eligible
+          ? "California no-probation misdemeanor timing appears satisfied."
+          : "California no-probation misdemeanor relief commonly uses a 1-year timing path."
+      );
+
+      return buildResult({
+        eligible,
+        status: eligible ? "likely_eligible" : "not_eligible_yet",
+        state: "CA",
+        reliefType: "1203.4a",
+        reasons,
+        waitingPeriod: "1 year from judgment",
+        earliestEligibleDate: eligibleDate,
+        manualReview: true
+      });
+    }
+
+    addReason(reasons, "California relief path depends on probation status and statute track. Manual review is recommended.");
+    return buildResult({
+      eligible: !!dischargeDate,
+      status: dischargeDate ? "likely_eligible" : "needs_review",
+      state: "CA",
+      reliefType: "dismissal_or_reduction",
+      reasons,
+      earliestEligibleDate: dischargeDate || null,
+      manualReview: true
     });
   }
 
   function evaluateRecordEligibility(record) {
-    const state = (record.caseState || "").trim().toUpperCase();
+    const state = normalizeState(record.caseState);
 
     if (!state) {
       return buildResult({
@@ -399,6 +661,8 @@
 
     if (state === "OH") return evaluateOhio(record);
     if (state === "NV") return evaluateNevada(record);
+    if (state === "AZ") return evaluateArizona(record);
+    if (state === "CA") return evaluateCalifornia(record);
 
     return buildResult({
       eligible: false,
