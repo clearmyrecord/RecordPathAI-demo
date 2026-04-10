@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Eligibility Check | RecordPathAI</title>
+  <title>Eligibility Intake | RecordPathAI</title>
   <link rel="stylesheet" href="css/styles.css" />
   <style>
     :root {
@@ -229,47 +229,6 @@
       line-height: 1.5;
     }
 
-    .checkbox-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px 24px;
-      margin-top: 8px;
-    }
-
-    .checkbox-row {
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      min-height: 24px;
-    }
-
-    .checkbox-row input {
-      width: auto;
-      margin-top: 3px;
-      flex: 0 0 auto;
-    }
-
-    .checkbox-row label {
-      margin: 0;
-      color: #314d7b;
-      font-size: 15px;
-      line-height: 1.45;
-      font-weight: 600;
-    }
-
-    .state-panel {
-      display: none;
-      margin-top: 16px;
-      padding: 20px;
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      background: var(--surface-soft);
-    }
-
-    .state-panel.is-active {
-      display: block;
-    }
-
     .button-row {
       display: flex;
       gap: 14px;
@@ -305,43 +264,26 @@
       flex: 0 0 auto;
     }
 
-    .result-box {
+    .summary-box {
       margin-top: 26px;
-    }
-
-    .result-card {
       background: #f8fbff;
       border: 1px solid #d9e8f7;
       border-radius: 18px;
       padding: 18px;
     }
 
-    .status-likely_eligible {
-      border-left: 6px solid #258344;
+    .summary-title {
+      margin: 0 0 10px;
+      color: #26457a;
+      font-size: 18px;
+      font-weight: 800;
     }
 
-    .status-not_eligible_yet {
-      border-left: 6px solid #d97706;
-    }
-
-    .status-ineligible {
-      border-left: 6px solid #c62828;
-    }
-
-    .status-needs_review {
-      border-left: 6px solid #5b5fc7;
-    }
-
-    .mini-chip {
-      display: inline-block;
-      background: #eef4ff;
-      color: #355486;
-      border: 1px solid #d7e3fb;
-      border-radius: 999px;
-      padding: 8px 12px;
-      font-size: 13px;
-      font-weight: 700;
-      margin-bottom: 12px;
+    .summary-copy {
+      margin: 0;
+      color: #60708d;
+      font-size: 14px;
+      line-height: 1.6;
     }
 
     @media (max-width: 760px) {
@@ -369,8 +311,7 @@
         padding: 24px 18px;
       }
 
-      .form-grid,
-      .checkbox-grid {
+      .form-grid {
         grid-template-columns: 1fr;
       }
 
@@ -396,8 +337,8 @@
 
       <nav class="nav">
         <a href="how-it-works.html">How It Works</a>
-        <a href="eligibility.html">Eligibility</a>
-        <a href="eligibility.html" class="nav-cta">Check Eligibility</a>
+        <a href="eligibility.html" class="nav-cta">Eligibility</a>
+        <a href="record-details.html">Record Details</a>
         <a href="login.html" class="nav-login">Log In</a>
       </nav>
     </div>
@@ -405,19 +346,19 @@
 
   <main class="container-page">
     <section class="page-card">
-      <h1 class="page-title">Eligibility Check</h1>
+      <h1 class="page-title">Start Your Eligibility Intake</h1>
       <p class="page-subtitle">
-        Start with your contact info and the case details. RecordPathAI will screen the case using the state where the case was filed, not where you currently live.
+        Enter your personal information so RecordPathAI can use it to populate your packet and court-ready forms later in the process.
       </p>
 
       <div class="info-banner">
-        <strong>Important:</strong> If you live in Nevada but your case is in Ohio, choose <strong>Ohio</strong> as the case state. The packet and eligibility logic must follow the <strong>case state</strong>, not your residence.
+        <strong>Important:</strong> This page is only for your personal and mailing information. Case details, offense details, and court details are entered on the <strong>Record Details</strong> page.
       </div>
 
       <section class="section-block">
         <h2 class="section-title">Your Contact Information</h2>
         <p class="section-copy">
-          This information is used to populate the packet and court forms. It auto-saves as you type.
+          This information is saved to your profile and used to fill out the packet. You can update it anytime before generating your final paperwork.
         </p>
 
         <form id="user-profile-form" class="form-grid" onsubmit="return false;">
@@ -477,204 +418,19 @@
           </div>
         </form>
 
-        <div class="autosave-note">Contact information auto-saves into the packet profile.</div>
-      </section>
+        <div class="autosave-note">Your personal information auto-saves into the RecordPathAI packet profile.</div>
 
-      <section class="section-block">
-        <h2 class="section-title">Case Details</h2>
-        <p class="section-copy">
-          These are the core fields used for eligibility logic and packet generation.
-        </p>
+        <div class="button-row">
+          <button type="button" id="save-profile" class="btn btn-secondary">Save Intake</button>
+          <a href="record-details.html" id="eligibility-continue" class="btn btn-primary">Save and Continue</a>
+        </div>
 
-        <form id="eligibility-form" class="form-grid">
-          <div class="field">
-            <label for="caseState">Case State</label>
-            <select id="caseState" name="caseState" required>
-              <option value="">Select</option>
-              <option value="OH">Ohio</option>
-              <option value="NV">Nevada</option>
-              <option value="CA">California</option>
-              <option value="AZ">Arizona</option>
-            </select>
-            <div class="field-helper">Use the state where the case was filed.</div>
-          </div>
-
-          <div class="field">
-            <label for="filingCourtName">Filing Court Name</label>
-            <input id="filingCourtName" name="filingCourtName" type="text" placeholder="Franklin County Municipal Court" />
-          </div>
-
-          <div class="field">
-            <label for="filingCounty">Filing County</label>
-            <input id="filingCounty" name="filingCounty" type="text" placeholder="Franklin County" />
-          </div>
-
-          <div class="field">
-            <label for="caseNumber">Case Number</label>
-            <input id="caseNumber" name="caseNumber" type="text" placeholder="Case number" />
-          </div>
-
-          <div class="field">
-            <label for="chargeName">Charge Name</label>
-            <input id="chargeName" name="chargeName" type="text" placeholder="Example: Possession of Drugs" />
-          </div>
-
-          <div class="field">
-            <label for="statute">Statute / Offense Code</label>
-            <input id="statute" name="statute" type="text" placeholder="Example: 2925.11(A)" />
-          </div>
-
-          <div class="field">
-            <label for="degree">Degree</label>
-            <select id="degree" name="degree">
-              <option value="">Select</option>
-              <option value="MM">Minor Misdemeanor</option>
-              <option value="M">Misdemeanor</option>
-              <option value="F5">F5</option>
-              <option value="F4">F4</option>
-              <option value="F3">F3</option>
-              <option value="F2">F2</option>
-              <option value="F1">F1</option>
-            </select>
-          </div>
-
-          <div class="field">
-            <label for="outcome">Outcome</label>
-            <select id="outcome" name="outcome">
-              <option value="">Select</option>
-              <option value="dismissed">Dismissed</option>
-              <option value="not guilty">Not Guilty</option>
-              <option value="acquitted">Acquitted</option>
-              <option value="no bill">No Bill</option>
-              <option value="pardon">Pardon</option>
-              <option value="intervention in lieu">Intervention in Lieu</option>
-              <option value="convicted">Convicted</option>
-            </select>
-          </div>
-
-          <div class="field">
-            <label for="dispositionDate">Disposition Date</label>
-            <input id="dispositionDate" name="dispositionDate" type="date" />
-          </div>
-
-          <div class="field">
-            <label for="dischargeDate">Case Closed / Discharge Date</label>
-            <input id="dischargeDate" name="dischargeDate" type="date" />
-          </div>
-
-          <div class="field field-full">
-            <div class="mini-chip">Screening Details</div>
-            <div class="checkbox-grid">
-              <div class="checkbox-row">
-                <input id="pendingCharges" name="pendingCharges" type="checkbox" />
-                <label for="pendingCharges">Pending charges anywhere?</label>
-              </div>
-
-              <div class="checkbox-row">
-                <input id="isTraffic" name="isTraffic" type="checkbox" />
-                <label for="isTraffic">Traffic conviction</label>
-              </div>
-
-              <div class="checkbox-row">
-                <input id="isTheftInOffice" name="isTheftInOffice" type="checkbox" />
-                <label for="isTheftInOffice">Theft in office</label>
-              </div>
-
-              <div class="checkbox-row">
-                <input id="isFirstOrSecondDegreeFelony" name="isFirstOrSecondDegreeFelony" type="checkbox" />
-                <label for="isFirstOrSecondDegreeFelony">1st or 2nd degree felony</label>
-              </div>
-
-              <div class="checkbox-row">
-                <input id="isSexOffenseRegistry" name="isSexOffenseRegistry" type="checkbox" />
-                <label for="isSexOffenseRegistry">Subject to sex offender registry</label>
-              </div>
-
-              <div class="checkbox-row">
-                <input id="victimUnder13" name="victimUnder13" type="checkbox" />
-                <label for="victimUnder13">Victim under 13</label>
-              </div>
-
-              <div class="checkbox-row">
-                <input id="isFelonyViolenceNonSex" name="isFelonyViolenceNonSex" type="checkbox" />
-                <label for="isFelonyViolenceNonSex">Felony violence non-sex offense</label>
-              </div>
-
-              <div class="checkbox-row">
-                <input id="isDomesticViolenceConviction" name="isDomesticViolenceConviction" type="checkbox" />
-                <label for="isDomesticViolenceConviction">Domestic violence conviction</label>
-              </div>
-
-              <div class="checkbox-row">
-                <input id="dvMisdemeanorSealable" name="dvMisdemeanorSealable" type="checkbox" />
-                <label for="dvMisdemeanorSealable">DV falls in limited sealable misdemeanor bucket</label>
-              </div>
-            </div>
-          </div>
-
-          <div id="ohioFields" class="field field-full state-panel">
-            <h3 style="margin:0 0 14px; color:#26457a; font-size:22px;">Ohio Case Details</h3>
-            <div class="form-grid">
-              <div class="field">
-                <label for="totalFelonies">Total Felony Convictions</label>
-                <input id="totalFelonies" name="totalFelonies" type="number" min="0" value="0" />
-              </div>
-
-              <div class="field">
-                <label for="totalF3">Total F3 Convictions</label>
-                <input id="totalF3" name="totalF3" type="number" min="0" value="0" />
-              </div>
-            </div>
-          </div>
-
-          <div id="nevadaFields" class="field field-full state-panel">
-            <h3 style="margin:0 0 14px; color:#26457a; font-size:22px;">Nevada Case Details</h3>
-            <div class="form-grid">
-              <div class="field">
-                <label for="nvCategory">Nevada Category</label>
-                <select id="nvCategory" name="nvCategory">
-                  <option value="">Select</option>
-                  <option value="standard_misdemeanor">Standard misdemeanor</option>
-                  <option value="listed_misdemeanor">Listed misdemeanor</option>
-                  <option value="dui_or_dv">DUI / domestic violence bucket</option>
-                  <option value="felony">General felony</option>
-                  <option value="violent_or_category_a">Violent / Category A bucket</option>
-                </select>
-              </div>
-
-              <div class="field"></div>
-
-              <div class="checkbox-row">
-                <input id="isCrimeAgainstChild" name="isCrimeAgainstChild" type="checkbox" />
-                <label for="isCrimeAgainstChild">Crime against child</label>
-              </div>
-
-              <div class="checkbox-row">
-                <input id="isSexOffense" name="isSexOffense" type="checkbox" />
-                <label for="isSexOffense">Sex offense</label>
-              </div>
-
-              <div class="checkbox-row">
-                <input id="isFelonyDUI" name="isFelonyDUI" type="checkbox" />
-                <label for="isFelonyDUI">Felony DUI</label>
-              </div>
-
-              <div class="checkbox-row">
-                <input id="isHomeInvasionDeadlyWeapon" name="isHomeInvasionDeadlyWeapon" type="checkbox" />
-                <label for="isHomeInvasionDeadlyWeapon">Home invasion with deadly weapon</label>
-              </div>
-            </div>
-          </div>
-
-          <div class="field field-full">
-            <div class="button-row">
-              <button type="submit" class="btn btn-secondary">Save Eligibility</button>
-              <button type="button" id="eligibility-continue" class="btn btn-primary">Save and Continue</button>
-            </div>
-          </div>
-        </form>
-
-        <div id="eligibility-result" class="result-box"></div>
+        <div class="summary-box">
+          <h3 class="summary-title">What happens next</h3>
+          <p class="summary-copy">
+            After this step, you will enter your case, charge, court, and filing details on the Record Details page. Eligibility results and packet output should be handled on the packet page.
+          </p>
+        </div>
       </section>
     </section>
   </main>
@@ -716,25 +472,36 @@
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
       }
 
-      function toggleStatePanels() {
-        const caseState = (document.getElementById("caseState")?.value || "").toUpperCase();
-        const ohioFields = document.getElementById("ohioFields");
-        const nevadaFields = document.getElementById("nevadaFields");
+      function loadProfileDraft() {
+        const state = getStoredState();
+        const user = state && state.user ? state.user : {};
 
-        if (ohioFields) {
-          ohioFields.classList.toggle("is-active", caseState === "OH");
-        }
+        const fieldMap = {
+          firstName: "firstName",
+          lastName: "lastName",
+          email: "email",
+          phone: "phone",
+          address1: "address1",
+          address2: "address2",
+          city: "city",
+          residenceState: "residenceState",
+          zip: "zip"
+        };
 
-        if (nevadaFields) {
-          nevadaFields.classList.toggle("is-active", caseState === "NV");
-        }
+        Object.keys(fieldMap).forEach(function (key) {
+          const el = document.getElementById(fieldMap[key]);
+          if (el && user[key] != null) {
+            el.value = user[key];
+          }
+        });
       }
 
       document.addEventListener("DOMContentLoaded", function () {
         const profileForm = document.getElementById("user-profile-form");
-        const caseStateSelect = document.getElementById("caseState");
+        const saveBtn = document.getElementById("save-profile");
         const continueBtn = document.getElementById("eligibility-continue");
-        const eligibilityForm = document.getElementById("eligibility-form");
+
+        loadProfileDraft();
 
         if (profileForm) {
           profileForm.querySelectorAll("input, select").forEach((el) => {
@@ -743,13 +510,8 @@
           });
         }
 
-        if (caseStateSelect) {
-          caseStateSelect.addEventListener("change", toggleStatePanels);
-          toggleStatePanels();
-        }
-
-        if (eligibilityForm) {
-          eligibilityForm.addEventListener("submit", function () {
+        if (saveBtn) {
+          saveBtn.addEventListener("click", function () {
             saveProfileDraft();
           });
         }
