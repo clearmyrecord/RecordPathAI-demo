@@ -504,380 +504,193 @@
     </section>
   </main>
 
-  <script>
-    (function () {
-      const STORAGE_KEY = "cmr_app_state_v2";
+<script>
+(function () {
 
-      const offenseList = document.getElementById("offenseList");
-      const addOffenseBtn = document.getElementById("addOffenseBtn");
-      const continueBtn = document.getElementById("continueBtn");
-      const recordStatus = document.getElementById("recordStatus");
+  const offenseList = document.getElementById("offenseList");
+  const addOffenseBtn = document.getElementById("addOffenseBtn");
+  const continueBtn = document.getElementById("continueBtn");
+  const recordStatus = document.getElementById("recordStatus");
 
-      const STATE_OPTIONS = [
-        { code: "OH", label: "Ohio" },
-        { code: "NV", label: "Nevada" },
-        { code: "CA", label: "California" },
-        { code: "AZ", label: "Arizona" },
-        { code: "TX", label: "Texas" },
-        { code: "FL", label: "Florida" }
-      ];
+  let offenseCounter = 0;
 
-      const DEGREE_OPTIONS = [
-        { value: "", label: "Select degree" },
-        { value: "MM", label: "Minor Misdemeanor (MM)" },
-        { value: "M", label: "Misdemeanor (M)" },
-        { value: "F5", label: "Felony 5 (F5)" },
-        { value: "F4", label: "Felony 4 (F4)" },
-        { value: "F3", label: "Felony 3 (F3)" },
-        { value: "F2", label: "Felony 2 (F2)" },
-        { value: "F1", label: "Felony 1 (F1)" }
-      ];
+  function updateStatus() {
+    const count = offenseList.querySelectorAll(".rd-offense").length;
+    recordStatus.textContent = count === 1 ? "1 offense added" : `${count} offenses added`;
+  }
 
-      const OUTCOME_OPTIONS = [
-        { value: "", label: "Select outcome" },
-        { value: "convicted", label: "Convicted" },
-        { value: "dismissed", label: "Dismissed" },
-        { value: "not guilty", label: "Not Guilty" },
-        { value: "acquitted", label: "Acquitted" },
-        { value: "no bill", label: "No Bill" },
-        { value: "pardon", label: "Pardon" },
-        { value: "intervention in lieu", label: "Intervention in Lieu" }
-      ];
+  function renumberOffenses() {
+    offenseList.querySelectorAll(".rd-offense").forEach((card, index) => {
+      card.querySelector("h2").textContent = `Offense ${index + 1}`;
+    });
+  }
 
-      let offenseCounter = 0;
+  function buildOffenseCard(index) {
+    const card = document.createElement("section");
+    card.className = "rd-offense";
 
-      function safe(value, fallback = "") {
-        return (value ?? "").toString().trim() || fallback;
-      }
+    card.innerHTML = `
+      <div class="rd-offense-head">
+        <h2>Offense ${index + 1}</h2>
+        <button type="button" class="rd-btn rd-btn-secondary remove-offense-btn">Remove</button>
+      </div>
 
-      function getStoredState() {
-        try {
-          return JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
-        } catch (err) {
-          return null;
-        }
-      }
+      <div class="rd-grid">
+        <div class="rd-field">
+          <label>Charge Name</label>
+          <input data-field="charge_name" placeholder="Charge name" />
+        </div>
 
-      function updateStatus() {
-        const count = offenseList.querySelectorAll(".rd-offense").length;
-        recordStatus.textContent = count === 1 ? "1 offense added" : `${count} offenses added`;
-      }
+        <div class="rd-field">
+          <label>Statute</label>
+          <input data-field="charge_code" placeholder="Statute code" />
+        </div>
 
-      function renumberOffenses() {
-        offenseList.querySelectorAll(".rd-offense").forEach((card, index) => {
-          const title = card.querySelector(".rd-offense-head h2");
-          if (title) title.textContent = `Offense ${index + 1}`;
-        });
-      }
-
-      function makeField(label, name, placeholder, type = "text", full = false, helper = "", listId = "") {
-        const wrap = document.createElement("div");
-        wrap.className = `rd-field${full ? " rd-field-full" : ""}`;
-
-        const listAttr = listId ? ` list="${listId}"` : "";
-
-        let control = "";
-        if (type === "textarea") {
-          control = `<textarea name="${name}" placeholder="${placeholder || ""}"></textarea>`;
-        } else {
-          control = `<input type="${type}" name="${name}" placeholder="${placeholder || ""}"${listAttr} />`;
-        }
-
-        wrap.innerHTML = `
-          <label>${label}</label>
-          ${control}
-          ${helper ? `<div class="rd-helper">${helper}</div>` : ""}
-        `;
-        return wrap;
-      }
-
-      function makeSelectField(label, name, options, helper = "") {
-        const wrap = document.createElement("div");
-        wrap.className = "rd-field";
-        wrap.innerHTML = `
-          <label>${label}</label>
-          <select name="${name}">
-            ${options.map(option => `<option value="${option.value}">${option.label}</option>`).join("")}
+        <div class="rd-field">
+          <label>Outcome</label>
+          <select data-field="final_disposition">
+            <option value="">Select</option>
+            <option value="Convicted">Convicted</option>
+            <option value="Dismissed">Dismissed</option>
           </select>
-          ${helper ? `<div class="rd-helper">${helper}</div>` : ""}
-        `;
-        return wrap;
-      }
+        </div>
 
-      function makeStateField(name) {
-        const wrap = document.createElement("div");
-        wrap.className = "rd-field";
-        wrap.innerHTML = `
+        <div class="rd-field">
+          <label>Case Number</label>
+          <input data-field="case_number" />
+        </div>
+
+        <div class="rd-field">
+          <label>Disposition Date</label>
+          <input type="date" data-field="disposition_date" />
+        </div>
+
+        <div class="rd-field">
+          <label>Court</label>
+          <input data-field="court_name" />
+        </div>
+
+        <div class="rd-field">
+          <label>County</label>
+          <input data-field="court_county" />
+        </div>
+
+        <div class="rd-field">
           <label>Case State</label>
-          <select name="${name}">
-            <option value="">Select case state</option>
-            ${STATE_OPTIONS.map(state => `<option value="${state.code}">${state.label} (${state.code})</option>`).join("")}
+          <select data-field="case_state">
+            <option value="">Select</option>
+            <option value="NV">Nevada</option>
+            <option value="OH">Ohio</option>
           </select>
-          <div class="rd-helper">Use the state where this case was filed.</div>
-        `;
-        return wrap;
-      }
+        </div>
 
-      function makeFlagsBlock(index) {
-        const wrap = document.createElement("div");
-        wrap.className = "rd-flags";
-        wrap.innerHTML = `
-          <h3 class="rd-flags-title">Screening Flags</h3>
-          <div class="rd-check-grid">
-            <label class="rd-check"><input type="checkbox" name="pendingCharges_${index}" /> Pending charges anywhere</label>
-            <label class="rd-check"><input type="checkbox" name="isTraffic_${index}" /> Traffic conviction</label>
-            <label class="rd-check"><input type="checkbox" name="isTheftInOffice_${index}" /> Theft in office</label>
-            <label class="rd-check"><input type="checkbox" name="isFirstOrSecondDegreeFelony_${index}" /> 1st or 2nd degree felony</label>
-            <label class="rd-check"><input type="checkbox" name="isSexOffenseRegistry_${index}" /> Subject to sex offender registry</label>
-            <label class="rd-check"><input type="checkbox" name="victimUnder13_${index}" /> Victim under 13</label>
-            <label class="rd-check"><input type="checkbox" name="isFelonyViolenceNonSex_${index}" /> Felony violence non-sex offense</label>
-            <label class="rd-check"><input type="checkbox" name="isDomesticViolenceConviction_${index}" /> Domestic violence conviction</label>
-            <label class="rd-check"><input type="checkbox" name="dvMisdemeanorSealable_${index}" /> DV falls in limited sealable misdemeanor bucket</label>
-            <label class="rd-check"><input type="checkbox" name="isCrimeAgainstChild_${index}" /> Crime against child</label>
-            <label class="rd-check"><input type="checkbox" name="isSexOffense_${index}" /> Sex offense</label>
-            <label class="rd-check"><input type="checkbox" name="isFelonyDUI_${index}" /> Felony DUI</label>
-            <label class="rd-check"><input type="checkbox" name="isHomeInvasionDeadlyWeapon_${index}" /> Home invasion with deadly weapon</label>
-          </div>
-        `;
-        return wrap;
-      }
+        <div class="rd-field">
+          <label>Arresting Agency</label>
+          <input data-field="arresting_agency" />
+        </div>
 
-      function buildOffenseCard(index) {
-        const card = document.createElement("section");
-        card.className = "rd-offense";
+        <div class="rd-field">
+          <label>Dismissed</label>
+          <input type="checkbox" data-field="is_dismissed" />
+        </div>
 
-        card.innerHTML = `
-          <div class="rd-offense-head">
-            <h2>Offense ${index + 1}</h2>
-            <button type="button" class="rd-btn rd-btn-secondary remove-offense-btn">Remove</button>
-          </div>
-          <div class="rd-grid"></div>
-        `;
+        <div class="rd-field">
+          <label>Convicted</label>
+          <input type="checkbox" data-field="is_convicted" />
+        </div>
 
-        const grid = card.querySelector(".rd-grid");
+        <div class="rd-field rd-field-full">
+          <label>Notes</label>
+          <textarea data-field="notes"></textarea>
+        </div>
+      </div>
+    `;
 
-        grid.appendChild(makeField("Charge Name", `chargeName_${index}`, "Example: Possession of Drugs", "text", false, "", "chargeNameSuggestions"));
-        grid.appendChild(makeField("Statute / Offense Code", `statute_${index}`, "Example: 2925.11(A)", "text", false, "Use the exact criminal statute or ordinance code when possible.", "offenseCodeSuggestions"));
+    card.querySelector(".remove-offense-btn").onclick = () => {
+      card.remove();
+      renumberOffenses();
+      updateStatus();
+    };
 
-        grid.appendChild(makeSelectField("Degree", `degree_${index}`, DEGREE_OPTIONS));
-        grid.appendChild(makeSelectField("Outcome", `outcome_${index}`, OUTCOME_OPTIONS));
+    return card;
+  }
 
-        grid.appendChild(makeField("Case Number", `caseNumber_${index}`, "Case number"));
-        grid.appendChild(makeField("Disposition Date", `dispositionDate_${index}`, "", "date"));
+  function addOffense(data = null) {
+    const index = offenseCounter++;
+    const card = buildOffenseCard(index);
+    offenseList.appendChild(card);
 
-        grid.appendChild(makeField("Case Closed / Discharge Date", `dischargeDate_${index}`, "", "date"));
-        grid.appendChild(makeField("Filing Court Name", `filingCourtName_${index}`, "Example: Franklin County Municipal Court", "text", false, "", "courtSuggestions"));
-
-        grid.appendChild(makeField("Filing County", `filingCounty_${index}`, "Example: Franklin County", "text", false, "", "countySuggestions"));
-        grid.appendChild(makeStateField(`caseState_${index}`));
-
-        grid.appendChild(makeFlagsBlock(index));
-
-        grid.appendChild(makeField(
-          "Notes",
-          `notes_${index}`,
-          "Anything else about this offense...",
-          "textarea",
-          true
-        ));
-
-        const removeBtn = card.querySelector(".remove-offense-btn");
-        removeBtn.addEventListener("click", function () {
-          card.remove();
-          renumberOffenses();
-          updateStatus();
-        });
-
-        return card;
-      }
-
-      function addOffense(prefill = null) {
-        const index = offenseCounter;
-        const card = buildOffenseCard(index);
-        offenseCounter += 1;
-        offenseList.appendChild(card);
-
-        if (prefill) {
-          card.querySelectorAll("input, textarea, select").forEach((field) => {
-            if (prefill[field.name] != null) {
-              if (field.type === "checkbox") {
-                field.checked = !!prefill[field.name];
-              } else {
-                field.value = prefill[field.name];
-              }
-            }
-          });
+    if (data) {
+      card.querySelectorAll("[data-field]").forEach((input) => {
+        const key = input.dataset.field;
+        if (data[key] != null) {
+          if (input.type === "checkbox") {
+            input.checked = data[key];
+          } else {
+            input.value = data[key];
+          }
         }
+      });
+    }
 
-        updateStatus();
-      }
+    updateStatus();
+  }
 
-      function collectOffenses() {
-        return Array.from(offenseList.querySelectorAll(".rd-offense")).map((card) => {
-          const row = {};
-          card.querySelectorAll("input, textarea, select").forEach((field) => {
-            if (field.type === "checkbox") {
-              row[field.name] = field.checked;
-            } else {
-              row[field.name] = field.value.trim();
-            }
-          });
-          return row;
-        });
-      }
+  function collectCharges() {
+    const charges = [];
 
-      function validate(rows) {
-        if (!rows.length) {
-          alert("Please add at least one offense.");
-          return false;
+    offenseList.querySelectorAll(".rd-offense").forEach((card, index) => {
+      const charge = {};
+      card.querySelectorAll("[data-field]").forEach((input) => {
+        const key = input.dataset.field;
+
+        if (input.type === "checkbox") {
+          charge[key] = input.checked;
+        } else {
+          charge[key] = input.value.trim();
         }
-
-        const first = rows[0];
-        const required = [
-          "chargeName_0",
-          "statute_0",
-          "filingCourtName_0",
-          "filingCounty_0",
-          "caseState_0",
-          "outcome_0"
-        ];
-
-        const missing = required.filter((key) => !safe(first[key]));
-        if (missing.length) {
-          alert("Please complete the charge name, statute, court, county, case state, and outcome for the first offense.");
-          return false;
-        }
-
-        return true;
-      }
-
-      function buildAppState(offenseRows) {
-        const existing = getStoredState();
-        const base = existing && typeof existing === "object"
-          ? existing
-          : {
-              user: {
-                firstName: "",
-                lastName: "",
-                email: "",
-                phone: "",
-                address1: "",
-                address2: "",
-                city: "",
-                residenceState: "",
-                zip: ""
-              },
-              records: [],
-              currentRecordId: null
-            };
-
-        const records = offenseRows.map((row, index) => {
-          const degree = safe(row[`degree_${index}`]).toUpperCase();
-          const chargeName = safe(row[`chargeName_${index}`]);
-
-          return {
-            id: `rec_${Date.now()}_${index}_${Math.random().toString(36).slice(2, 7)}`,
-            caseState: safe(row[`caseState_${index}`]).toUpperCase(),
-            filingCourtName: safe(row[`filingCourtName_${index}`]),
-            filingCounty: safe(row[`filingCounty_${index}`]),
-            caseNumber: safe(row[`caseNumber_${index}`]),
-            chargeName: chargeName,
-            statute: safe(row[`statute_${index}`]),
-            degree: degree,
-            outcome: safe(row[`outcome_${index}`]).toLowerCase(),
-            dispositionDate: safe(row[`dispositionDate_${index}`]),
-            dischargeDate: safe(row[`dischargeDate_${index}`]),
-            notes: safe(row[`notes_${index}`]),
-
-            pendingCharges: !!row[`pendingCharges_${index}`],
-            isTraffic: !!row[`isTraffic_${index}`],
-            isTheftInOffice: !!row[`isTheftInOffice_${index}`],
-            isFirstOrSecondDegreeFelony: !!row[`isFirstOrSecondDegreeFelony_${index}`] || degree === "F1" || degree === "F2",
-            isSexOffenseRegistry: !!row[`isSexOffenseRegistry_${index}`],
-            victimUnder13: !!row[`victimUnder13_${index}`],
-            isFelonyViolenceNonSex: !!row[`isFelonyViolenceNonSex_${index}`],
-            isDomesticViolenceConviction: !!row[`isDomesticViolenceConviction_${index}`] || chargeName.toLowerCase().includes("domestic violence"),
-            dvMisdemeanorSealable: !!row[`dvMisdemeanorSealable_${index}`],
-
-            totalFelonies: ["F1", "F2", "F3", "F4", "F5"].includes(degree) ? 1 : 0,
-            totalF3: degree === "F3" ? 1 : 0,
-
-            nvCategory: "",
-            isCrimeAgainstChild: !!row[`isCrimeAgainstChild_${index}`],
-            isSexOffense: !!row[`isSexOffense_${index}`],
-            isFelonyDUI: !!row[`isFelonyDUI_${index}`],
-            isHomeInvasionDeadlyWeapon: !!row[`isHomeInvasionDeadlyWeapon_${index}`],
-
-            eligibility: null
-          };
-        });
-
-        base.records = records;
-        base.currentRecordId = records[0]?.id || null;
-
-        return base;
-      }
-
-      function loadExistingData() {
-        const state = getStoredState();
-
-        if (state && Array.isArray(state.records) && state.records.length) {
-          state.records.forEach((record, index) => {
-            addOffense({
-              [`chargeName_${index}`]: safe(record.chargeName),
-              [`statute_${index}`]: safe(record.statute),
-              [`degree_${index}`]: safe(record.degree),
-              [`outcome_${index}`]: safe(record.outcome),
-              [`caseNumber_${index}`]: safe(record.caseNumber),
-              [`dispositionDate_${index}`]: safe(record.dispositionDate),
-              [`dischargeDate_${index}`]: safe(record.dischargeDate),
-              [`filingCourtName_${index}`]: safe(record.filingCourtName),
-              [`filingCounty_${index}`]: safe(record.filingCounty),
-              [`caseState_${index}`]: safe(record.caseState).toUpperCase(),
-              [`notes_${index}`]: safe(record.notes),
-
-              [`pendingCharges_${index}`]: !!record.pendingCharges,
-              [`isTraffic_${index}`]: !!record.isTraffic,
-              [`isTheftInOffice_${index}`]: !!record.isTheftInOffice,
-              [`isFirstOrSecondDegreeFelony_${index}`]: !!record.isFirstOrSecondDegreeFelony,
-              [`isSexOffenseRegistry_${index}`]: !!record.isSexOffenseRegistry,
-              [`victimUnder13_${index}`]: !!record.victimUnder13,
-              [`isFelonyViolenceNonSex_${index}`]: !!record.isFelonyViolenceNonSex,
-              [`isDomesticViolenceConviction_${index}`]: !!record.isDomesticViolenceConviction,
-              [`dvMisdemeanorSealable_${index}`]: !!record.dvMisdemeanorSealable,
-              [`isCrimeAgainstChild_${index}`]: !!record.isCrimeAgainstChild,
-              [`isSexOffense_${index}`]: !!record.isSexOffense,
-              [`isFelonyDUI_${index}`]: !!record.isFelonyDUI,
-              [`isHomeInvasionDeadlyWeapon_${index}`]: !!record.isHomeInvasionDeadlyWeapon
-            });
-          });
-
-          updateStatus();
-          return;
-        }
-
-        addOffense();
-        updateStatus();
-      }
-
-      addOffenseBtn.addEventListener("click", function () {
-        addOffense();
       });
 
-      continueBtn.addEventListener("click", function () {
-        const offenseRows = collectOffenses();
+      charges.push(charge);
+    });
 
-        if (!validate(offenseRows)) return;
+    return charges;
+  }
 
-        const appState = buildAppState(offenseRows);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+  function loadExisting() {
+    const data = RecordPathDataBridge.loadPacketData();
 
-        window.location.href = "packet.html";
-      });
+    if (data.charges && data.charges.length) {
+      data.charges.forEach(c => addOffense(c));
+    } else {
+      addOffense();
+    }
+  }
 
-      loadExistingData();
-    })();
-  </script>
+  addOffenseBtn.onclick = () => addOffense();
+
+  continueBtn.onclick = function () {
+    const data = RecordPathDataBridge.loadPacketData();
+
+    const charges = collectCharges();
+
+    if (!charges.length) {
+      alert("Add at least one offense");
+      return;
+    }
+
+    data.charges = charges;
+
+    RecordPathDataBridge.derivePacketData(data);
+    RecordPathDataBridge.savePacketData(data);
+
+    window.location.href = "packet.html";
+  };
+
+  loadExisting();
+
+})();
+</script>
 <script src="js/packet-data-bridge.js"></script>
 <script>
   document.addEventListener("DOMContentLoaded", function () {
