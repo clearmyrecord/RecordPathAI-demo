@@ -503,199 +503,391 @@
       </div>
     </section>
   </main>
-<script src="js/packet-data-bridge.js"></script>
-<script>
-(function () {
 
-  const offenseList = document.getElementById("offenseList");
-  const addOffenseBtn = document.getElementById("addOffenseBtn");
-  const continueBtn = document.getElementById("continueBtn");
-  const recordStatus = document.getElementById("recordStatus");
+  <script src="js/packet-data-bridge.js"></script>
+  <script>
+    (function () {
+      const offenseList = document.getElementById("offenseList");
+      const addOffenseBtn = document.getElementById("addOffenseBtn");
+      const continueBtn = document.getElementById("continueBtn");
+      const recordStatus = document.getElementById("recordStatus");
 
-  let offenseCounter = 0;
+      let offenseCounter = 0;
 
-  function updateStatus() {
-    const count = offenseList.querySelectorAll(".rd-offense").length;
-    recordStatus.textContent = count === 1 ? "1 offense added" : `${count} offenses added`;
-  }
+      function updateStatus() {
+        const count = offenseList.querySelectorAll(".rd-offense").length;
+        recordStatus.textContent = count === 1 ? "1 offense added" : `${count} offenses added`;
+      }
 
-  function renumberOffenses() {
-    offenseList.querySelectorAll(".rd-offense").forEach((card, index) => {
-      card.querySelector("h2").textContent = `Offense ${index + 1}`;
-    });
-  }
+      function renumberOffenses() {
+        offenseList.querySelectorAll(".rd-offense").forEach((card, index) => {
+          const heading = card.querySelector("h2");
+          if (heading) heading.textContent = `Offense ${index + 1}`;
+        });
+      }
 
-  function buildOffenseCard(index) {
-    const card = document.createElement("section");
-    card.className = "rd-offense";
+      function buildOffenseCard(index) {
+        const card = document.createElement("section");
+        card.className = "rd-offense";
 
-    card.innerHTML = `
-      <div class="rd-offense-head">
-        <h2>Offense ${index + 1}</h2>
-        <button type="button" class="rd-btn rd-btn-secondary remove-offense-btn">Remove</button>
-      </div>
+        card.innerHTML = `
+          <div class="rd-offense-head">
+            <h2>Offense ${index + 1}</h2>
+            <button type="button" class="rd-btn rd-btn-secondary remove-offense-btn">Remove</button>
+          </div>
 
-      <div class="rd-grid">
-        <div class="rd-field">
-          <label>Charge Name</label>
-          <input data-field="charge_name" placeholder="Charge name" />
-        </div>
+          <div class="rd-grid">
+            <div class="rd-field">
+              <label>Charge Name</label>
+              <input data-field="charge_name" list="chargeNameSuggestions" placeholder="Charge name" />
+            </div>
 
-        <div class="rd-field">
-          <label>Statute</label>
-          <input data-field="charge_code" placeholder="Statute code" />
-        </div>
+            <div class="rd-field">
+              <label>Statute / Offense Code</label>
+              <input data-field="charge_code" list="offenseCodeSuggestions" placeholder="Statute code" />
+            </div>
 
-        <div class="rd-field">
-          <label>Outcome</label>
-          <select data-field="final_disposition">
-            <option value="">Select</option>
-            <option value="Convicted">Convicted</option>
-            <option value="Dismissed">Dismissed</option>
-          </select>
-        </div>
+            <div class="rd-field">
+              <label>Outcome</label>
+              <select data-field="final_disposition">
+                <option value="">Select</option>
+                <option value="Convicted">Convicted</option>
+                <option value="Dismissed">Dismissed</option>
+                <option value="Not Guilty">Not Guilty</option>
+                <option value="Acquitted">Acquitted</option>
+                <option value="No Bill">No Bill</option>
+                <option value="Pardon">Pardon</option>
+                <option value="Intervention in Lieu">Intervention in Lieu</option>
+              </select>
+            </div>
 
-        <div class="rd-field">
-          <label>Case Number</label>
-          <input data-field="case_number" />
-        </div>
+            <div class="rd-field">
+              <label>Level / Degree</label>
+              <select data-field="level">
+                <option value="">Select</option>
+                <option value="MM">Minor Misdemeanor</option>
+                <option value="M">Misdemeanor</option>
+                <option value="F5">Felony 5</option>
+                <option value="F4">Felony 4</option>
+                <option value="F3">Felony 3</option>
+                <option value="F2">Felony 2</option>
+                <option value="F1">Felony 1</option>
+              </select>
+            </div>
 
-        <div class="rd-field">
-          <label>Disposition Date</label>
-          <input type="date" data-field="disposition_date" />
-        </div>
+            <div class="rd-field">
+              <label>Case Number</label>
+              <input data-field="case_number" placeholder="Case number" />
+            </div>
 
-        <div class="rd-field">
-          <label>Court</label>
-          <input data-field="court_name" />
-        </div>
+            <div class="rd-field">
+              <label>Disposition Date</label>
+              <input type="date" data-field="disposition_date" />
+            </div>
 
-        <div class="rd-field">
-          <label>County</label>
-          <input data-field="court_county" />
-        </div>
+            <div class="rd-field">
+              <label>Discharge / Case Closed Date</label>
+              <input type="date" data-field="discharge_date" />
+              <div class="rd-helper">Use the final discharge, release, or probation completion date when applicable.</div>
+            </div>
 
-        <div class="rd-field">
-          <label>Case State</label>
-          <select data-field="case_state">
-            <option value="">Select</option>
-            <option value="NV">Nevada</option>
-            <option value="OH">Ohio</option>
-          </select>
-        </div>
+            <div class="rd-field">
+              <label>Arrest / Offense Date</label>
+              <input type="date" data-field="offense_date" />
+            </div>
 
-        <div class="rd-field">
-          <label>Arresting Agency</label>
-          <input data-field="arresting_agency" />
-        </div>
+            <div class="rd-field">
+              <label>Court</label>
+              <input data-field="court_name" list="courtSuggestions" />
+            </div>
 
-        <div class="rd-field">
-          <label>Dismissed</label>
-          <input type="checkbox" data-field="is_dismissed" />
-        </div>
+            <div class="rd-field">
+              <label>County</label>
+              <input data-field="court_county" list="countySuggestions" />
+            </div>
 
-        <div class="rd-field">
-          <label>Convicted</label>
-          <input type="checkbox" data-field="is_convicted" />
-        </div>
+            <div class="rd-field">
+              <label>Case State</label>
+              <select data-field="case_state">
+                <option value="">Select</option>
+                <option value="OH">Ohio</option>
+                <option value="NV">Nevada</option>
+                <option value="CA">California</option>
+                <option value="AZ">Arizona</option>
+                <option value="TX">Texas</option>
+                <option value="FL">Florida</option>
+              </select>
+            </div>
 
-        <div class="rd-field rd-field-full">
-          <label>Notes</label>
-          <textarea data-field="notes"></textarea>
-        </div>
-      </div>
-    `;
+            <div class="rd-field">
+              <label>Arresting Agency</label>
+              <input data-field="arresting_agency" placeholder="Arresting agency" />
+            </div>
 
-    card.querySelector(".remove-offense-btn").onclick = () => {
-      card.remove();
-      renumberOffenses();
-      updateStatus();
-    };
+            <div class="rd-field">
+              <label>Prosecutor / Filing Agency</label>
+              <input data-field="prosecutor_agency" placeholder="Prosecutor or filing agency" />
+            </div>
 
-    return card;
-  }
+            <div class="rd-flags">
+              <h3 class="rd-flags-title">Disposition Flags</h3>
+              <div class="rd-check-grid">
+                <label class="rd-check">
+                  <input type="checkbox" data-field="is_dismissed" />
+                  <span>Dismissed</span>
+                </label>
+                <label class="rd-check">
+                  <input type="checkbox" data-field="is_convicted" />
+                  <span>Convicted</span>
+                </label>
+                <label class="rd-check">
+                  <input type="checkbox" data-field="pendingCharges" />
+                  <span>Pending charges or open case</span>
+                </label>
+                <label class="rd-check">
+                  <input type="checkbox" data-field="isTraffic" />
+                  <span>Traffic offense</span>
+                </label>
+              </div>
+            </div>
 
-  function addOffense(data = null) {
-    const index = offenseCounter++;
-    const card = buildOffenseCard(index);
-    offenseList.appendChild(card);
+            <div class="rd-flags">
+              <h3 class="rd-flags-title">Flagged Offense Questions</h3>
+              <div class="rd-check-grid">
+                <label class="rd-check">
+                  <input type="checkbox" data-field="isTheftInOffice" />
+                  <span>Theft in office</span>
+                </label>
+                <label class="rd-check">
+                  <input type="checkbox" data-field="isFirstOrSecondDegreeFelony" />
+                  <span>1st or 2nd degree felony</span>
+                </label>
+                <label class="rd-check">
+                  <input type="checkbox" data-field="isSexOffenseRegistry" />
+                  <span>Sex offense registry related</span>
+                </label>
+                <label class="rd-check">
+                  <input type="checkbox" data-field="victimUnder13" />
+                  <span>Victim under 13</span>
+                </label>
+                <label class="rd-check">
+                  <input type="checkbox" data-field="isFelonyViolenceNonSex" />
+                  <span>Felony violence offense (non-sex)</span>
+                </label>
+                <label class="rd-check">
+                  <input type="checkbox" data-field="isDomesticViolenceConviction" />
+                  <span>Domestic violence conviction</span>
+                </label>
+                <label class="rd-check">
+                  <input type="checkbox" data-field="dvMisdemeanorSealable" />
+                  <span>Domestic violence misdemeanor sealable</span>
+                </label>
+                <label class="rd-check">
+                  <input type="checkbox" data-field="isCrimeAgainstChild" />
+                  <span>Crime against child</span>
+                </label>
+                <label class="rd-check">
+                  <input type="checkbox" data-field="isSexOffense" />
+                  <span>Sex offense</span>
+                </label>
+                <label class="rd-check">
+                  <input type="checkbox" data-field="isFelonyDUI" />
+                  <span>Felony DUI</span>
+                </label>
+                <label class="rd-check">
+                  <input type="checkbox" data-field="isHomeInvasionDeadlyWeapon" />
+                  <span>Home invasion with deadly weapon</span>
+                </label>
+              </div>
+            </div>
 
-    if (data) {
-      card.querySelectorAll("[data-field]").forEach((input) => {
-        const key = input.dataset.field;
-        if (data[key] != null) {
-          if (input.type === "checkbox") {
-            input.checked = data[key];
-          } else {
-            input.value = data[key];
-          }
+            <div class="rd-field">
+              <label>Total Felonies on Record</label>
+              <input type="number" min="0" data-field="totalFelonies" placeholder="0" />
+            </div>
+
+            <div class="rd-field">
+              <label>Total F3 Felonies</label>
+              <input type="number" min="0" data-field="totalF3" placeholder="0" />
+            </div>
+
+            <div class="rd-field">
+              <label>Nevada Category</label>
+              <select data-field="nvCategory">
+                <option value="">Select</option>
+                <option value="standard_misdemeanor">Standard misdemeanor</option>
+                <option value="listed_misdemeanor">Listed misdemeanor</option>
+                <option value="dui_or_dv">DUI or domestic violence</option>
+                <option value="felony">Felony</option>
+                <option value="violent_or_category_a">Violent or Category A</option>
+              </select>
+            </div>
+
+            <div class="rd-field">
+              <label>Arizona Class</label>
+              <select data-field="azClass">
+                <option value="">Select</option>
+                <option value="AZ_F2">Class 2 felony</option>
+                <option value="AZ_F3">Class 3 felony</option>
+                <option value="AZ_F4">Class 4 felony</option>
+                <option value="AZ_F5">Class 5 felony</option>
+                <option value="AZ_F6">Class 6 felony</option>
+                <option value="AZ_M1">Class 1 misdemeanor</option>
+                <option value="AZ_M2">Class 2 misdemeanor</option>
+                <option value="AZ_M3">Class 3 misdemeanor</option>
+              </select>
+            </div>
+
+            <div class="rd-field">
+              <label>California Relief Track</label>
+              <select data-field="caReliefTrack">
+                <option value="">Select</option>
+                <option value="1203.4">1203.4</option>
+                <option value="1203.42">1203.42</option>
+              </select>
+            </div>
+
+            <div class="rd-field">
+              <label>California No Probation</label>
+              <select data-field="caNoProbation">
+                <option value="">Select</option>
+                <option value="true">Yes</option>
+                <option value="false">No</option>
+              </select>
+            </div>
+
+            <div class="rd-field rd-field-full">
+              <label>Notes</label>
+              <textarea data-field="notes" placeholder="Add anything important about this offense, filing track, or special facts."></textarea>
+            </div>
+          </div>
+        `;
+
+        card.querySelector(".remove-offense-btn").addEventListener("click", function () {
+          card.remove();
+          renumberOffenses();
+          updateStatus();
+        });
+
+        return card;
+      }
+
+      function normalizeBooleanValue(value) {
+        if (typeof value === "boolean") return value;
+        if (typeof value === "number") return value !== 0;
+        if (typeof value === "string") {
+          const v = value.trim().toLowerCase();
+          return v === "true" || v === "1" || v === "yes";
         }
-      });
-    }
+        return false;
+      }
 
-    updateStatus();
-  }
-
-  function collectCharges() {
-    const charges = [];
-
-    offenseList.querySelectorAll(".rd-offense").forEach((card, index) => {
-      const charge = {};
-      card.querySelectorAll("[data-field]").forEach((input) => {
-        const key = input.dataset.field;
-
+      function setInputValue(input, value) {
         if (input.type === "checkbox") {
-          charge[key] = input.checked;
-        } else {
-          charge[key] = input.value.trim();
+          input.checked = normalizeBooleanValue(value);
+          return;
         }
+        input.value = value == null ? "" : value;
+      }
+
+      function addOffense(data = null) {
+        const index = offenseCounter++;
+        const card = buildOffenseCard(index);
+        offenseList.appendChild(card);
+
+        if (data) {
+          card.querySelectorAll("[data-field]").forEach((input) => {
+            const key = input.dataset.field;
+            if (Object.prototype.hasOwnProperty.call(data, key)) {
+              setInputValue(input, data[key]);
+            }
+          });
+        }
+
+        updateStatus();
+      }
+
+      function collectCharges() {
+        const charges = [];
+
+        offenseList.querySelectorAll(".rd-offense").forEach((card) => {
+          const charge = {};
+
+          card.querySelectorAll("[data-field]").forEach((input) => {
+            const key = input.dataset.field;
+
+            if (input.type === "checkbox") {
+              charge[key] = input.checked;
+            } else if (input.type === "number") {
+              charge[key] = input.value === "" ? "" : Number(input.value);
+            } else if (key === "caNoProbation") {
+              if (input.value === "true") charge[key] = true;
+              else if (input.value === "false") charge[key] = false;
+              else charge[key] = "";
+            } else {
+              charge[key] = input.value.trim();
+            }
+          });
+
+          if (!charge.charge_name && !charge.case_number && !charge.charge_code) {
+            return;
+          }
+
+          charges.push(charge);
+        });
+
+        return charges;
+      }
+
+      function loadExisting() {
+        const data = RecordPathDataBridge.loadPacketData();
+
+        if (Array.isArray(data.charges) && data.charges.length) {
+          data.charges.forEach((charge) => addOffense(charge));
+        } else {
+          addOffense();
+        }
+      }
+
+      addOffenseBtn.addEventListener("click", function () {
+        addOffense();
       });
 
-      charges.push(charge);
+      continueBtn.addEventListener("click", function () {
+        const data = RecordPathDataBridge.loadPacketData();
+        const charges = collectCharges();
+
+        if (!charges.length) {
+          alert("Add at least one offense.");
+          return;
+        }
+
+        data.charges = charges;
+
+        if (!data.court) data.court = {};
+        if (!data.meta) data.meta = {};
+
+        const first = charges[0] || {};
+        data.court.state = first.case_state || data.court.state || "";
+        data.court.county = first.court_county || data.court.county || "";
+        data.court.name = first.court_name || data.court.name || "";
+        data.court.case_number = first.case_number || data.court.case_number || "";
+        data.meta.source_state = first.case_state || data.meta.source_state || "";
+        data.meta.source_county = first.court_county || data.meta.source_county || "";
+
+        RecordPathDataBridge.derivePacketData(data);
+        RecordPathDataBridge.savePacketData(data);
+
+        window.location.href = "packet.html";
+      });
+
+      loadExisting();
+    })();
+  </script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      RecordPathDataBridge.initPage(document);
     });
-
-    return charges;
-  }
-
-  function loadExisting() {
-    const data = RecordPathDataBridge.loadPacketData();
-
-    if (data.charges && data.charges.length) {
-      data.charges.forEach(c => addOffense(c));
-    } else {
-      addOffense();
-    }
-  }
-
-  addOffenseBtn.onclick = () => addOffense();
-
-  continueBtn.onclick = function () {
-    const data = RecordPathDataBridge.loadPacketData();
-
-    const charges = collectCharges();
-
-    if (!charges.length) {
-      alert("Add at least one offense");
-      return;
-    }
-
-    data.charges = charges;
-
-    RecordPathDataBridge.derivePacketData(data);
-    RecordPathDataBridge.savePacketData(data);
-
-    window.location.href = "packet.html";
-  };
-
-  loadExisting();
-
-})();
-</script>
-<script>
-  document.addEventListener("DOMContentLoaded", function () {
-    RecordPathDataBridge.initPage(document);
-  });
-</script>
-  
+  </script>
 </body>
 </html>
