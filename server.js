@@ -1,9 +1,15 @@
 import express from "express";
 import Stripe from "stripe";
+import cors from "cors";
 
 const app = express();
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
+app.use(cors({
+  origin: [
+    "https://clearmyrecord.github.io"
+  ]
+}));
 app.use(express.json());
 app.use(express.static("."));
 
@@ -128,9 +134,6 @@ function woodCountyShortcut(court) {
   };
 }
 
-/**
- * STRIPE CHECKOUT
- */
 app.post("/api/create-checkout-session", async (req, res) => {
   try {
     if (!process.env.STRIPE_SECRET_KEY) {
@@ -144,8 +147,8 @@ app.post("/api/create-checkout-session", async (req, res) => {
       applicant = {},
       caseInfo = {},
       eligibility = {},
-      successPath = "/payment-success.html",
-      cancelPath = "/packet.html?payment=cancelled"
+      successUrl,
+      cancelUrl
     } = req.body || {};
 
     const numericAmount = Number(amount);
@@ -154,16 +157,15 @@ app.post("/api/create-checkout-session", async (req, res) => {
     }
 
     const baseUrl = getBaseUrl(req);
-    const successUrl = `${baseUrl}${successPath}`;
-    const cancelUrl = `${baseUrl}${cancelPath}`;
-
+    const finalSuccessUrl = safe(successUrl) || `${baseUrl}/payment-success.html`;
+    const finalCancelUrl = safe(cancelUrl) || `${baseUrl}/packet.html?payment=cancelled`;
     const internalOrderId = `packet_${Date.now()}`;
 
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       ui_mode: "hosted_page",
-      success_url: successUrl,
-      cancel_url: cancelUrl,
+      success_url: finalSuccessUrl,
+      cancel_url: finalCancelUrl,
       client_reference_id: internalOrderId,
       customer_email: safe(applicant.email) || undefined,
       line_items: [
