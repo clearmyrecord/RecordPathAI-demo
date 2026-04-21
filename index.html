@@ -6,20 +6,30 @@
   <title>RecordPathAI</title>
 
   <style>
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
 
     :root {
       --bg: #eef2f8;
       --surface: #ffffff;
+      --surface-soft: #f7faff;
       --text: #233d70;
       --muted: #667796;
       --line: #dbe3f0;
       --blue: #6da7ff;
       --blue-dark: #4f88e8;
       --blue-soft: #dfe9fb;
+      --navy: #143d8f;
+      --navy-dark: #102f6c;
       --shadow: 0 10px 30px rgba(50, 78, 128, 0.08);
       --radius: 24px;
+      --radius-sm: 16px;
       --container: 1180px;
+    }
+
+    html {
+      scroll-behavior: smooth;
     }
 
     body {
@@ -41,7 +51,15 @@
 
     /* HEADER */
     .site-header {
-      padding: 20px 0 12px;
+      padding: 18px 0 10px;
+    }
+
+    .header-shell {
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid rgba(219, 227, 240, 0.9);
+      box-shadow: var(--shadow);
+      border-radius: 22px;
+      padding: 14px 18px;
     }
 
     .header-inner {
@@ -52,95 +70,172 @@
     }
 
     .brand {
-      display: flex;
+      display: inline-flex;
       align-items: center;
       gap: 12px;
-      font-weight: 700;
-      font-size: 18px;
+      font-weight: 800;
+      font-size: 20px;
       color: #3b6db4;
+      letter-spacing: -0.02em;
     }
 
     .brand-icon {
-      width: 26px;
-      height: 32px;
-      border: 2px solid #222;
-      border-radius: 2px;
-      background: #fff;
+      width: 28px;
+      height: 34px;
+      border: 2px solid #22345f;
+      border-radius: 4px;
+      background: #ffffff;
       position: relative;
+      flex: 0 0 auto;
     }
 
     .brand-icon::before {
       content: "";
       position: absolute;
-      left: 4px;
-      right: 4px;
-      top: 8px;
+      left: 5px;
+      right: 5px;
+      top: 9px;
       height: 2px;
-      background: #999;
-      box-shadow: 0 6px 0 #999, 0 12px 0 #999;
+      background: #97a4bb;
+      box-shadow: 0 6px 0 #97a4bb, 0 12px 0 #97a4bb;
     }
 
     .nav {
       display: flex;
-      gap: 14px;
+      align-items: center;
+      gap: 10px;
       flex-wrap: wrap;
     }
 
     .nav a {
-      padding: 10px 12px;
+      padding: 10px 14px;
       border-radius: 14px;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+
+    .nav a:hover {
+      background: var(--blue-soft);
+      color: var(--blue-dark);
     }
 
     .nav-cta {
-      background: #e8f0fd;
-      font-weight: 700;
+      background: var(--blue-soft);
+      color: var(--blue-dark);
+      font-weight: 800;
+    }
+
+    .nav-cta:hover {
+      background: #d4e3fd;
     }
 
     /* HERO */
     .hero {
-      padding: 30px 0 40px;
+      padding: 30px 0 36px;
+    }
+
+    .hero-card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.80) 100%);
+      border: 1px solid var(--line);
+      border-radius: 34px;
+      box-shadow: var(--shadow);
+      padding: 56px 48px;
       text-align: center;
     }
 
-    .hero h1 {
-      font-size: clamp(38px, 6vw, 72px);
-      line-height: 1;
+    .eyebrow {
+      display: inline-block;
       margin-bottom: 18px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: var(--blue-soft);
+      color: var(--blue-dark);
+      font-size: 13px;
       font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .hero h1 {
+      margin: 0 0 18px;
+      font-size: clamp(38px, 6vw, 72px);
+      line-height: 0.98;
+      font-weight: 800;
+      letter-spacing: -0.04em;
     }
 
     .hero p {
+      max-width: 920px;
+      margin: 0 auto 28px;
       font-size: 20px;
+      line-height: 1.55;
       color: var(--muted);
-      margin-bottom: 28px;
-      max-width: 900px;
-      margin-left: auto;
-      margin-right: auto;
-      line-height: 1.5;
     }
 
-    .hero-button {
-      display: inline-block;
-      padding: 20px 34px;
-      border-radius: 20px;
-      background: linear-gradient(180deg, #7fb2ff 0%, #5b93eb 100%);
-      color: #fff;
+    .hero-actions {
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 58px;
+      padding: 16px 28px;
+      border-radius: 18px;
+      font-size: 18px;
       font-weight: 800;
-      font-size: 20px;
+      border: 0;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.2s ease;
     }
 
-    /* STEPS */
+    .btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn-primary {
+      background: linear-gradient(180deg, #7fb2ff 0%, #5b93eb 100%);
+      color: #ffffff;
+      box-shadow: 0 12px 24px rgba(91, 147, 235, 0.22);
+    }
+
+    .btn-secondary {
+      background: #ffffff;
+      color: var(--text);
+      border: 1px solid var(--line);
+    }
+
+    /* SECTION */
     .section {
-      padding: 30px 0;
+      padding: 26px 0;
     }
 
     .section-title {
       text-align: center;
-      font-size: 42px;
+      font-size: clamp(32px, 4vw, 44px);
       font-weight: 800;
-      margin-bottom: 30px;
+      line-height: 1.05;
+      margin: 0 0 14px;
+      letter-spacing: -0.03em;
     }
 
+    .section-copy {
+      max-width: 760px;
+      margin: 0 auto 30px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 1.55;
+    }
+
+    /* STEPS */
     .steps-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -148,61 +243,189 @@
     }
 
     .step-card {
-      background: rgba(255,255,255,0.6);
+      background: rgba(255,255,255,0.72);
       border: 1px solid var(--line);
       border-radius: var(--radius);
-      padding: 30px;
+      padding: 30px 26px;
+      box-shadow: var(--shadow);
       text-align: center;
     }
 
-    .step-icon {
-      font-size: 48px;
-      margin-bottom: 20px;
+    .step-number {
+      width: 54px;
+      height: 54px;
+      margin: 0 auto 18px;
+      border-radius: 16px;
+      background: var(--blue-soft);
+      color: var(--blue-dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      font-weight: 800;
     }
 
     .step-card h3 {
-      font-size: 20px;
-      margin-bottom: 10px;
+      margin: 0 0 12px;
+      font-size: 22px;
+      font-weight: 800;
     }
 
     .step-card p {
+      margin: 0;
       color: var(--muted);
-      line-height: 1.5;
+      line-height: 1.6;
+      font-size: 16px;
     }
 
     /* FEATURES */
+    .features-wrap {
+      background: rgba(255,255,255,0.6);
+      border: 1px solid var(--line);
+      border-radius: 32px;
+      box-shadow: var(--shadow);
+      padding: 28px;
+    }
+
     .features-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 20px;
+      gap: 18px;
+    }
+
+    .feature-item {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 24px 20px;
       text-align: center;
     }
 
     .feature-icon {
-      font-size: 34px;
-      margin-bottom: 10px;
+      width: 58px;
+      height: 58px;
+      margin: 0 auto 14px;
+      border-radius: 18px;
+      background: var(--blue-soft);
+      color: var(--blue-dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
     }
 
     .feature-item h4 {
-      margin-bottom: 6px;
+      margin: 0 0 8px;
+      font-size: 18px;
+      font-weight: 800;
     }
 
     .feature-item p {
+      margin: 0;
       color: var(--muted);
-      line-height: 1.5;
+      line-height: 1.55;
+      font-size: 15px;
     }
 
-    /* CTA */
+    /* BOTTOM CTA */
     .bottom-cta {
+      padding: 36px 0 54px;
+    }
+
+    .cta-card {
+      background: linear-gradient(180deg, #173f8f 0%, #102f6c 100%);
+      color: #ffffff;
+      border-radius: 30px;
+      padding: 44px 28px;
       text-align: center;
-      padding: 50px 0;
+      box-shadow: 0 18px 36px rgba(16, 47, 108, 0.22);
+    }
+
+    .cta-card h2 {
+      margin: 0 0 12px;
+      font-size: clamp(30px, 4vw, 42px);
+      line-height: 1.08;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+
+    .cta-card p {
+      max-width: 760px;
+      margin: 0 auto 24px;
+      color: rgba(255,255,255,0.84);
+      font-size: 18px;
+      line-height: 1.6;
+    }
+
+    .cta-card .btn-primary {
+      background: linear-gradient(180deg, #8cc0ff 0%, #6aa4f6 100%);
+      color: #ffffff;
+      box-shadow: none;
+    }
+
+    /* FOOTER */
+    .site-footer {
+      padding: 0 0 26px;
+    }
+
+    .footer-shell {
+      background: #ffffff;
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      border-radius: 22px;
+      padding: 20px 22px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .footer-brand {
+      font-weight: 800;
+      color: #3b6db4;
+    }
+
+    .footer-copy {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .footer-links {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a {
+      padding: 8px 12px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .footer-links a:hover {
+      background: var(--blue-soft);
+      color: var(--blue-dark);
     }
 
     /* MOBILE */
-    @media (max-width: 900px) {
+    @media (max-width: 980px) {
       .steps-grid,
       .features-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .hero-card {
+        padding: 42px 28px;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .site-header {
+        padding-top: 14px;
       }
 
       .header-inner {
@@ -210,113 +433,211 @@
         align-items: flex-start;
       }
 
-      .hero h1 {
-        font-size: 44px;
+      .nav {
+        width: 100%;
       }
 
-      .hero-button {
+      .nav a {
         width: 100%;
+        text-align: center;
+      }
+
+      .hero {
+        padding-top: 18px;
+      }
+
+      .hero h1 {
+        font-size: 42px;
+      }
+
+      .hero p,
+      .section-copy,
+      .cta-card p {
+        font-size: 17px;
+      }
+
+      .hero-actions {
+        flex-direction: column;
+      }
+
+      .btn {
+        width: 100%;
+      }
+
+      .steps-grid,
+      .features-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .step-card,
+      .feature-item {
+        padding: 24px 20px;
+      }
+
+      .footer-shell {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .footer-links {
+        width: 100%;
+      }
+
+      .footer-links a {
+        width: 100%;
+        text-align: center;
       }
     }
   </style>
 </head>
 
 <body>
+  <header class="site-header">
+    <div class="container">
+      <div class="header-shell">
+        <div class="header-inner">
+          <a href="index.html" class="brand">
+            <span class="brand-icon"></span>
+            <span>RecordPathAI</span>
+          </a>
 
-<header class="site-header">
-  <div class="container header-inner">
-    <a href="index.html" class="brand">
-      <span class="brand-icon"></span>
-      <span>RecordPathAI</span>
-    </a>
-
-    <nav class="nav">
-      <a href="how-it-works.html">How It Works</a>
-      <a href="eligibility.html">Eligibility</a>
-      <a href="eligibility.html" class="nav-cta">Check Eligibility</a>
-    </nav>
-  </div>
-</header>
-
-<main>
-
-<section class="hero">
-  <div class="container">
-    <h1>The Record Clearing System Is Broken</h1>
-    <p>
-      Between 80 and 100 million Americans have some form of criminal record, and an estimated 50% to 60% may be eligible to seal or expunge that record. Most never do. They are not told when they qualify, the process is confusing, legal help can be expensive, and the courts do not automatically guide people through it.
-    </p>
-    <a href="eligibility.html" class="hero-button">Check Eligibility</a>
-  </div>
-</section>
-
-<section class="section">
-  <div class="container">
-    <h2 class="section-title">How We Solve It</h2>
-
-    <div class="steps-grid">
-      <div class="step-card">
-        <div class="step-icon">🔎</div>
-        <h3>Check Eligibility</h3>
-        <p>RecordPathAI helps users quickly understand whether they may qualify based on their state and case details.</p>
-      </div>
-
-      <div class="step-card">
-        <div class="step-icon">📝</div>
-        <h3>Build Your Record</h3>
-        <p>Users organize their charges, case numbers, court details, and filing information in one guided workflow.</p>
-      </div>
-
-      <div class="step-card">
-        <div class="step-icon">📄</div>
-        <h3>Generate Packet</h3>
-        <p>We turn that information into structured, court-ready documents that users can review, print, and file.</p>
+          <nav class="nav">
+            <a href="index.html">Home</a>
+            <a href="how-it-works.html">How It Works</a>
+            <a href="eligibility.html">Eligibility</a>
+            <a href="eligibility.html" class="nav-cta">Check Eligibility</a>
+          </nav>
+        </div>
       </div>
     </div>
-  </div>
-</section>
+  </header>
 
-<section class="section">
-  <div class="container">
-    <h2 class="section-title">Why RecordPathAI</h2>
+  <main>
+    <section class="hero">
+      <div class="container">
+        <div class="hero-card">
+          <span class="eyebrow">Court document automation for record relief</span>
+          <h1>The Record Clearing System Is Broken</h1>
+          <p>
+            Between 80 and 100 million Americans have some form of criminal record, and an estimated 50% to 60% may be eligible to seal or expunge that record. Most never do. They are not told when they qualify, the process is confusing, legal help can be expensive, and the courts do not automatically guide people through it.
+          </p>
 
-    <div class="features-grid">
-      <div class="feature-item">
-        <div class="feature-icon">⚡</div>
-        <h4>Accessible</h4>
-        <p>Makes a complicated legal process easier to understand and act on.</p>
+          <div class="hero-actions">
+            <a href="eligibility.html" class="btn btn-primary">Check Eligibility</a>
+            <a href="how-it-works.html" class="btn btn-secondary">See How It Works</a>
+          </div>
+        </div>
       </div>
+    </section>
 
-      <div class="feature-item">
-        <div class="feature-icon">🔒</div>
-        <h4>Private</h4>
-        <p>Helps users handle sensitive record information in a secure, guided experience.</p>
+    <section class="section">
+      <div class="container">
+        <h2 class="section-title">How RecordPathAI Solves It</h2>
+        <p class="section-copy">
+          RecordPathAI gives users a guided path from confusion to action by helping them organize their information, understand the process, and generate the forms they need to move forward.
+        </p>
+
+        <div class="steps-grid">
+          <div class="step-card">
+            <div class="step-number">1</div>
+            <h3>Check Eligibility</h3>
+            <p>
+              Users enter their information and case state so the platform can evaluate whether they may qualify under the right rules.
+            </p>
+          </div>
+
+          <div class="step-card">
+            <div class="step-number">2</div>
+            <h3>Build the Filing Record</h3>
+            <p>
+              Charges, case details, court information, and supporting data are collected in one organized workflow designed for packet generation.
+            </p>
+          </div>
+
+          <div class="step-card">
+            <div class="step-number">3</div>
+            <h3>Generate Court-Ready Documents</h3>
+            <p>
+              RecordPathAI turns that information into a structured filing packet users can review, print, and prepare to file with the court.
+            </p>
+          </div>
+        </div>
       </div>
+    </section>
 
-      <div class="feature-item">
-        <div class="feature-icon">📑</div>
-        <h4>Structured</h4>
-        <p>Collects the right details in the right order so nothing important gets missed.</p>
+    <section class="section">
+      <div class="container">
+        <h2 class="section-title">Why RecordPathAI</h2>
+        <p class="section-copy">
+          The platform is designed to make a difficult legal process more understandable, more organized, and more actionable for everyday users.
+        </p>
+
+        <div class="features-wrap">
+          <div class="features-grid">
+            <div class="feature-item">
+              <div class="feature-icon">⚡</div>
+              <h4>Accessible</h4>
+              <p>
+                Makes a complicated process easier to understand without forcing users to decode the system on their own.
+              </p>
+            </div>
+
+            <div class="feature-item">
+              <div class="feature-icon">🔒</div>
+              <h4>Private</h4>
+              <p>
+                Supports users handling sensitive criminal record information in a guided and structured experience.
+              </p>
+            </div>
+
+            <div class="feature-item">
+              <div class="feature-icon">📑</div>
+              <h4>Structured</h4>
+              <p>
+                Organizes the right information in the right order so packet generation is cleaner and more reliable.
+              </p>
+            </div>
+
+            <div class="feature-item">
+              <div class="feature-icon">⚖️</div>
+              <h4>Practical</h4>
+              <p>
+                Bridges the gap between eligibility confusion and the actual court documents people need to prepare.
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
+    </section>
 
-      <div class="feature-item">
-        <div class="feature-icon">⚖️</div>
-        <h4>Practical</h4>
-        <p>Bridges the gap between eligibility confusion and the actual documents users need to file.</p>
+    <section class="bottom-cta">
+      <div class="container">
+        <div class="cta-card">
+          <h2>Start Your Free Eligibility Check</h2>
+          <p>
+            Begin the workflow, enter your information, and see whether RecordPathAI can help you move toward sealing or expunging your record.
+          </p>
+          <a href="eligibility.html" class="btn btn-primary">Get Started</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-shell">
+        <div>
+          <div class="footer-brand">RecordPathAI</div>
+          <div class="footer-copy">Guided record relief workflow and court packet preparation.</div>
+        </div>
+
+        <div class="footer-links">
+          <a href="index.html">Home</a>
+          <a href="how-it-works.html">How It Works</a>
+          <a href="eligibility.html">Eligibility</a>
+        </div>
       </div>
     </div>
-  </div>
-</section>
-
-<section class="bottom-cta">
-  <div class="container">
-    <a href="eligibility.html" class="hero-button">
-      Start Your Free Eligibility Check
-    </a>
-  </div>
-</section>
-
-</main>
-
+  </footer>
 </body>
 </html>
