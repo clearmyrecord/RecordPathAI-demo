@@ -4,19 +4,32 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Record Details | RecordPathAI</title>
+
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     :root {
       --bg: #eef2f8;
       --surface: #ffffff;
-      --surface-soft: #f8fbff;
+      --surface-soft: #f7faff;
       --text: #233d70;
       --muted: #667796;
-      --line: #dbe4f1;
-      --shadow: 0 10px 30px rgba(78, 110, 167, 0.12);
+      --line: #dbe3f0;
+      --blue: #6da7ff;
+      --blue-dark: #4f88e8;
+      --blue-soft: #dfe9fb;
+      --navy: #143d8f;
+      --navy-dark: #102f6c;
+      --shadow: 0 10px 30px rgba(50, 78, 128, 0.08);
+      --radius: 24px;
       --container: 1180px;
     }
 
-    * { box-sizing: border-box; }
+    html {
+      scroll-behavior: smooth;
+    }
 
     body {
       margin: 0;
@@ -40,32 +53,42 @@
       margin: 0 auto;
     }
 
+    /* HEADER */
     .site-header {
-      padding: 20px 0 12px;
+      padding: 18px 0 10px;
+    }
+
+    .header-shell {
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid rgba(219, 227, 240, 0.9);
+      box-shadow: var(--shadow);
+      border-radius: 22px;
+      padding: 14px 18px;
     }
 
     .header-inner {
       display: flex;
-      align-items: center;
       justify-content: space-between;
+      align-items: center;
       gap: 20px;
     }
 
     .brand {
-      display: flex;
+      display: inline-flex;
       align-items: center;
       gap: 12px;
-      font-weight: 700;
-      font-size: 18px;
+      font-weight: 800;
+      font-size: 20px;
       color: #3b6db4;
+      letter-spacing: -0.02em;
     }
 
     .brand-icon {
-      width: 26px;
-      height: 32px;
-      border: 2px solid #222;
-      border-radius: 2px;
-      background: #fff;
+      width: 28px;
+      height: 34px;
+      border: 2px solid #22345f;
+      border-radius: 4px;
+      background: #ffffff;
       position: relative;
       flex: 0 0 auto;
     }
@@ -73,134 +96,181 @@
     .brand-icon::before {
       content: "";
       position: absolute;
-      left: 4px;
-      right: 4px;
-      top: 8px;
+      left: 5px;
+      right: 5px;
+      top: 9px;
       height: 2px;
-      background: #999;
-      box-shadow: 0 6px 0 #999, 0 12px 0 #999;
+      background: #97a4bb;
+      box-shadow: 0 6px 0 #97a4bb, 0 12px 0 #97a4bb;
     }
 
     .nav {
       display: flex;
       align-items: center;
-      gap: 14px;
+      gap: 10px;
       flex-wrap: wrap;
     }
 
     .nav a {
-      font-size: 16px;
-      color: var(--text);
-      padding: 10px 12px;
+      padding: 10px 14px;
       border-radius: 14px;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      transition: background 0.2s ease, color 0.2s ease;
     }
 
-    .nav .nav-cta {
-      background: #e8f0fd;
-      font-weight: 700;
-      padding: 12px 18px;
+    .nav a:hover {
+      background: var(--blue-soft);
+      color: var(--blue-dark);
     }
 
-    .nav .nav-login {
-      background: #fff;
-      border: 1px solid #d6dfed;
-      font-weight: 700;
-      padding: 12px 18px;
+    .nav-cta {
+      background: var(--blue-soft);
+      color: var(--blue-dark);
+      font-weight: 800;
     }
 
-    .rd-shell {
-      width: min(1040px, 92%);
-      margin: 28px auto 60px;
+    .nav-cta:hover {
+      background: #d4e3fd;
     }
 
-    .rd-card {
-      background: var(--surface);
+    /* HERO */
+    .page-hero {
+      padding: 30px 0 24px;
+    }
+
+    .hero-card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.80) 100%);
       border: 1px solid var(--line);
-      border-radius: 24px;
+      border-radius: 34px;
       box-shadow: var(--shadow);
-      padding: 36px;
+      padding: 48px 42px;
     }
 
-    .rd-header {
-      margin-bottom: 26px;
+    .eyebrow {
+      display: inline-block;
+      margin-bottom: 18px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: var(--blue-soft);
+      color: var(--blue-dark);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
     }
 
-    .rd-header h1 {
-      margin: 0 0 10px;
-      color: #26457a;
-      font-size: clamp(38px, 5vw, 64px);
-      line-height: 1.02;
+    .page-title {
+      margin: 0 0 14px;
+      font-size: clamp(38px, 6vw, 62px);
+      line-height: 0.98;
+      font-weight: 800;
       letter-spacing: -0.04em;
-      font-weight: 700;
+      color: var(--text);
     }
 
-    .rd-header p {
+    .page-subtitle {
       margin: 0;
-      color: #60708d;
-      font-size: 17px;
+      max-width: 920px;
+      font-size: 19px;
       line-height: 1.6;
-      max-width: 780px;
+      color: var(--muted);
     }
 
-    .rd-toolbar {
+    /* PAGE SECTION */
+    .page-section {
+      padding: 0 0 34px;
+    }
+
+    .page-card {
+      background: rgba(255,255,255,0.72);
+      border: 1px solid var(--line);
+      border-radius: 30px;
+      box-shadow: var(--shadow);
+      padding: 30px;
+    }
+
+    .case-banner {
+      background: #eef4ff;
+      border: 1px solid #d7e3fb;
+      border-radius: 18px;
+      padding: 18px;
+      margin-bottom: 22px;
+      color: #355486;
+      line-height: 1.65;
+      font-size: 14px;
+    }
+
+    .toolbar {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 14px;
       flex-wrap: wrap;
-      margin-bottom: 20px;
+      margin-bottom: 22px;
     }
 
-    .rd-status {
+    .record-status {
       color: #6a7894;
       font-size: 14px;
       line-height: 1.5;
+      font-weight: 600;
     }
 
-    .rd-btn {
+    /* BUTTONS */
+    .btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
       min-height: 58px;
-      padding: 16px 24px;
-      border-radius: 16px;
+      padding: 16px 28px;
+      border-radius: 18px;
       font-size: 17px;
-      font-weight: 700;
+      font-weight: 800;
       border: none;
       cursor: pointer;
       text-decoration: none;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.2s ease;
     }
 
-    .rd-btn-primary {
-      background: linear-gradient(180deg, #86b7fb 0%, #5d91e6 100%);
+    .btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn-primary {
+      background: linear-gradient(180deg, #7fb2ff 0%, #5b93eb 100%);
       color: #ffffff;
-      box-shadow: 0 10px 30px rgba(78, 110, 167, 0.12);
+      box-shadow: 0 12px 24px rgba(91, 147, 235, 0.22);
     }
 
-    .rd-btn-secondary {
+    .btn-secondary {
       background: #ffffff;
-      color: #3c557d;
-      border: 1px solid #d5e0ef;
+      color: var(--text);
+      border: 1px solid var(--line);
     }
 
-    .rd-btn-soft {
-      background: #eaf1fb;
-      color: #406199;
+    .btn-soft {
+      background: var(--blue-soft);
+      color: var(--blue-dark);
+      border: 1px solid #d7e4fb;
     }
 
-    .rd-list {
+    /* OFFENSE LIST */
+    .record-list {
       display: grid;
       gap: 18px;
     }
 
-    .rd-offense {
+    .record-card {
       background: var(--surface-soft);
       border: 1px solid var(--line);
-      border-radius: 22px;
-      padding: 22px;
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: var(--shadow);
     }
 
-    .rd-offense-head {
+    .record-card-head {
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -208,29 +278,30 @@
       margin-bottom: 18px;
     }
 
-    .rd-offense-head h2 {
+    .record-card-head h2 {
       margin: 0;
-      color: #26457a;
-      font-size: 22px;
-      line-height: 1.2;
-      font-weight: 700;
+      color: var(--text);
+      font-size: 24px;
+      line-height: 1.15;
+      font-weight: 800;
+      letter-spacing: -0.02em;
     }
 
-    .rd-grid {
+    .record-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 18px;
     }
 
-    .rd-field {
+    .field {
       display: block;
     }
 
-    .rd-field-full {
+    .field-full {
       grid-column: 1 / -1;
     }
 
-    .rd-field label {
+    .field label {
       display: block;
       margin-bottom: 9px;
       color: #3f5a87;
@@ -239,9 +310,9 @@
       line-height: 1.2;
     }
 
-    .rd-field input,
-    .rd-field textarea,
-    .rd-field select {
+    .field input,
+    .field textarea,
+    .field select {
       width: 100%;
       min-height: 58px;
       padding: 16px 18px;
@@ -256,27 +327,27 @@
       transition: border-color 0.15s ease, box-shadow 0.15s ease;
     }
 
-    .rd-field textarea {
+    .field textarea {
       min-height: 110px;
       resize: vertical;
       line-height: 1.5;
     }
 
-    .rd-field input:focus,
-    .rd-field textarea:focus,
-    .rd-field select:focus {
+    .field input:focus,
+    .field textarea:focus,
+    .field select:focus {
       border-color: #7eaef3;
       box-shadow: 0 0 0 4px rgba(126,174,243,0.15);
     }
 
-    .rd-helper {
+    .helper {
       margin-top: 7px;
       color: #7a89a3;
       font-size: 13px;
       line-height: 1.5;
     }
 
-    .rd-flags {
+    .flag-box {
       grid-column: 1 / -1;
       background: #ffffff;
       border: 1px solid #dbe4f1;
@@ -284,20 +355,20 @@
       padding: 18px;
     }
 
-    .rd-flags-title {
+    .flag-title {
       margin: 0 0 12px;
-      color: #26457a;
+      color: var(--text);
       font-size: 18px;
-      font-weight: 700;
+      font-weight: 800;
     }
 
-    .rd-check-grid {
+    .check-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 12px 22px;
     }
 
-    .rd-check {
+    .check {
       display: flex;
       align-items: flex-start;
       gap: 10px;
@@ -307,106 +378,141 @@
       font-weight: 600;
     }
 
-    .rd-check input {
+    .check input {
       margin-top: 3px;
       width: auto;
       min-height: auto;
       padding: 0;
     }
 
-    .rd-actions {
+    .actions {
       display: flex;
       gap: 14px;
       flex-wrap: wrap;
-      margin-top: 32px;
+      margin-top: 30px;
     }
 
-    .rd-actions .rd-btn-primary {
+    .actions .btn-primary {
       flex: 1 1 220px;
     }
 
-    .rd-note {
+    .note {
       margin-top: 18px;
       color: #6a7894;
       font-size: 14px;
       line-height: 1.6;
     }
 
-    .case-banner {
-      background: #eef4ff;
-      border: 1px solid #d7e3fb;
-      border-radius: 18px;
-      padding: 18px;
-      margin-bottom: 20px;
-      color: #355486;
-      line-height: 1.6;
+    /* FOOTER */
+    .site-footer {
+      padding: 0 0 26px;
+    }
+
+    .footer-shell {
+      background: #ffffff;
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      border-radius: 22px;
+      padding: 20px 22px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .footer-brand {
+      font-weight: 800;
+      color: #3b6db4;
+    }
+
+    .footer-copy {
+      color: var(--muted);
       font-size: 14px;
     }
 
-    @media (max-width: 700px) {
-      .container {
-        width: min(var(--container), calc(100% - 24px));
-      }
+    .footer-links {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
 
+    .footer-links a {
+      padding: 8px 12px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .footer-links a:hover {
+      background: var(--blue-soft);
+      color: var(--blue-dark);
+    }
+
+    /* MOBILE */
+    @media (max-width: 760px) {
       .site-header {
         padding-top: 14px;
-        padding-bottom: 8px;
       }
 
       .header-inner {
         flex-direction: column;
         align-items: flex-start;
-        gap: 14px;
       }
 
       .nav {
         width: 100%;
-        gap: 10px;
       }
 
       .nav a {
-        padding: 10px 12px;
-        font-size: 14px;
+        width: 100%;
+        text-align: center;
       }
 
-      .rd-shell {
-        width: min(92%, 1040px);
-        margin-top: 18px;
+      .hero-card {
+        padding: 38px 24px;
       }
 
-      .rd-card {
-        padding: 26px 20px 24px;
-        border-radius: 20px;
+      .page-title {
+        font-size: 42px;
       }
 
-      .rd-header h1 {
-        font-size: 34px;
-        line-height: 1.04;
+      .page-subtitle,
+      .note {
+        font-size: 16px;
       }
 
-      .rd-header p {
-        font-size: 15px;
+      .page-card {
+        padding: 22px 18px;
       }
 
-      .rd-grid,
-      .rd-check-grid {
-        grid-template-columns: 1fr;
-        gap: 16px;
-      }
-
-      .rd-offense {
+      .record-card {
         padding: 18px;
       }
 
-      .rd-offense-head,
-      .rd-toolbar,
-      .rd-actions {
+      .record-grid,
+      .check-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .record-card-head,
+      .toolbar,
+      .actions,
+      .footer-shell {
         flex-direction: column;
         align-items: stretch;
       }
 
-      .rd-btn {
+      .btn,
+      .footer-links,
+      .footer-links a {
         width: 100%;
+      }
+
+      .footer-links a {
+        text-align: center;
       }
     }
   </style>
@@ -456,53 +562,81 @@
   </datalist>
 
   <header class="site-header">
-    <div class="container header-inner">
-      <a href="index.html" class="brand">
-        <span class="brand-icon" aria-hidden="true"></span>
-        <span>RecordPathAI</span>
-      </a>
+    <div class="container">
+      <div class="header-shell">
+        <div class="header-inner">
+          <a href="index.html" class="brand">
+            <span class="brand-icon" aria-hidden="true"></span>
+            <span>RecordPathAI</span>
+          </a>
 
-      <nav class="nav">
-        <a href="how-it-works.html">How It Works</a>
-        <a href="eligibility.html">Eligibility</a>
-        <a href="record-details.html" class="nav-cta">Record Details</a>
-        <a href="login.html" class="nav-login">Log In</a>
-      </nav>
+          <nav class="nav">
+            <a href="index.html">Home</a>
+            <a href="how-it-works.html">How It Works</a>
+            <a href="eligibility.html">Eligibility</a>
+            <a href="record-details.html" class="nav-cta">Record Details</a>
+          </nav>
+        </div>
+      </div>
     </div>
   </header>
 
   <main>
-    <section class="rd-shell">
-      <div class="rd-card">
-        <div class="rd-header">
-          <h1>Enter Your Record Details</h1>
-          <p>
-            Add each offense with the exact charge, statute, court, dates, and case state. RecordPathAI will use this information later on the packet page to determine form output and eligibility handling.
+    <section class="page-hero">
+      <div class="container">
+        <div class="hero-card">
+          <span class="eyebrow">Step 2 of the workflow</span>
+          <h1 class="page-title">Enter Your Record Details</h1>
+          <p class="page-subtitle">
+            Add each offense with the exact charge, statute, court, dates, and case state. RecordPathAI will use this information later on the packet page to determine packet logic, court output, and eligibility handling.
           </p>
         </div>
+      </div>
+    </section>
 
-        <div class="case-banner">
-          <strong>Important:</strong> The <strong>case state</strong> is the state where the case was filed. If you live in Nevada but the case is in Ohio, choose <strong>Ohio</strong> for that offense.
-        </div>
+    <section class="page-section">
+      <div class="container">
+        <section class="page-card">
+          <div class="case-banner">
+            <strong>Important:</strong> The <strong>case state</strong> is the state where the case was filed. If you live in Nevada but the case is in Ohio, choose <strong>Ohio</strong> for that offense.
+          </div>
 
-        <div class="rd-toolbar">
-          <button type="button" class="rd-btn rd-btn-soft" id="addOffenseBtn">+ Add Offense</button>
-          <div class="rd-status" id="recordStatus">1 offense added</div>
-        </div>
+          <div class="toolbar">
+            <button type="button" class="btn btn-soft" id="addOffenseBtn">+ Add Offense</button>
+            <div class="record-status" id="recordStatus">1 offense added</div>
+          </div>
 
-        <div class="rd-list" id="offenseList"></div>
+          <div class="record-list" id="offenseList"></div>
 
-        <div class="rd-actions">
-          <a href="eligibility.html" class="rd-btn rd-btn-secondary">Back</a>
-          <button type="button" id="continueBtn" class="rd-btn rd-btn-primary">Save & Continue</button>
-        </div>
+          <div class="actions">
+            <a href="eligibility.html" class="btn btn-secondary">Back</a>
+            <button type="button" id="continueBtn" class="btn btn-primary">Save &amp; Continue</button>
+          </div>
 
-        <p class="rd-note">
-          This page stores the case data only. Eligibility results should be shown on <code>packet.html</code>, not here.
-        </p>
+          <p class="note">
+            This page stores case data only. Eligibility results should be shown on <code>packet.html</code>, not here.
+          </p>
+        </section>
       </div>
     </section>
   </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-shell">
+        <div>
+          <div class="footer-brand">RecordPathAI</div>
+          <div class="footer-copy">Guided record relief workflow and court packet preparation.</div>
+        </div>
+
+        <div class="footer-links">
+          <a href="index.html">Home</a>
+          <a href="how-it-works.html">How It Works</a>
+          <a href="eligibility.html">Eligibility</a>
+        </div>
+      </div>
+    </div>
+  </footer>
 
   <script src="js/packet-data-bridge.js"></script>
   <script>
@@ -515,12 +649,12 @@
       let offenseCounter = 0;
 
       function updateStatus() {
-        const count = offenseList.querySelectorAll(".rd-offense").length;
+        const count = offenseList.querySelectorAll(".record-card").length;
         recordStatus.textContent = count === 1 ? "1 offense added" : `${count} offenses added`;
       }
 
       function renumberOffenses() {
-        offenseList.querySelectorAll(".rd-offense").forEach((card, index) => {
+        offenseList.querySelectorAll(".record-card").forEach((card, index) => {
           const heading = card.querySelector("h2");
           if (heading) heading.textContent = `Offense ${index + 1}`;
         });
@@ -528,26 +662,26 @@
 
       function buildOffenseCard(index) {
         const card = document.createElement("section");
-        card.className = "rd-offense";
+        card.className = "record-card";
 
         card.innerHTML = `
-          <div class="rd-offense-head">
+          <div class="record-card-head">
             <h2>Offense ${index + 1}</h2>
-            <button type="button" class="rd-btn rd-btn-secondary remove-offense-btn">Remove</button>
+            <button type="button" class="btn btn-secondary remove-offense-btn">Remove</button>
           </div>
 
-          <div class="rd-grid">
-            <div class="rd-field">
+          <div class="record-grid">
+            <div class="field">
               <label>Charge Name</label>
               <input data-field="charge_name" list="chargeNameSuggestions" placeholder="Charge name" />
             </div>
 
-            <div class="rd-field">
+            <div class="field">
               <label>Statute / Offense Code</label>
               <input data-field="charge_code" list="offenseCodeSuggestions" placeholder="Statute code" />
             </div>
 
-            <div class="rd-field">
+            <div class="field">
               <label>Outcome</label>
               <select data-field="final_disposition">
                 <option value="">Select</option>
@@ -561,7 +695,7 @@
               </select>
             </div>
 
-            <div class="rd-field">
+            <div class="field">
               <label>Level / Degree</label>
               <select data-field="level">
                 <option value="">Select</option>
@@ -575,38 +709,38 @@
               </select>
             </div>
 
-            <div class="rd-field">
+            <div class="field">
               <label>Case Number</label>
               <input data-field="case_number" placeholder="Case number" />
             </div>
 
-            <div class="rd-field">
+            <div class="field">
               <label>Disposition Date</label>
               <input type="date" data-field="disposition_date" />
             </div>
 
-            <div class="rd-field">
+            <div class="field">
               <label>Discharge / Case Closed Date</label>
               <input type="date" data-field="discharge_date" />
-              <div class="rd-helper">Use the final discharge, release, or probation completion date when applicable.</div>
+              <div class="helper">Use the final discharge, release, or probation completion date when applicable.</div>
             </div>
 
-            <div class="rd-field">
+            <div class="field">
               <label>Arrest / Offense Date</label>
               <input type="date" data-field="offense_date" />
             </div>
 
-            <div class="rd-field">
+            <div class="field">
               <label>Court</label>
               <input data-field="court_name" list="courtSuggestions" />
             </div>
 
-            <div class="rd-field">
+            <div class="field">
               <label>County</label>
               <input data-field="court_county" list="countySuggestions" />
             </div>
 
-            <div class="rd-field">
+            <div class="field">
               <label>Case State</label>
               <select data-field="case_state">
                 <option value="">Select</option>
@@ -619,99 +753,99 @@
               </select>
             </div>
 
-            <div class="rd-field">
+            <div class="field">
               <label>Arresting Agency</label>
               <input data-field="arresting_agency" placeholder="Arresting agency" />
             </div>
 
-            <div class="rd-field">
+            <div class="field">
               <label>Prosecutor / Filing Agency</label>
               <input data-field="prosecutor_agency" placeholder="Prosecutor or filing agency" />
             </div>
 
-            <div class="rd-flags">
-              <h3 class="rd-flags-title">Disposition Flags</h3>
-              <div class="rd-check-grid">
-                <label class="rd-check">
+            <div class="flag-box">
+              <h3 class="flag-title">Disposition Flags</h3>
+              <div class="check-grid">
+                <label class="check">
                   <input type="checkbox" data-field="is_dismissed" />
                   <span>Dismissed</span>
                 </label>
-                <label class="rd-check">
+                <label class="check">
                   <input type="checkbox" data-field="is_convicted" />
                   <span>Convicted</span>
                 </label>
-                <label class="rd-check">
+                <label class="check">
                   <input type="checkbox" data-field="pendingCharges" />
                   <span>Pending charges or open case</span>
                 </label>
-                <label class="rd-check">
+                <label class="check">
                   <input type="checkbox" data-field="isTraffic" />
                   <span>Traffic offense</span>
                 </label>
               </div>
             </div>
 
-            <div class="rd-flags">
-              <h3 class="rd-flags-title">Flagged Offense Questions</h3>
-              <div class="rd-check-grid">
-                <label class="rd-check">
+            <div class="flag-box">
+              <h3 class="flag-title">Flagged Offense Questions</h3>
+              <div class="check-grid">
+                <label class="check">
                   <input type="checkbox" data-field="isTheftInOffice" />
                   <span>Theft in office</span>
                 </label>
-                <label class="rd-check">
+                <label class="check">
                   <input type="checkbox" data-field="isFirstOrSecondDegreeFelony" />
                   <span>1st or 2nd degree felony</span>
                 </label>
-                <label class="rd-check">
+                <label class="check">
                   <input type="checkbox" data-field="isSexOffenseRegistry" />
                   <span>Sex offense registry related</span>
                 </label>
-                <label class="rd-check">
+                <label class="check">
                   <input type="checkbox" data-field="victimUnder13" />
                   <span>Victim under 13</span>
                 </label>
-                <label class="rd-check">
+                <label class="check">
                   <input type="checkbox" data-field="isFelonyViolenceNonSex" />
                   <span>Felony violence offense (non-sex)</span>
                 </label>
-                <label class="rd-check">
+                <label class="check">
                   <input type="checkbox" data-field="isDomesticViolenceConviction" />
                   <span>Domestic violence conviction</span>
                 </label>
-                <label class="rd-check">
+                <label class="check">
                   <input type="checkbox" data-field="dvMisdemeanorSealable" />
                   <span>Domestic violence misdemeanor sealable</span>
                 </label>
-                <label class="rd-check">
+                <label class="check">
                   <input type="checkbox" data-field="isCrimeAgainstChild" />
                   <span>Crime against child</span>
                 </label>
-                <label class="rd-check">
+                <label class="check">
                   <input type="checkbox" data-field="isSexOffense" />
                   <span>Sex offense</span>
                 </label>
-                <label class="rd-check">
+                <label class="check">
                   <input type="checkbox" data-field="isFelonyDUI" />
                   <span>Felony DUI</span>
                 </label>
-                <label class="rd-check">
+                <label class="check">
                   <input type="checkbox" data-field="isHomeInvasionDeadlyWeapon" />
                   <span>Home invasion with deadly weapon</span>
                 </label>
               </div>
             </div>
 
-            <div class="rd-field">
+            <div class="field">
               <label>Total Felonies on Record</label>
               <input type="number" min="0" data-field="totalFelonies" placeholder="0" />
             </div>
 
-            <div class="rd-field">
+            <div class="field">
               <label>Total F3 Felonies</label>
               <input type="number" min="0" data-field="totalF3" placeholder="0" />
             </div>
 
-            <div class="rd-field">
+            <div class="field">
               <label>Nevada Category</label>
               <select data-field="nvCategory">
                 <option value="">Select</option>
@@ -723,7 +857,7 @@
               </select>
             </div>
 
-            <div class="rd-field">
+            <div class="field">
               <label>Arizona Class</label>
               <select data-field="azClass">
                 <option value="">Select</option>
@@ -738,7 +872,7 @@
               </select>
             </div>
 
-            <div class="rd-field">
+            <div class="field">
               <label>California Relief Track</label>
               <select data-field="caReliefTrack">
                 <option value="">Select</option>
@@ -747,7 +881,7 @@
               </select>
             </div>
 
-            <div class="rd-field">
+            <div class="field">
               <label>California No Probation</label>
               <select data-field="caNoProbation">
                 <option value="">Select</option>
@@ -756,7 +890,7 @@
               </select>
             </div>
 
-            <div class="rd-field rd-field-full">
+            <div class="field field-full">
               <label>Notes</label>
               <textarea data-field="notes" placeholder="Add anything important about this offense, filing track, or special facts."></textarea>
             </div>
@@ -810,7 +944,7 @@
       function collectCharges() {
         const charges = [];
 
-        offenseList.querySelectorAll(".rd-offense").forEach((card) => {
+        offenseList.querySelectorAll(".record-card").forEach((card) => {
           const charge = {};
 
           card.querySelectorAll("[data-field]").forEach((input) => {
