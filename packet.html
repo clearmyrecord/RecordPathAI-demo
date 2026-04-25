@@ -1726,14 +1726,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
   setupSignaturePad();
   updateSummary(initialData);
-  renderAllRecords(initialData.raw || {});
-  updateEligibilitySection(initialData);
-  updateTemplateCallout();
-  handlePaymentReturn();
+setupSignaturePad();
+updateSummary(initialData);
+renderAllRecords({ charges: initialData.charges });
+updateEligibilitySection(initialData);
+updateTemplateCallout();
+handlePaymentReturn();
 
-  document.getElementById("typedSignature").value = initialData.fullName || "";
-  setTypedSignature();
-});
+document.getElementById("typedSignature").value = initialData.fullName || "";
+setTypedSignature();
 </script>
 </body>
 </html>
