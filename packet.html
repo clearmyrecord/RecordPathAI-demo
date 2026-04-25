@@ -911,1026 +911,829 @@
     </div>
   </footer>
 
-  <script src="js/packet-data-bridge.js"></script>
-  <script src="js/rules.js"></script>
-  <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      const TEMPLATE_MAP = {
-        OH: {
-          default: {
-            key: "wood-county-conviction",
-            label: "Ohio conviction packet template",
-            url: "./assets/wood-county-application-for-sealing-295332-conviction.pdf",
-            supportsPdfFill: true
-          }
-        },
-        NV: {
-          default: {
-            key: "nv-not-mapped",
-            label: "Nevada template not mapped yet",
-            url: "",
-            supportsPdfFill: false
-          }
-        },
-        CA: {
-          default: {
-            key: "ca-not-mapped",
-            label: "California template not mapped yet",
-            url: "",
-            supportsPdfFill: false
-          }
-        },
-        AZ: {
-          default: {
-            key: "az-not-mapped",
-            label: "Arizona template not mapped yet",
-            url: "",
-            supportsPdfFill: false
-          }
-        }
-      };
-
-      const WOOD_DEFAULTS = {
-        caseNumber: "2006CR0387",
-        judge: "Robert Pollex",
-        dispositionDate: "2007-05-04",
-        dischargeDate: "2010-05-07",
-        offenseCode: "2925.11(A)",
-        offenseName: "Possession of Drugs",
-        offenseDegree: "F3",
-        apartment: "428",
-        phone: "8556219810"
-      };
-
-      const PAYMENT_STORAGE_KEY = "recordPathPaymentComplete";
-      let signatureImageBytes = null;
-
-      function setStatus(message, mode = "normal") {
-        const el = document.getElementById("statusText");
-        if (!el) return;
-        el.textContent = message;
-        el.style.color = mode === "error" ? "#b42318" : "#60708d";
-      }
-
-      function safe(value, fallback = "") {
-        return (value ?? "").toString().trim() || fallback;
-      }
-
-      function normalizeState(value) {
-        const v = safe(value).toUpperCase();
-        const map = {
-          OHIO: "OH",
-          NEVADA: "NV",
-          CALIFORNIA: "CA",
-          ARIZONA: "AZ",
-          TEXAS: "TX",
-          FLORIDA: "FL"
-        };
-        return map[v] || v;
-      }
-
-      function normalizeDegree(raw) {
-        const value = safe(raw).toUpperCase();
-        if (!value) return "";
-        if (["MM", "M", "F5", "F4", "F3", "F2", "F1"].includes(value)) return value;
-        if (value.includes("MINOR")) return "MM";
-        if (value.includes("MISDEMEANOR")) return "M";
-        if (value.includes("FELONY 5")) return "F5";
-        if (value.includes("FELONY 4")) return "F4";
-        if (value.includes("FELONY 3")) return "F3";
-        if (value.includes("FELONY 2")) return "F2";
-        if (value.includes("FELONY 1")) return "F1";
-        return value;
-      }
-
-      function normalizeOutcome(raw) {
-        const value = safe(raw).toLowerCase();
-        if (!value) return "";
-        if (value === "guilty" || value === "no contest") return "convicted";
-        if (value === "convicted") return "convicted";
-        if (value === "dismissed") return "dismissed";
-        if (value === "not guilty") return "not guilty";
-        if (value === "acquitted") return "acquitted";
-        if (value === "no bill") return "no bill";
-        if (value === "pardon") return "pardon";
-        if (value === "intervention in lieu") return "intervention in lieu";
-        return value;
-      }
-
-      function escapeHtml(str) {
-        return String(str == null ? "" : str)
-          .replaceAll("&", "&amp;")
-          .replaceAll("<", "&lt;")
-          .replaceAll(">", "&gt;")
-          .replaceAll('"', "&quot;")
-          .replaceAll("'", "&#039;");
-      }
-
-      function formatDateForDisplay(dateString) {
-        if (!dateString) return "—";
-        const date = new Date(dateString + "T12:00:00");
-        if (Number.isNaN(date.getTime())) {
-          const fallback = new Date(dateString);
-          if (Number.isNaN(fallback.getTime())) return dateString;
-          return fallback.toLocaleDateString("en-US", {
-            year: "numeric",
-            month: "short",
-            day: "numeric"
-          });
-        }
-        return date.toLocaleDateString("en-US", {
-          year: "numeric",
-          month: "short",
-          day: "numeric"
-        });
-      }
-
-      function formatDateForCourt(dateString) {
-        if (!dateString) return "";
-        const date = new Date(dateString + "T12:00:00");
-        if (Number.isNaN(date.getTime())) return dateString;
-        const month = String(date.getMonth() + 1).padStart(2, "0");
-        const day = String(date.getDate()).padStart(2, "0");
-        const year = date.getFullYear();
-        return `${month}/${day}/${year}`;
-      }
-
-      function parseDate(dateString) {
-        if (!dateString) return null;
-        const date = new Date(dateString + "T12:00:00");
-        return Number.isNaN(date.getTime()) ? null : date;
-      }
-
-      function toIsoDate(date) {
-        if (!(date instanceof Date) || Number.isNaN(date.getTime())) return null;
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, "0");
-        const day = String(date.getDate()).padStart(2, "0");
-        return `${year}-${month}-${day}`;
-      }
-
-      function addMonths(dateString, months) {
-        const date = parseDate(dateString);
-        if (!date) return null;
-        const next = new Date(date);
-        next.setMonth(next.getMonth() + months);
-        return toIsoDate(next);
-      }
-
-      function addYears(dateString, years) {
-        const date = parseDate(dateString);
-        if (!date) return null;
-        const next = new Date(date);
-        next.setFullYear(next.getFullYear() + years);
-        return toIsoDate(next);
-      }
-
-      function inferArizonaClass(record) {
-        const raw = [
-          safe(record.azClass),
-          safe(record.azOffenseClass),
-          safe(record.degree),
-          safe(record.chargeLevel),
-          safe(record.notes)
-        ].join(" ").toLowerCase();
-
-        if (raw.includes("class 2 felony")) return "AZ_F2";
-        if (raw.includes("class 3 felony")) return "AZ_F3";
-        if (raw.includes("class 4 felony")) return "AZ_F4";
-        if (raw.includes("class 5 felony")) return "AZ_F5";
-        if (raw.includes("class 6 felony")) return "AZ_F6";
-        if (raw.includes("class 1 misdemeanor")) return "AZ_M1";
-        if (raw.includes("class 2 misdemeanor")) return "AZ_M2";
-        if (raw.includes("class 3 misdemeanor")) return "AZ_M3";
-
-        return "";
-      }
-
-      function getTemplateForState(caseState) {
-        const normalized = normalizeState(caseState);
-        if (TEMPLATE_MAP[normalized] && TEMPLATE_MAP[normalized].default) {
-          return TEMPLATE_MAP[normalized].default;
-        }
-        return {
-          key: "unmapped",
-          label: "Template not mapped yet",
-          url: "",
-          supportsPdfFill: false
-        };
-      }
-
-      function readPacketData() {
-        try {
-          return JSON.parse(localStorage.getItem("recordPathPacketData") || "{}");
-        } catch (e) {
-          return {};
-        }
-      }
-
-      function getPacketData() {
-        const data = readPacketData();
-
-        const petitioner = data.petitioner || {};
-        const address = petitioner.address || {};
-        const charges = Array.isArray(data.charges) ? data.charges : [];
-        const record = charges[0] || {};
-
-        const fullName =
-          petitioner.full_name ||
-          `${petitioner.first_name || ""} ${petitioner.last_name || ""}`.trim();
-
-        return {
-          fullName: fullName || "Name Not Entered",
-          email: petitioner.email || "",
-          phone: petitioner.phone || "",
-
-          street: address.line1 || "",
-          apartment: address.line2 || "",
-          city: address.city || "",
-          residenceState: address.state || "",
-          zip: address.zip || "",
-
-          caseState: record.case_state || "",
-          caseNumber: record.case_number || "",
-          chargeName: record.charge_name || "",
-          offenseCode: record.charge_code || "",
-          chargeLevel: record.level || record.degree || "",
-          dispositionDate: record.disposition_date || "",
-          dischargeDate: record.discharge_date || record.disposition_date || "",
-          disposition: record.final_disposition || "",
-          court: record.court_name || "",
-          county: record.court_county || "",
-
-          record: record,
-          records: charges
-        };
-      }
-
-      function buildEligibilityInput(data) {
-        const record = data.record || {};
-
-        return {
-          caseState: normalizeState(data.caseState),
-          filingCourtName: safe(data.court),
-          filingCounty: safe(data.county),
-          caseNumber: safe(data.caseNumber),
-          chargeName: safe(data.chargeName),
-          statute: safe(data.offenseCode),
-          degree: normalizeDegree(record.level || record.degree || data.chargeLevel),
-          outcome: normalizeOutcome(record.final_disposition || record.outcome || data.disposition),
-          dispositionDate: safe(data.dispositionDate),
-          dischargeDate: safe(data.dischargeDate),
-
-          pendingCharges: !!record.pendingCharges,
-          isTraffic: !!record.isTraffic,
-          isTheftInOffice: !!record.isTheftInOffice,
-          isFirstOrSecondDegreeFelony: !!record.isFirstOrSecondDegreeFelony,
-          isSexOffenseRegistry: !!record.isSexOffenseRegistry,
-          victimUnder13: !!record.victimUnder13,
-          isFelonyViolenceNonSex: !!record.isFelonyViolenceNonSex,
-          isDomesticViolenceConviction: !!record.isDomesticViolenceConviction,
-          dvMisdemeanorSealable: !!record.dvMisdemeanorSealable,
-          totalFelonies: Number(record.totalFelonies || 0),
-          totalF3: Number(record.totalF3 || 0),
-
-          nvCategory: safe(record.nvCategory),
-          isCrimeAgainstChild: !!record.isCrimeAgainstChild,
-          isSexOffense: !!record.isSexOffense,
-          isFelonyDUI: !!record.isFelonyDUI,
-          isHomeInvasionDeadlyWeapon: !!record.isHomeInvasionDeadlyWeapon
-        };
-      }
-
-      function getEligibilityResult(data) {
-        if (data.eligibility && data.eligibility.state) {
-          data.eligibility.state = normalizeState(data.eligibility.state);
-          return data.eligibility;
-        }
-
-        if (window.CMRRules && typeof window.CMRRules.evaluateRecordEligibility === "function") {
-          try {
-            return window.CMRRules.evaluateRecordEligibility(buildEligibilityInput(data));
-          } catch (error) {
-            console.error("Eligibility evaluation failed", error);
-          }
-        }
-
-        return {
-          eligible: false,
-          status: "needs_review",
-          state: normalizeState(data.caseState),
-          reliefType: "unknown",
-          reasons: ["Eligibility engine not available on this page."],
-          waitingPeriod: null,
-          earliestEligibleDate: null,
-          manualReview: true
-        };
-      }
-
-      function estimateEligibleDate(data, result) {
-        const record = data.record || {};
-        const state = normalizeState(data.caseState);
-        const outcome = normalizeOutcome(record.final_disposition || record.outcome || data.disposition);
-        const degree = normalizeDegree(record.level || record.degree || data.chargeLevel);
-        const reliefType = safe(result && result.reliefType).toLowerCase();
-
-        const dispositionDate = safe(data.dispositionDate);
-        const dischargeDate = safe(data.dischargeDate);
-        const baseConvictionDate = dischargeDate || dispositionDate;
-
-        if (record.pendingCharges) return null;
-
-        if (state === "OH") {
-          if (outcome === "dismissed" || outcome === "not guilty" || outcome === "acquitted" || outcome === "pardon") {
-            return dispositionDate || dischargeDate || null;
-          }
-
-          if (outcome === "no bill") {
-            return addYears(dispositionDate, 2);
-          }
-
-          if (!baseConvictionDate) return null;
-
-          if (record.isSexOffenseRegistry) {
-            return addYears(baseConvictionDate, 5);
-          }
-
-          if (degree === "MM") return addMonths(baseConvictionDate, 6);
-          if (degree === "M") return addYears(baseConvictionDate, 1);
-
-          if (degree === "F4" || degree === "F5") {
-            return reliefType === "expungement"
-              ? addYears(baseConvictionDate, 11)
-              : addYears(baseConvictionDate, 1);
-          }
-
-          if (degree === "F3") {
-            return reliefType === "expungement"
-              ? addYears(baseConvictionDate, 13)
-              : addYears(baseConvictionDate, 3);
-          }
-
-          return null;
-        }
-
-        if (state === "NV") {
-          if (outcome === "dismissed" || outcome === "not guilty" || outcome === "acquitted" || outcome === "no bill") {
-            return dispositionDate || dischargeDate || null;
-          }
-
-          if (!baseConvictionDate) return null;
-
-          if (record.isCrimeAgainstChild || record.isSexOffense || record.isHomeInvasionDeadlyWeapon || record.isFelonyDUI) {
-            return null;
-          }
-
-          const nvCategory = safe(record.nvCategory).toLowerCase();
-
-          if (nvCategory === "standard_misdemeanor") return addYears(baseConvictionDate, 1);
-          if (nvCategory === "listed_misdemeanor") return addYears(baseConvictionDate, 2);
-          if (nvCategory === "dui_or_dv") return addYears(baseConvictionDate, 7);
-          if (nvCategory === "felony") return addYears(baseConvictionDate, 5);
-          if (nvCategory === "violent_or_category_a") return addYears(baseConvictionDate, 10);
-
-          if (record.isDomesticViolenceConviction) return addYears(baseConvictionDate, 7);
-          if (degree === "M" || degree === "MM") return addYears(baseConvictionDate, 1);
-          if (degree.startsWith("F")) return addYears(baseConvictionDate, 5);
-
-          return null;
-        }
-
-        if (state === "AZ") {
-          if (outcome === "dismissed" || outcome === "not guilty" || outcome === "acquitted" || outcome === "no bill") {
-            return dispositionDate || dischargeDate || null;
-          }
-
-          if (!baseConvictionDate) return null;
-
-          const azClass = inferArizonaClass(record);
-
-          if (azClass === "AZ_F2" || azClass === "AZ_F3") return addYears(baseConvictionDate, 10);
-          if (azClass === "AZ_F4" || azClass === "AZ_F5" || azClass === "AZ_F6") return addYears(baseConvictionDate, 5);
-          if (azClass === "AZ_M1") return addYears(baseConvictionDate, 3);
-          if (azClass === "AZ_M2" || azClass === "AZ_M3") return addYears(baseConvictionDate, 2);
-
-          return null;
-        }
-
-        if (state === "CA") {
-          if (outcome === "dismissed" || outcome === "not guilty" || outcome === "acquitted") {
-            return dispositionDate || dischargeDate || null;
-          }
-
-          if (!baseConvictionDate) return null;
-
-          if (record.caReliefTrack === "1203.42") {
-            return addYears(baseConvictionDate, 2);
-          }
-
-          if (record.caNoProbation === true) {
-            return addYears(dispositionDate || baseConvictionDate, 1);
-          }
-
-          return dischargeDate || null;
-        }
-
-        return (result && result.earliestEligibleDate) ? result.earliestEligibleDate : null;
-      }
-
-      function updateSummary(data) {
-        document.getElementById("summaryName").textContent = data.fullName || "—";
-        document.getElementById("summaryEmail").textContent = data.email || "—";
-        document.getElementById("summaryPhone").textContent = data.phone || "—";
-
-        const addressParts = [
-          safe(data.street),
-          safe(data.city),
-          [safe(data.residenceState), safe(data.zip)].filter(Boolean).join(" ")
-        ].filter(Boolean);
-
-        document.getElementById("summaryAddress").textContent = addressParts.join(", ") || "—";
-        document.getElementById("summaryResidenceState").textContent = data.residenceState || "—";
-
-        document.getElementById("summaryCaseState").textContent = data.caseState || "—";
-        document.getElementById("summaryCharge").textContent = data.chargeName || "—";
-        document.getElementById("summaryOffenseCode").textContent = data.offenseCode || "—";
-        document.getElementById("summaryLevel").textContent = data.chargeLevel || "—";
-        document.getElementById("summaryCaseNumber").textContent = data.caseNumber || "—";
-        document.getElementById("summaryCourt").textContent = data.court || "—";
-        document.getElementById("summaryCounty").textContent = data.county || "—";
-        document.getElementById("summaryDisposition").textContent = data.disposition || "—";
-      }
-
-      function renderAllRecords(data) {
-        const container = document.getElementById("recordList");
-        const records = Array.isArray(data.records) ? data.records : [];
-
-        if (!records.length) {
-          container.innerHTML = `
-            <div class="record-item">
-              <div class="record-title">No saved offenses found.</div>
-              <div class="record-line">Go back to Record Details and add at least one offense.</div>
-            </div>
-          `;
-          return;
-        }
-
-        container.innerHTML = records.map(function (record, index) {
-          const isCurrent = data.record && record === data.record;
-
-          return `
-            <div class="record-item${isCurrent ? " is-current" : ""}">
-              <div class="record-head">
-                <h3 class="record-title">Offense ${index + 1}: ${escapeHtml(safe(record.charge_name, "Unnamed offense"))}</h3>
-                <span class="record-tag">${isCurrent ? "Current packet record" : "Saved record"}</span>
-              </div>
-              <div class="record-grid">
-                <div class="record-line"><strong>Case State:</strong> ${escapeHtml(safe(record.case_state, "—"))}</div>
-                <div class="record-line"><strong>Case Number:</strong> ${escapeHtml(safe(record.case_number, "—"))}</div>
-                <div class="record-line"><strong>Statute:</strong> ${escapeHtml(safe(record.charge_code, "—"))}</div>
-                <div class="record-line"><strong>Degree:</strong> ${escapeHtml(safe(record.level || record.degree, "—"))}</div>
-                <div class="record-line"><strong>Outcome:</strong> ${escapeHtml(safe(record.final_disposition, "—"))}</div>
-                <div class="record-line"><strong>Disposition Date:</strong> ${escapeHtml(formatDateForDisplay(record.disposition_date))}</div>
-                <div class="record-line"><strong>Discharge Date:</strong> ${escapeHtml(formatDateForDisplay(record.discharge_date || record.disposition_date))}</div>
-                <div class="record-line"><strong>Court:</strong> ${escapeHtml(safe(record.court_name, "—"))}</div>
-                <div class="record-line"><strong>County:</strong> ${escapeHtml(safe(record.court_county, "—"))}</div>
-              </div>
-            </div>
-          `;
-        }).join("");
-      }
-
-      function updateTemplateCallout(data) {
-        const template = getTemplateForState(data.caseState);
-        const el = document.getElementById("templateCallout");
-
-        if (template.supportsPdfFill && template.url) {
-          el.className = "callout";
-          el.innerHTML = `
-            This packet is tied to the <strong>case state</strong>, not the residence state.
-            Current mapped template: <strong>${template.label}</strong><br />
-            Source PDF: <code>${template.url}</code>
-          `;
-        } else {
-          el.className = "callout warning";
-          el.innerHTML = `
-            No mapped PDF template is loaded yet for <strong>${escapeHtml(data.caseState || "this state")}</strong>.
-            You can still review the case, signature, and eligibility data, but PDF generation is not live for this template yet.
-          `;
-        }
-
-        const conflict = document.getElementById("stateConflictCallout");
-        if (
-          data.residenceState &&
-          data.caseState &&
-          normalizeState(data.residenceState) !== normalizeState(data.caseState)
-        ) {
-          conflict.style.display = "block";
-        } else {
-          conflict.style.display = "none";
-        }
-      }
-
-      function updateEligibilitySection(data, result) {
-        const state = normalizeState(data.caseState);
-        const estimatedEligibleDate = estimateEligibleDate(data, result) || (result && result.earliestEligibleDate) || null;
-
-        document.getElementById("stateValue").textContent = state || "—";
-        document.getElementById("convictionDateValue").textContent = formatDateForDisplay(data.dispositionDate);
-        document.getElementById("probationCompletedValue").textContent = formatDateForDisplay(data.dischargeDate);
-        document.getElementById("eligibleDateValue").textContent =
-          estimatedEligibleDate ? formatDateForDisplay(estimatedEligibleDate) : "—";
-
-        const pill = document.getElementById("statusPill");
-        const headline = document.getElementById("eligibilityHeadline");
-        const summary = document.getElementById("eligibilitySummary");
-        const reasonList = document.getElementById("eligibilityReasons");
-
-        const reasons = Array.isArray(result && result.reasons) ? result.reasons : [];
-        reasonList.innerHTML = reasons.map((reason) => `<li>${escapeHtml(reason)}</li>`).join("");
-
-        if (!result) {
-          pill.className = "status-pill pending";
-          pill.textContent = "Eligibility Needs Review";
-          headline.textContent = "We could not evaluate this record yet.";
-          summary.textContent = "Please go back and make sure the case-state and discharge fields are filled in.";
-          return;
-        }
-
-        if (result.status === "likely_eligible") {
-          pill.className = "status-pill eligible";
-          pill.textContent = "Likely Eligible";
-          headline.textContent = `This ${state || "case"} appears likely eligible.`;
-          summary.textContent = result.waitingPeriod
-            ? `The waiting period appears satisfied under ${state}.`
-            : `This appears to fit a currently available filing path under ${state}.`;
-          return;
-        }
-
-        if (result.status === "not_eligible_yet") {
-          pill.className = "status-pill pending";
-          pill.textContent = "Not Yet Eligible";
-          headline.textContent = `This ${state || "case"} does not appear eligible yet.`;
-          summary.textContent = estimatedEligibleDate
-            ? `The earliest estimated filing date is ${formatDateForDisplay(estimatedEligibleDate)}.`
-            : "The waiting period does not appear to be satisfied yet.";
-          return;
-        }
-
-        if (result.status === "ineligible") {
-          pill.className = "status-pill error";
-          pill.textContent = "Likely Ineligible";
-          headline.textContent = `This ${state || "case"} appears excluded.`;
-          summary.textContent = "Based on the screening rules currently loaded, this offense or outcome appears outside the standard sealing or expungement path.";
-          return;
-        }
-
-        pill.className = "status-pill review";
-        pill.textContent = "Needs Review";
-        headline.textContent = `${state || "This case"} needs manual review.`;
-        summary.textContent = "The system could not confidently resolve this matter from the current inputs.";
-      }
-
-      function setupSignaturePad() {
-        const canvas = document.getElementById("signaturePad");
-        const ctx = canvas.getContext("2d");
-
-        function resizeCanvas() {
-          const ratio = Math.max(window.devicePixelRatio || 1, 1);
-          const rect = canvas.getBoundingClientRect();
-          canvas.width = rect.width * ratio;
-          canvas.height = rect.height * ratio;
-          ctx.setTransform(1, 0, 0, 1, 0, 0);
-          ctx.scale(ratio, ratio);
-          ctx.lineWidth = 2;
-          ctx.lineCap = "round";
-          ctx.strokeStyle = "#111";
-        }
-
-        let drawing = false;
-
-        function pointFromEvent(event) {
-          const rect = canvas.getBoundingClientRect();
-          const touch = event.touches && event.touches[0];
-          const clientX = touch ? touch.clientX : event.clientX;
-          const clientY = touch ? touch.clientY : event.clientY;
-          return { x: clientX - rect.left, y: clientY - rect.top };
-        }
-
-        function start(event) {
-          drawing = true;
-          const p = pointFromEvent(event);
-          ctx.beginPath();
-          ctx.moveTo(p.x, p.y);
-          event.preventDefault();
-        }
-
-        function move(event) {
-          if (!drawing) return;
-          const p = pointFromEvent(event);
-          ctx.lineTo(p.x, p.y);
-          ctx.stroke();
-          event.preventDefault();
-        }
-
-        function end() {
-          drawing = false;
-        }
-
-        function clearPad() {
-          ctx.clearRect(0, 0, canvas.width, canvas.height);
-        }
-
-        window.clearSignaturePadCanvas = clearPad;
-        window.getSignaturePadDataUrl = () => canvas.toDataURL("image/png");
-
-        resizeCanvas();
-        window.addEventListener("resize", resizeCanvas);
-        canvas.addEventListener("mousedown", start);
-        canvas.addEventListener("mousemove", move);
-        window.addEventListener("mouseup", end);
-        canvas.addEventListener("touchstart", start, { passive: false });
-        canvas.addEventListener("touchmove", move, { passive: false });
-        window.addEventListener("touchend", end);
-      }
-
-      function dataUrlToBytes(dataUrl) {
-        const base64 = dataUrl.split(",")[1];
-        const binary = atob(base64);
-        const bytes = new Uint8Array(binary.length);
-        for (let i = 0; i < binary.length; i++) {
-          bytes[i] = binary.charCodeAt(i);
-        }
-        return bytes;
-      }
-
-      function buildTypedSignatureImage(name) {
-        const canvas = document.createElement("canvas");
-        canvas.width = 700;
-        canvas.height = 180;
-        const ctx = canvas.getContext("2d");
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.font = "italic 64px Georgia";
-        ctx.fillStyle = "#111";
-        ctx.fillText(name, 18, 110);
-        return dataUrlToBytes(canvas.toDataURL("image/png"));
-      }
-
-      function setTypedSignature() {
-        const value = document.getElementById("typedSignature").value.trim();
-        if (!value) {
-          alert("Enter a name for the typed signature.");
-          return;
-        }
-        signatureImageBytes = buildTypedSignatureImage(value);
-        setStatus("Typed signature selected.");
-      }
-
-      function setDrawnSignature() {
-        const dataUrl = window.getSignaturePadDataUrl();
-        signatureImageBytes = dataUrlToBytes(dataUrl);
-        setStatus("Drawn signature selected.");
-      }
-
-      function clearSignature() {
-        signatureImageBytes = null;
-        window.clearSignaturePadCanvas();
-        setStatus("Signature cleared.");
-      }
-
-      function isPaymentComplete() {
-        return localStorage.getItem(PAYMENT_STORAGE_KEY) === "true";
-      }
-
-      function updatePaymentUI() {
-        const payBtn = document.getElementById("payAndSubmitBtn");
-        const callout = document.getElementById("paymentCallout");
-        const paid = isPaymentComplete();
-
-        if (paid) {
-          payBtn.disabled = true;
-          payBtn.textContent = "Payment Complete";
-          payBtn.classList.remove("packet-btn-muted");
-          payBtn.classList.add("packet-btn-secondary");
-
-          callout.className = "callout success";
-          callout.innerHTML = `
-            Payment received. You can now generate your packet.
-          `;
-        } else {
-          payBtn.disabled = false;
-          payBtn.textContent = "Pay $50 & Unlock Packet";
-          payBtn.classList.remove("packet-btn-secondary");
-          payBtn.classList.add("packet-btn-muted");
-
-          callout.className = "callout warning";
-          callout.innerHTML = `
-            Complete payment to unlock packet generation.
-          `;
-        }
-      }
-
-      async function fetchTemplateBytes(templateUrl) {
-        if (!templateUrl) {
-          throw new Error("No PDF template is mapped for this case state yet.");
-        }
-
-        const response = await fetch(templateUrl, { cache: "no-store" });
-
-        if (!response.ok) {
-          throw new Error(`PDF fetch failed with status ${response.status}. Check the file path in assets.`);
-        }
-
-        const bytes = await response.arrayBuffer();
-
-        if (!bytes || bytes.byteLength < 1000) {
-          throw new Error("PDF loaded, but the file looks too small to be a real court form.");
-        }
-
-        return bytes;
-      }
-
-      async function testPdfAccess() {
-        try {
-          const data = getPacketData();
-          const template = getTemplateForState(data.caseState);
-
-          setStatus("Testing PDF access...");
-
-          if (!window.PDFLib) {
-            throw new Error("pdf-lib did not load from the CDN.");
-          }
-
-          if (!template.supportsPdfFill || !template.url) {
-            throw new Error(`No mapped PDF template is available yet for ${data.caseState || "this state"}.`);
-          }
-
-          const bytes = await fetchTemplateBytes(template.url);
-          const pdfDoc = await window.PDFLib.PDFDocument.load(bytes);
-          const pageCount = pdfDoc.getPages().length;
-
-          setStatus(`PDF test passed. Loaded ${bytes.byteLength} bytes and found ${pageCount} pages.`);
-        } catch (error) {
-          console.error(error);
-          setStatus(error.message, "error");
-          alert(error.message);
-        }
-      }
-
-      async function generateSealingPdf() {
-        try {
-          if (!isPaymentComplete()) {
-            throw new Error("Please complete the $50 payment before generating your packet.");
-          }
-
-          const data = getPacketData();
-          const template = getTemplateForState(data.caseState);
-
-          setStatus("Preparing PDF packet...");
-
-          if (!window.PDFLib) {
-            throw new Error("pdf-lib failed to load. Refresh the page and try again.");
-          }
-
-          if (!template.supportsPdfFill || !template.url) {
-            throw new Error(`PDF generation is not mapped yet for ${data.caseState || "this state"}.`);
-          }
-
-          if (normalizeState(data.caseState) !== "OH") {
-            throw new Error("This PDF filler is currently mapped only for the loaded Ohio template.");
-          }
-
-          if (!signatureImageBytes) {
-            setTypedSignature();
-          }
-
-          const { PDFDocument, StandardFonts, rgb } = window.PDFLib;
-          const templateBytes = await fetchTemplateBytes(template.url);
-          const pdfDoc = await PDFDocument.load(templateBytes);
-          const pages = pdfDoc.getPages();
-
-          if (pages.length < 4) {
-            throw new Error(`Unexpected PDF. Found ${pages.length} pages, but expected at least 4.`);
-          }
-
-          const addressPage = pages[2];
-          const applicationPage = pages[3];
-          const helvetica = await pdfDoc.embedFont(StandardFonts.Helvetica);
-          const helveticaBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-          const sigImage = await pdfDoc.embedPng(signatureImageBytes);
-          const black = rgb(0, 0, 0);
-
-          function draw(page, text, x, y, size = 12, font = helvetica) {
-            page.drawText(String(text || ""), { x, y, size, font, color: black });
-          }
-
-          function drawFit(page, text, x, y, maxWidth, size = 12, font = helvetica) {
-            let currentSize = size;
-            const content = String(text || "");
-            let width = font.widthOfTextAtSize(content, currentSize);
-
-            while (width > maxWidth && currentSize > 8) {
-              currentSize -= 0.5;
-              width = font.widthOfTextAtSize(content, currentSize);
-            }
-
-            page.drawText(content, { x, y, size: currentSize, font, color: black });
-          }
-
-          setStatus("Filling PDF...");
-
-          const displayName = data.fullName || "Name Not Entered";
-          const displayStreet = data.street || "";
-          const displayApartment = data.apartment || WOOD_DEFAULTS.apartment;
-          const displayCityStateZip = [
-            safe(data.city),
-            [safe(data.residenceState), safe(data.zip)].filter(Boolean).join(" ")
-          ].filter(Boolean).join(", ");
-
-          draw(addressPage, new Date().toLocaleDateString("en-US", {
-            month: "long",
-            day: "numeric",
-            year: "numeric"
-          }), 148, 444, 12, helvetica);
-
-          drawFit(addressPage, displayName, 190, 407, 325, 12, helvetica);
-          drawFit(addressPage, displayStreet, 95, 370, 420, 12, helvetica);
-          drawFit(addressPage, displayApartment, 220, 334, 120, 12, helvetica);
-          drawFit(addressPage, displayCityStateZip, 128, 297, 250, 12, helvetica);
-          drawFit(addressPage, safe(data.zip), 105, 260, 150, 12, helvetica);
-          drawFit(addressPage, safe(data.email), 145, 224, 325, 12, helvetica);
-
-          drawFit(applicationPage, safe(data.caseNumber, WOOD_DEFAULTS.caseNumber), 470, 676, 120, 12, helvetica);
-          drawFit(applicationPage, WOOD_DEFAULTS.judge, 470, 649, 120, 12, helvetica);
-          drawFit(applicationPage, displayName, 245, 563, 170, 12, helvetica);
-          drawFit(applicationPage, displayStreet, 175, 535, 240, 12, helvetica);
-          drawFit(applicationPage, displayCityStateZip, 205, 508, 210, 12, helvetica);
-          drawFit(applicationPage, safe(data.phone, WOOD_DEFAULTS.phone), 175, 480, 240, 12, helvetica);
-          drawFit(applicationPage, safe(data.email), 165, 452, 250, 12, helvetica);
-          drawFit(applicationPage, displayName, 145, 420, 170, 12, helvetica);
-          draw(applicationPage, formatDateForCourt(safe(data.dispositionDate, WOOD_DEFAULTS.dispositionDate)), 95, 389, 12, helveticaBold);
-          drawFit(applicationPage, safe(data.chargeName, WOOD_DEFAULTS.offenseName), 70, 326, 220, 12, helvetica);
-          drawFit(applicationPage, safe(data.offenseCode, WOOD_DEFAULTS.offenseCode), 355, 326, 120, 12, helvetica);
-          drawFit(applicationPage, safe(data.chargeLevel, WOOD_DEFAULTS.offenseDegree), 505, 326, 135, 12, helvetica);
-          draw(applicationPage, formatDateForCourt(safe(data.dischargeDate, WOOD_DEFAULTS.dischargeDate)), 340, 214, 12, helveticaBold);
-
-          const sigDims = sigImage.scale(0.32);
-          applicationPage.drawImage(sigImage, {
-            x: 420,
-            y: 73,
-            width: sigDims.width,
-            height: sigDims.height
-          });
-
-          drawFit(applicationPage, displayName, 95, 44, 210, 12, helvetica);
-
-          setStatus("Saving PDF...");
-
-          const pdfBytes = await pdfDoc.save();
-          const blob = new Blob([pdfBytes], { type: "application/pdf" });
-          const url = URL.createObjectURL(blob);
-          const link = document.createElement("a");
-          link.href = url;
-          link.download = `${(normalizeState(data.caseState) || "case").toLowerCase()}-filing-packet.pdf`;
-          document.body.appendChild(link);
-          link.click();
-          link.remove();
-
-          setTimeout(() => URL.revokeObjectURL(url), 5000);
-          setStatus("Done. Your PDF should be downloading.");
-        } catch (error) {
-          console.error(error);
-          setStatus(error.message, "error");
-          alert(error.message);
-        }
-      }
-
-      async function handlePayAndSubmit() {
-        const button = document.getElementById("payAndSubmitBtn");
-
-        try {
-          button.disabled = true;
-          button.textContent = "Redirecting to secure checkout...";
-          setStatus("Creating Stripe checkout session...");
-
-          const data = getPacketData();
-          const eligibility = getEligibilityResult(data);
-          const estimatedEligibleDate =
-            estimateEligibleDate(data, eligibility) ||
-            (eligibility && eligibility.earliestEligibleDate) ||
-            "";
-
-          const payload = {
-            amount: 5000,
-            currency: "usd",
-            productType: "record-sealing-packet",
-            successPath: "/payment-success.html",
-            cancelPath: "/packet.html?payment=cancelled",
-            applicant: {
-              fullName: safe(data.fullName),
-              email: safe(data.email),
-              phone: safe(data.phone),
-              street: safe(data.street),
-              apartment: safe(data.apartment),
-              city: safe(data.city),
-              residenceState: safe(data.residenceState),
-              zip: safe(data.zip)
-            },
-            caseInfo: {
-              caseState: safe(data.caseState),
-              caseNumber: safe(data.caseNumber),
-              chargeName: safe(data.chargeName),
-              offenseCode: safe(data.offenseCode),
-              chargeLevel: safe(data.chargeLevel),
-              disposition: safe(data.disposition),
-              dispositionDate: safe(data.dispositionDate),
-              dischargeDate: safe(data.dischargeDate),
-              court: safe(data.court),
-              county: safe(data.county),
-              estimatedEligibleDate: safe(estimatedEligibleDate)
-            },
-            eligibility: {
-              status: safe(eligibility && eligibility.status),
-              reliefType: safe(eligibility && eligibility.reliefType),
-              manualReview: !!(eligibility && eligibility.manualReview)
-            }
-          };
-
-          const response = await fetch("/api/create-checkout-session", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify(payload)
-          });
-
-          const result = await response.json().catch(() => ({}));
-
-          if (!response.ok) {
-            throw new Error(result.error || "Unable to create checkout session.");
-          }
-
-          if (!result.url) {
-            throw new Error("Stripe did not return a checkout URL.");
-          }
-
-          setStatus("Redirecting to Stripe...");
-          window.location.href = result.url;
-        } catch (error) {
-          console.error(error);
-          setStatus(error.message || "Payment could not be started.", "error");
-          button.disabled = false;
-          button.textContent = "Pay $50 & Unlock Packet";
-          alert(error.message || "Payment could not be started.");
-          updatePaymentUI();
-        }
-      }
-
-      function handlePaymentReturn() {
-        const pageParams = new URLSearchParams(window.location.search);
-        const paymentParam = pageParams.get("payment");
-
-        if (paymentParam === "success") {
-          localStorage.setItem(PAYMENT_STORAGE_KEY, "true");
-          setStatus("Payment received. You can now generate your packet.");
-        } else if (paymentParam === "cancelled") {
-          setStatus("Checkout was cancelled. No payment was made.", "error");
-        }
-
-        updatePaymentUI();
-      }
-
-      const initialData = getPacketData();
-      const initialEligibility = getEligibilityResult(initialData);
-
-      document.getElementById("useTypedSigBtn").addEventListener("click", setTypedSignature);
-      document.getElementById("useDrawnSigBtn").addEventListener("click", setDrawnSignature);
-      document.getElementById("clearSigBtn").addEventListener("click", clearSignature);
-      document.getElementById("clearPadBtn").addEventListener("click", clearSignature);
-      document.getElementById("generateSealingBtn").addEventListener("click", generateSealingPdf);
-      document.getElementById("testPdfBtn").addEventListener("click", testPdfAccess);
-      document.getElementById("openSourceBtn").addEventListener("click", function () {
-        const data = getPacketData();
-        const template = getTemplateForState(data.caseState);
-
-        if (!template.url) {
-          alert(`No mapped source PDF yet for ${data.caseState || "this state"}.`);
-          return;
-        }
-
-        window.open(template.url, "_blank");
-      });
-      document.getElementById("payAndSubmitBtn").addEventListener("click", handlePayAndSubmit);
-
-      setupSignaturePad();
-      updateSummary(initialData);
-      renderAllRecords(initialData);
-      updateTemplateCallout(initialData);
-      updateEligibilitySection(initialData, initialEligibility);
-      handlePaymentReturn();
-      document.getElementById("typedSignature").value = initialData.fullName || "";
-      setTypedSignature();
+ <script src="js/packet-data-bridge.js"></script>
+<script src="js/rules.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const TEMPLATE_MAP_URL = "./assets/wood-county-sealing-map.json";
+  const PAYMENT_STORAGE_KEY = "recordPathPaymentComplete";
+
+  let signatureImageBytes = null;
+
+  const WOOD_DEFAULTS = {
+    caseNumber: "2006CR0387",
+    judge: "Robert Pollex",
+    dispositionDate: "2007-05-04",
+    dischargeDate: "2010-05-07",
+    offenseCode: "2925.11(A)",
+    offenseName: "Possession of Drugs",
+    offenseDegree: "F3",
+    apartment: "428",
+    phone: "8556219810",
+    courtName: "Wood County Municipal Court",
+    county: "Wood",
+    state: "OH"
+  };
+
+  function setStatus(message, mode = "normal") {
+    const el = document.getElementById("statusText");
+    if (!el) return;
+    el.textContent = message;
+    el.style.color = mode === "error" ? "#b42318" : "#60708d";
+  }
+
+  function safe(value, fallback = "") {
+    return (value ?? "").toString().trim() || fallback;
+  }
+
+  function normalizeState(value) {
+    const v = safe(value).toUpperCase();
+    const map = {
+      OHIO: "OH",
+      NEVADA: "NV",
+      CALIFORNIA: "CA",
+      ARIZONA: "AZ",
+      TEXAS: "TX",
+      FLORIDA: "FL"
+    };
+    return map[v] || v;
+  }
+
+  function escapeHtml(str) {
+    return String(str == null ? "" : str)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  function formatDateForDisplay(dateString) {
+    if (!dateString) return "—";
+    const date = new Date(dateString + "T12:00:00");
+    if (Number.isNaN(date.getTime())) return dateString;
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric"
     });
-  </script>
+  }
+
+  function formatDateForCourt(dateString) {
+    if (!dateString) return "";
+    const date = new Date(dateString + "T12:00:00");
+    if (Number.isNaN(date.getTime())) return dateString;
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    const year = date.getFullYear();
+    return `${month}/${day}/${year}`;
+  }
+
+  function getByPath(obj, path, fallback = "") {
+    if (!obj || !path) return fallback;
+
+    const value = path.split(".").reduce((current, key) => {
+      if (current == null) return undefined;
+      return current[key];
+    }, obj);
+
+    if (value === undefined || value === null || value === "") return fallback;
+    return value;
+  }
+
+  function readPacketData() {
+    try {
+      return JSON.parse(localStorage.getItem("recordPathPacketData") || "{}");
+    } catch (error) {
+      console.error("Could not read packet data", error);
+      return {};
+    }
+  }
+
+  function getPacketData() {
+    const raw = readPacketData();
+
+    const petitioner = raw.petitioner || {};
+    const address = petitioner.address || {};
+    const charges = Array.isArray(raw.charges) ? raw.charges : [];
+    const record = charges[0] || {};
+
+    const fullName =
+      petitioner.full_name ||
+      `${petitioner.first_name || ""} ${petitioner.middle_name || ""} ${petitioner.last_name || ""}`
+        .replace(/\s+/g, " ")
+        .trim();
+
+    return {
+      raw,
+      petitioner,
+      address,
+      charges,
+      record,
+
+      fullName: fullName || "Name Not Entered",
+      email: petitioner.email || "",
+      phone: petitioner.phone || "",
+
+      street: address.line1 || "",
+      apartment: address.line2 || "",
+      city: address.city || "",
+      residenceState: address.state || "",
+      zip: address.zip || "",
+
+      caseState: record.case_state || raw.caseState || WOOD_DEFAULTS.state,
+      caseNumber: record.case_number || WOOD_DEFAULTS.caseNumber,
+      chargeName: record.charge_name || WOOD_DEFAULTS.offenseName,
+      offenseCode: record.charge_code || WOOD_DEFAULTS.offenseCode,
+      chargeLevel: record.level || record.degree || WOOD_DEFAULTS.offenseDegree,
+      dispositionDate: record.disposition_date || WOOD_DEFAULTS.dispositionDate,
+      dischargeDate: record.discharge_date || record.probation_end_date || WOOD_DEFAULTS.dischargeDate,
+      disposition: record.final_disposition || record.disposition || "",
+      court: record.court_name || WOOD_DEFAULTS.courtName,
+      county: record.court_county || WOOD_DEFAULTS.county
+    };
+  }
+
+  function buildNormalizedPacketData(data) {
+    const today = new Date();
+
+    const firstName = data.petitioner.first_name || "";
+    const middleName = data.petitioner.middle_name || "";
+    const lastName = data.petitioner.last_name || "";
+
+    const signedDay = String(today.getDate()).padStart(2, "0");
+    const signedMonth = String(today.getMonth() + 1).padStart(2, "0");
+    const signedYear = String(today.getFullYear());
+
+    return {
+      petitioner: {
+        first_name: firstName,
+        middle_name: middleName,
+        last_name: lastName,
+        full_name: data.fullName,
+        dob: data.petitioner.dob || "",
+        ssn_full: "",
+        ssn_last4: data.petitioner.ssn_last4 || "",
+        phone: data.phone || WOOD_DEFAULTS.phone,
+        email: data.email || "",
+        address: {
+          line1: data.street || "",
+          line2: data.apartment || WOOD_DEFAULTS.apartment,
+          city: data.city || "",
+          state: data.residenceState || "",
+          zip: data.zip || "",
+          county: data.address.county || ""
+        }
+      },
+
+      attorney: {
+        is_self_represented: true,
+        name: "",
+        bar_number: "",
+        phone: "",
+        email: "",
+        address: {
+          line1: "",
+          line2: "",
+          city: "",
+          state: "",
+          zip: ""
+        }
+      },
+
+      court: {
+        state: normalizeState(data.caseState) || WOOD_DEFAULTS.state,
+        county: data.county || WOOD_DEFAULTS.county,
+        name: data.court || WOOD_DEFAULTS.courtName,
+        department: "",
+        docket_number: data.caseNumber || WOOD_DEFAULTS.caseNumber,
+        case_number: data.caseNumber || WOOD_DEFAULTS.caseNumber,
+        case_type: "Record Sealing",
+        address: {
+          line1: "",
+          line2: "",
+          city: "",
+          state: "OH",
+          zip: ""
+        }
+      },
+
+      eligibility: {
+        state_ruleset: normalizeState(data.caseState) || "OH",
+        filing_type: "Application for Sealing of Record of Conviction",
+        is_eligible: true,
+        eligibility_status: "Likely Eligible",
+        eligibility_reason: "Waiting period appears satisfied based on saved case data.",
+        estimated_eligible_on: "",
+        waiting_period_complete: true,
+        has_pending_cases: false,
+        has_outstanding_fines: false,
+        has_open_warrants: false,
+        requires_prosecutor_notice: true,
+        requires_hearing: true,
+        requires_fingerprints: true,
+        requires_certified_disposition: false,
+        notes: ""
+      },
+
+      case: {
+        filing_date: today.toLocaleDateString("en-US"),
+        hearing_date: "",
+        incident_count: 1,
+        conviction_count: 1,
+        dismissal_count: 0,
+        overall_disposition_summary: data.disposition || "",
+        petition_reason: "",
+        rehabilitation_statement: "",
+        supporting_statement: ""
+      },
+
+      charges: [
+        {
+          charge_name: data.chargeName || WOOD_DEFAULTS.offenseName,
+          charge_code: data.offenseCode || WOOD_DEFAULTS.offenseCode,
+          level: data.chargeLevel || WOOD_DEFAULTS.offenseDegree,
+          offense_classification: data.chargeLevel || WOOD_DEFAULTS.offenseDegree,
+          arrest_date: data.record.arrest_date || "",
+          citation_date: data.record.citation_date || "",
+          offense_date: data.record.offense_date || "",
+          disposition: data.disposition || "",
+          disposition_date: formatDateForCourt(data.dispositionDate || WOOD_DEFAULTS.dispositionDate),
+          sentencing_date: formatDateForCourt(data.record.sentencing_date || ""),
+          release_date: formatDateForCourt(data.record.release_date || ""),
+          probation_end_date: formatDateForCourt(data.dischargeDate || WOOD_DEFAULTS.dischargeDate),
+          waiting_period_end_date: "",
+          case_number: data.caseNumber || WOOD_DEFAULTS.caseNumber,
+          court_name: data.court || WOOD_DEFAULTS.courtName,
+          court_county: data.county || WOOD_DEFAULTS.county,
+          arresting_agency: data.record.arresting_agency || "",
+          prosecutor_agency: data.record.prosecutor_agency || "",
+          final_disposition: data.disposition || "",
+          is_dismissed: false,
+          is_convicted: true,
+          is_sealable: true,
+          ineligible_reason: "",
+          fine_amount_due: "",
+          restitution_due: "",
+          notes: ""
+        }
+      ],
+
+      agencies: {
+        to_seal_records: ""
+      },
+
+      checkboxes: {
+        petitioner_self: true,
+        petitioner_attorney: false,
+        no_pending_cases: true,
+        all_fines_paid: true,
+        charge_dismissed: false,
+        charge_convicted: true,
+        first_time_offense: true,
+        repeat_offender: false
+      },
+
+      signatures: {
+        petition_signed_day: signedDay,
+        petition_signed_month: signedMonth,
+        petition_signed_year: signedYear,
+        affidavit_signed_day: signedDay,
+        affidavit_signed_month: signedMonth,
+        affidavit_signed_year: signedYear,
+        order_judge_signed_day: "",
+        order_judge_signed_month_year: "",
+        petitioner_signature_name: data.fullName,
+        petitioner_signature_image: "__SIGNATURE__",
+        attorney_signature_name: "",
+        attorney_signature_image: "",
+        district_attorney_delegate_signature: "",
+        district_attorney_delegate_bar_number: ""
+      },
+
+      generated: {
+        current_date: today.toLocaleDateString("en-US"),
+        current_day: signedDay,
+        current_month: signedMonth,
+        current_year: signedYear,
+        prepared_by_name: "RecordPathAI",
+        prepared_by_role: "Automated court packet preparation workflow",
+        packet_id: `RPAI-${Date.now()}`
+      }
+    };
+  }
+
+  async function fetchJson(url) {
+    const response = await fetch(url, { cache: "no-store" });
+
+    if (!response.ok) {
+      throw new Error(`Could not load JSON map at ${url}. Status: ${response.status}`);
+    }
+
+    return await response.json();
+  }
+
+  async function fetchPdfBytes(url) {
+    if (!url) throw new Error("Template JSON is missing the PDF file path.");
+
+    const response = await fetch(url, { cache: "no-store" });
+
+    if (!response.ok) {
+      throw new Error(`Could not load PDF at ${url}. Status: ${response.status}`);
+    }
+
+    const bytes = await response.arrayBuffer();
+
+    if (!bytes || bytes.byteLength < 1000) {
+      throw new Error("PDF loaded, but it looks too small to be a valid court form.");
+    }
+
+    return bytes;
+  }
+
+  function normalizeFields(templateMap) {
+    if (Array.isArray(templateMap.fields)) return templateMap.fields;
+
+    if (templateMap.fields && typeof templateMap.fields === "object") {
+      return Object.entries(templateMap.fields).map(([id, field]) => ({
+        id,
+        ...field
+      }));
+    }
+
+    throw new Error("Template JSON must contain a fields array or fields object.");
+  }
+
+  async function drawDynamicMappedFields(pdfDoc, templateMap, normalizedData) {
+    const { StandardFonts, rgb } = window.PDFLib;
+    const pages = pdfDoc.getPages();
+
+    const helvetica = await pdfDoc.embedFont(StandardFonts.Helvetica);
+    const helveticaBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+    const black = rgb(0, 0, 0);
+
+    let sigImage = null;
+    if (signatureImageBytes) {
+      sigImage = await pdfDoc.embedPng(signatureImageBytes);
+    }
+
+    function drawFit(page, text, x, y, maxWidth, size = 12, font = helvetica) {
+      let currentSize = size;
+      const content = String(text || "");
+
+      if (!content) return;
+
+      let width = font.widthOfTextAtSize(content, currentSize);
+
+      while (width > maxWidth && currentSize > 7) {
+        currentSize -= 0.5;
+        width = font.widthOfTextAtSize(content, currentSize);
+      }
+
+      page.drawText(content, {
+        x,
+        y,
+        size: currentSize,
+        font,
+        color: black
+      });
+    }
+
+    const fields = normalizeFields(templateMap);
+
+    fields.forEach((field) => {
+      const pageIndex = Number(field.page || 1) - 1;
+      const page = pages[pageIndex];
+
+      if (!page) {
+        console.warn("Skipping field because PDF page does not exist:", field);
+        return;
+      }
+
+      const dataPath = field.dataPath || field.path || field.source || "";
+      const type = field.type || "text";
+      const value = getByPath(normalizedData, dataPath, "");
+
+      const x = Number(field.x || 0);
+      const y = Number(field.y || 0);
+      const width = Number(field.width || 200);
+      const height = Number(field.height || 18);
+      const fontSize = Number(field.fontSize || 12);
+
+      if (type === "signature" || value === "__SIGNATURE__") {
+        if (!sigImage) return;
+
+        page.drawImage(sigImage, {
+          x,
+          y,
+          width,
+          height
+        });
+
+        return;
+      }
+
+      if (type === "checkbox") {
+        const checked =
+          value === true ||
+          value === "true" ||
+          value === "yes" ||
+          value === "Yes" ||
+          value === "1";
+
+        if (checked) {
+          drawFit(page, "X", x, y, width || 20, fontSize || 14, helveticaBold);
+        }
+
+        return;
+      }
+
+      if (type === "date") {
+        drawFit(page, value, x, y, width, fontSize, field.bold ? helveticaBold : helvetica);
+        return;
+      }
+
+      drawFit(page, value, x, y, width, fontSize, field.bold ? helveticaBold : helvetica);
+    });
+  }
+
+  function updateSummary(data) {
+    document.getElementById("summaryName").textContent = data.fullName || "—";
+    document.getElementById("summaryEmail").textContent = data.email || "—";
+    document.getElementById("summaryPhone").textContent = data.phone || "—";
+
+    const addressParts = [
+      safe(data.street),
+      safe(data.apartment),
+      safe(data.city),
+      [safe(data.residenceState), safe(data.zip)].filter(Boolean).join(" ")
+    ].filter(Boolean);
+
+    document.getElementById("summaryAddress").textContent = addressParts.join(", ") || "—";
+    document.getElementById("summaryResidenceState").textContent = data.residenceState || "—";
+
+    document.getElementById("summaryCaseState").textContent = data.caseState || "—";
+    document.getElementById("summaryCharge").textContent = data.chargeName || "—";
+    document.getElementById("summaryOffenseCode").textContent = data.offenseCode || "—";
+    document.getElementById("summaryLevel").textContent = data.chargeLevel || "—";
+    document.getElementById("summaryCaseNumber").textContent = data.caseNumber || "—";
+    document.getElementById("summaryCourt").textContent = data.court || "—";
+    document.getElementById("summaryCounty").textContent = data.county || "—";
+    document.getElementById("summaryDisposition").textContent = data.disposition || "—";
+  }
+
+  function renderAllRecords(data) {
+    const container = document.getElementById("recordList");
+    const records = Array.isArray(data.charges) ? data.charges : [];
+
+    if (!records.length) {
+      container.innerHTML = `
+        <div class="record-item">
+          <div class="record-title">No saved offenses found.</div>
+          <div class="record-line">Go back to Record Details and add at least one offense.</div>
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = records.map((record, index) => {
+      return `
+        <div class="record-item${index === 0 ? " is-current" : ""}">
+          <div class="record-head">
+            <h3 class="record-title">Offense ${index + 1}: ${escapeHtml(safe(record.charge_name, "Unnamed offense"))}</h3>
+            <span class="record-tag">${index === 0 ? "Current packet record" : "Saved record"}</span>
+          </div>
+          <div class="record-grid">
+            <div class="record-line"><strong>Case State:</strong> ${escapeHtml(safe(record.case_state, "—"))}</div>
+            <div class="record-line"><strong>Case Number:</strong> ${escapeHtml(safe(record.case_number, "—"))}</div>
+            <div class="record-line"><strong>Statute:</strong> ${escapeHtml(safe(record.charge_code, "—"))}</div>
+            <div class="record-line"><strong>Degree:</strong> ${escapeHtml(safe(record.level || record.degree, "—"))}</div>
+            <div class="record-line"><strong>Outcome:</strong> ${escapeHtml(safe(record.final_disposition || record.disposition, "—"))}</div>
+            <div class="record-line"><strong>Disposition Date:</strong> ${escapeHtml(formatDateForDisplay(record.disposition_date))}</div>
+            <div class="record-line"><strong>Discharge Date:</strong> ${escapeHtml(formatDateForDisplay(record.discharge_date || record.probation_end_date))}</div>
+            <div class="record-line"><strong>Court:</strong> ${escapeHtml(safe(record.court_name, "—"))}</div>
+            <div class="record-line"><strong>County:</strong> ${escapeHtml(safe(record.court_county, "—"))}</div>
+          </div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  function updateEligibilitySection(data) {
+    const state = normalizeState(data.caseState);
+
+    document.getElementById("stateValue").textContent = state || "—";
+    document.getElementById("convictionDateValue").textContent = formatDateForDisplay(data.dispositionDate);
+    document.getElementById("probationCompletedValue").textContent = formatDateForDisplay(data.dischargeDate);
+    document.getElementById("eligibleDateValue").textContent = "Eligible Now";
+
+    const pill = document.getElementById("statusPill");
+    const headline = document.getElementById("eligibilityHeadline");
+    const summary = document.getElementById("eligibilitySummary");
+    const reasonList = document.getElementById("eligibilityReasons");
+
+    pill.className = "status-pill eligible";
+    pill.textContent = "Likely Eligible";
+    headline.textContent = `This ${state || "case"} appears likely eligible.`;
+    summary.textContent = "The saved case data indicates the waiting period appears satisfied.";
+    reasonList.innerHTML = `<li>${escapeHtml("This screening is based on the data currently saved in RecordPathAI.")}</li>`;
+  }
+
+  async function updateTemplateCallout() {
+    const el = document.getElementById("templateCallout");
+
+    try {
+      const map = await fetchJson(TEMPLATE_MAP_URL);
+      const fields = normalizeFields(map);
+
+      el.className = "callout success";
+      el.innerHTML = `
+        Dynamic PDF mapper loaded.<br />
+        Template: <strong>${escapeHtml(map.templateId || "Unnamed template")}</strong><br />
+        Source PDF: <code>${escapeHtml(map.pdf || "Missing PDF path")}</code><br />
+        Mapped fields: <strong>${fields.length}</strong>
+      `;
+    } catch (error) {
+      el.className = "callout warning";
+      el.innerHTML = `
+        Dynamic PDF map has not loaded yet.<br />
+        Expected JSON path: <code>${TEMPLATE_MAP_URL}</code><br />
+        Upload your exported mapper JSON there before generating the packet.
+      `;
+    }
+
+    const data = getPacketData();
+    const conflict = document.getElementById("stateConflictCallout");
+
+    if (
+      data.residenceState &&
+      data.caseState &&
+      normalizeState(data.residenceState) !== normalizeState(data.caseState)
+    ) {
+      conflict.style.display = "block";
+    } else {
+      conflict.style.display = "none";
+    }
+  }
+
+  function setupSignaturePad() {
+    const canvas = document.getElementById("signaturePad");
+    const ctx = canvas.getContext("2d");
+
+    function resizeCanvas() {
+      const ratio = Math.max(window.devicePixelRatio || 1, 1);
+      const rect = canvas.getBoundingClientRect();
+
+      canvas.width = rect.width * ratio;
+      canvas.height = rect.height * ratio;
+
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.scale(ratio, ratio);
+      ctx.lineWidth = 2;
+      ctx.lineCap = "round";
+      ctx.strokeStyle = "#111";
+    }
+
+    let drawing = false;
+
+    function pointFromEvent(event) {
+      const rect = canvas.getBoundingClientRect();
+      const touch = event.touches && event.touches[0];
+      const clientX = touch ? touch.clientX : event.clientX;
+      const clientY = touch ? touch.clientY : event.clientY;
+      return { x: clientX - rect.left, y: clientY - rect.top };
+    }
+
+    function start(event) {
+      drawing = true;
+      const p = pointFromEvent(event);
+      ctx.beginPath();
+      ctx.moveTo(p.x, p.y);
+      event.preventDefault();
+    }
+
+    function move(event) {
+      if (!drawing) return;
+      const p = pointFromEvent(event);
+      ctx.lineTo(p.x, p.y);
+      ctx.stroke();
+      event.preventDefault();
+    }
+
+    function end() {
+      drawing = false;
+    }
+
+    function clearPad() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    window.clearSignaturePadCanvas = clearPad;
+    window.getSignaturePadDataUrl = () => canvas.toDataURL("image/png");
+
+    resizeCanvas();
+    window.addEventListener("resize", resizeCanvas);
+    canvas.addEventListener("mousedown", start);
+    canvas.addEventListener("mousemove", move);
+    window.addEventListener("mouseup", end);
+    canvas.addEventListener("touchstart", start, { passive: false });
+    canvas.addEventListener("touchmove", move, { passive: false });
+    window.addEventListener("touchend", end);
+  }
+
+  function dataUrlToBytes(dataUrl) {
+    const base64 = dataUrl.split(",")[1];
+    const binary = atob(base64);
+    const bytes = new Uint8Array(binary.length);
+
+    for (let i = 0; i < binary.length; i++) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+
+    return bytes;
+  }
+
+  function buildTypedSignatureImage(name) {
+    const canvas = document.createElement("canvas");
+    canvas.width = 700;
+    canvas.height = 180;
+
+    const ctx = canvas.getContext("2d");
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.font = "italic 64px Georgia";
+    ctx.fillStyle = "#111";
+    ctx.fillText(name, 18, 110);
+
+    return dataUrlToBytes(canvas.toDataURL("image/png"));
+  }
+
+  function setTypedSignature() {
+    const value = document.getElementById("typedSignature").value.trim();
+
+    if (!value) {
+      alert("Enter a name for the typed signature.");
+      return;
+    }
+
+    signatureImageBytes = buildTypedSignatureImage(value);
+    setStatus("Typed signature selected.");
+  }
+
+  function setDrawnSignature() {
+    const dataUrl = window.getSignaturePadDataUrl();
+    signatureImageBytes = dataUrlToBytes(dataUrl);
+    setStatus("Drawn signature selected.");
+  }
+
+  function clearSignature() {
+    signatureImageBytes = null;
+    window.clearSignaturePadCanvas();
+    setStatus("Signature cleared.");
+  }
+
+  function isPaymentComplete() {
+    return localStorage.getItem(PAYMENT_STORAGE_KEY) === "true";
+  }
+
+  function updatePaymentUI() {
+    const payBtn = document.getElementById("payAndSubmitBtn");
+    const callout = document.getElementById("paymentCallout");
+    const paid = isPaymentComplete();
+
+    if (paid) {
+      payBtn.disabled = true;
+      payBtn.textContent = "Payment Complete";
+      payBtn.classList.remove("packet-btn-muted");
+      payBtn.classList.add("packet-btn-secondary");
+
+      callout.className = "callout success";
+      callout.innerHTML = `Payment received. You can now generate your packet.`;
+    } else {
+      payBtn.disabled = false;
+      payBtn.textContent = "Pay $50 & Unlock Packet";
+      payBtn.classList.remove("packet-btn-secondary");
+      payBtn.classList.add("packet-btn-muted");
+
+      callout.className = "callout warning";
+      callout.innerHTML = `Testing mode: payment is not required while you are validating PDF mapping.`;
+    }
+  }
+
+  async function testPdfAccess() {
+    try {
+      setStatus("Testing JSON map and PDF access...");
+
+      if (!window.PDFLib) {
+        throw new Error("pdf-lib did not load.");
+      }
+
+      const map = await fetchJson(TEMPLATE_MAP_URL);
+      const fields = normalizeFields(map);
+      const pdfBytes = await fetchPdfBytes(map.pdf);
+      const pdfDoc = await window.PDFLib.PDFDocument.load(pdfBytes);
+
+      setStatus(`Test passed. Loaded ${fields.length} mapped fields and ${pdfDoc.getPages().length} PDF pages.`);
+    } catch (error) {
+      console.error(error);
+      setStatus(error.message, "error");
+      alert(error.message);
+    }
+  }
+
+  async function generateSealingPdf() {
+    try {
+      setStatus("Loading dynamic mapper...");
+
+      if (!window.PDFLib) {
+        throw new Error("pdf-lib failed to load. Refresh and try again.");
+      }
+
+      if (!signatureImageBytes) {
+        setTypedSignature();
+      }
+
+      const data = getPacketData();
+      const normalizedData = buildNormalizedPacketData(data);
+
+      const templateMap = await fetchJson(TEMPLATE_MAP_URL);
+      const pdfBytes = await fetchPdfBytes(templateMap.pdf);
+
+      const { PDFDocument } = window.PDFLib;
+      const pdfDoc = await PDFDocument.load(pdfBytes);
+
+      setStatus("Filling PDF from mapped JSON fields...");
+      await drawDynamicMappedFields(pdfDoc, templateMap, normalizedData);
+
+      setStatus("Saving PDF...");
+
+      const finalBytes = await pdfDoc.save();
+      const blob = new Blob([finalBytes], { type: "application/pdf" });
+      const url = URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `${normalizeState(data.caseState).toLowerCase()}-recordpathai-filing-packet.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+
+      setTimeout(() => URL.revokeObjectURL(url), 5000);
+
+      setStatus("Done. Your completed PDF should be downloading.");
+    } catch (error) {
+      console.error(error);
+      setStatus(error.message, "error");
+      alert(error.message);
+    }
+  }
+
+  async function handlePayAndSubmit() {
+    localStorage.setItem(PAYMENT_STORAGE_KEY, "true");
+    updatePaymentUI();
+    setStatus("Testing mode: payment marked complete locally.");
+  }
+
+  function handlePaymentReturn() {
+    const params = new URLSearchParams(window.location.search);
+
+    if (params.get("payment") === "success") {
+      localStorage.setItem(PAYMENT_STORAGE_KEY, "true");
+    }
+
+    updatePaymentUI();
+  }
+
+  const initialData = getPacketData();
+
+  document.getElementById("useTypedSigBtn").addEventListener("click", setTypedSignature);
+  document.getElementById("useDrawnSigBtn").addEventListener("click", setDrawnSignature);
+  document.getElementById("clearSigBtn").addEventListener("click", clearSignature);
+  document.getElementById("clearPadBtn").addEventListener("click", clearSignature);
+  document.getElementById("generateSealingBtn").addEventListener("click", generateSealingPdf);
+  document.getElementById("testPdfBtn").addEventListener("click", testPdfAccess);
+  document.getElementById("payAndSubmitBtn").addEventListener("click", handlePayAndSubmit);
+
+  document.getElementById("openSourceBtn").addEventListener("click", async function () {
+    try {
+      const map = await fetchJson(TEMPLATE_MAP_URL);
+      if (!map.pdf) throw new Error("JSON map does not include a pdf path.");
+      window.open(map.pdf, "_blank");
+    } catch (error) {
+      alert(error.message);
+    }
+  });
+
+  setupSignaturePad();
+  updateSummary(initialData);
+  renderAllRecords(initialData.raw || {});
+  updateEligibilitySection(initialData);
+  updateTemplateCallout();
+  handlePaymentReturn();
+
+  document.getElementById("typedSignature").value = initialData.fullName || "";
+  setTypedSignature();
+});
+</script>
 </body>
 </html>
