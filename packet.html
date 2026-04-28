@@ -1498,7 +1498,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const scaleX = page.getWidth() / sourcePageWidth;
             const scaleY = page.getHeight() / sourcePageHeight;
 
-            const x = Number(field.x || 0) * scaleX;
+            const x = Number(field.x || 0) * scaleX + 6;
             const yTop = Number(field.y || 0) * scaleY;
             const width = Number(field.width || 200) * scaleX;
             const height = Number(field.height || 18) * scaleY;
