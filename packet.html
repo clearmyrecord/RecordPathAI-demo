@@ -1507,40 +1507,61 @@
             }
 
             if (field.type === "signature") {
-              if (sigImage) {
-                page.drawImage(sigImage, {
-                  x,
-                  y: pdfY,
-                  width,
-                  height
-                });
-              } else {
-                drawFit(page, value, x, pdfY, width, fontSize, helveticaBold);
-              }
-              return;
-            }
+  if (sigImage) {
+    page.drawImage(sigImage, {
+      x,
+      y: pdfY, // keep base for images
+      width,
+      height
+    });
+  } else {
+    drawFit(page, value, x, textY, width, fontSize, helveticaBold);
+  }
+  return;
+}
 
-            if (field.type === "checkbox") {
-              const checked =
-                value === true ||
-                value === "true" ||
-                value === "yes" ||
-                value === "Yes" ||
-                value === "1";
+if (field.type === "checkbox") {
+  const checked =
+    value === true ||
+    value === "true" ||
+    value === "yes" ||
+    value === "Yes" ||
+    value === "1";
 
-              if (checked) {
-                drawFit(page, "X", x, pdfY, width || 20, Math.max(fontSize, 13), helveticaBold);
-              }
-              return;
-            }
+  if (checked) {
+    // center checkbox better inside box
+    const checkX = x + (width / 4);
+    const checkY = textY;
 
-            drawFit(page, value, x, pdfY, width, fontSize, field.bold ? helveticaBold : helvetica);
-          });
+    drawFit(
+      page,
+      "X",
+      checkX,
+      checkY,
+      width,
+      Math.max(fontSize, 13),
+      helveticaBold
+    );
+  }
+  return;
+}
 
-          const finalBytes = await pdfDoc.save();
-          const blob = new Blob([finalBytes], { type: "application/pdf" });
-          const url = URL.createObjectURL(blob);
+// default text rendering
+drawFit(
+  page,
+  value,
+  x,
+  textY, // <-- IMPORTANT FIX (was pdfY)
+  width,
+  fontSize,
+  field.bold ? helveticaBold : helvetica
+);
+});
 
+const finalBytes = await pdfDoc.save();
+
+const blob = new Blob([finalBytes], { type: "application/pdf" });
+const url = URL.createObjectURL(blob);
           const link = document.createElement("a");
           link.href = url;
           link.download = `${data.court.state.toLowerCase()}-${data.court.county.toLowerCase().replace(/\s+/g, "-")}-recordpathai-packet.pdf`;
