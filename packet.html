@@ -852,7 +852,7 @@
 
   <script>
     document.addEventListener("DOMContentLoaded", function () {
-      const TEMPLATE_JSON_URL = "./templates/ohio/wood-county/sealing-conviction.json?v=5";
+const TEMPLATE_JSON_URL = "./templates/ohio/wood-county/sealing-conviction.json?v=6";
       const SOURCE_PDF_URL = "./assets/wood-county-application-for-sealing-295332-conviction.pdf";
       const PAYMENT_STORAGE_KEY = "recordPathPaymentComplete";
 
@@ -1506,7 +1506,7 @@
               value = formatDateForCourt(value);
             }
 
-                       if (field.type === "signature") {
+                         if (field.type === "signature") {
               if (sigImage) {
                 page.drawImage(sigImage, {
                   x,
@@ -1529,7 +1529,26 @@
                 value === "1";
 
               if (checked) {
-          const link = document.createElement("a");
+                const checkX = x + width / 4;
+                drawFit(page, "X", checkX, textY, width || 20, Math.max(fontSize, 13), helveticaBold);
+              }
+              return;
+            }
+
+            drawFit(
+              page,
+              value,
+              x,
+              textY,
+              width,
+              fontSize,
+              field.bold ? helveticaBold : helvetica
+            );
+          });
+
+          const finalBytes = await pdfDoc.save();
+          const blob = new Blob([finalBytes], { type: "application/pdf" });
+          const url = URL.createObjectURL(blob);          const link = document.createElement("a");
           link.href = url;
           link.download = `${data.court.state.toLowerCase()}-${data.court.county.toLowerCase().replace(/\s+/g, "-")}-recordpathai-packet.pdf`;
           document.body.appendChild(link);
