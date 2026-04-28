@@ -1498,14 +1498,14 @@ document.addEventListener("DOMContentLoaded", function () {
             const scaleX = page.getWidth() / sourcePageWidth;
             const scaleY = page.getHeight() / sourcePageHeight;
 
-            const x = Number(field.x || 0) * scaleX + 6;
+            const x = Number(field.x || 0) * scaleX + 10;
             const yTop = Number(field.y || 0) * scaleY;
             const width = Number(field.width || 200) * scaleX;
             const height = Number(field.height || 18) * scaleY;
             const fontSize = Number(field.fontSize || 11) * Math.min(scaleX, scaleY);
 
             const pdfY = page.getHeight() - yTop - height;
-            const textY = pdfY + Math.max(4, (height - fontSize) / 2) + 3;
+            const textY = pdfY + Math.max(4, (height - fontSize) / 2);
             const path = fieldPath(field);
             let value = getByPath(data, path, "");
 
