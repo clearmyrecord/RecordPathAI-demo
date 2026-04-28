@@ -854,10 +854,7 @@
 document.addEventListener("DOMContentLoaded", function () {
 
   // 🔥 Initialize data bridge FIRST (critical for loading saved data)
-  if (window.RecordPathDataBridge && RecordPathDataBridge.initPage) {
-    RecordPathDataBridge.initPage(document);
-  }
-
+ 
   // 🔗 Template + PDF sources (cache-busted)
   const TEMPLATE_JSON_URL = "./templates/ohio/wood-county/sealing-conviction.json?v=6";
   const SOURCE_PDF_URL = "./assets/wood-county-application-for-sealing-295332-conviction.pdf";
@@ -867,8 +864,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // ✍️ Signature storage (typed or drawn)
   let signatureImageBytes = null;
-
-      let signatureImageBytes = null;
 
       function setStatus(message, mode = "normal") {
         const el = document.getElementById("statusText");
@@ -1560,7 +1555,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
           const finalBytes = await pdfDoc.save();
           const blob = new Blob([finalBytes], { type: "application/pdf" });
-          const url = URL.createObjectURL(blob);          const link = document.createElement("a");
+          const url = URL.createObjectURL(blob);          
+          const link = document.createElement("a");
           link.href = url;
           link.download = `${data.court.state.toLowerCase()}-${data.court.county.toLowerCase().replace(/\s+/g, "-")}-recordpathai-packet.pdf`;
           document.body.appendChild(link);
