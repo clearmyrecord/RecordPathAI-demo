@@ -10,7 +10,7 @@
     { "id": 1, "name": "generated.current_date", "type": "date", "page": 3, "x": 130, "y": 426, "width": 180, "height": 28 },
     { "id": 2, "name": "petitioner.full_name", "type": "text", "page": 3, "x": 195, "y": 473, "width": 439, "height": 30 },
     { "id": 3, "name": "petitioner.address.line1", "type": "text", "page": 3, "x": 148, "y": 524, "width": 495, "height": 29 },
-    { "id": 4, "name": "petitioner.address.line2", "type": "text", "page": 3, "x": 292, "y": 574, "width": 180, "height": 28 },
+    { "id": 4, "name": "petitioner.address.line2", "type": "text", "page": 3, "x": 292, "y": 568, "width": 180, "height": 28 },
     { "id": 5, "name": "petitioner.address.city", "type": "text", "page": 3, "x": 179, "y": 625, "width": 182, "height": 27 },
     { "id": 6, "name": "petitioner.address.state", "type": "text", "page": 3, "x": 366, "y": 625, "width": 180, "height": 28 },
     { "id": 7, "name": "petitioner.address.zip", "type": "text", "page": 3, "x": 159, "y": 672, "width": 180, "height": 28 },
@@ -24,7 +24,7 @@
     { "id": 11, "name": "petitioner.phone", "type": "text", "page": 4, "x": 120, "y": 321, "width": 227, "height": 26 },
     { "id": 12, "name": "petitioner.email", "type": "text", "page": 4, "x": 99, "y": 348, "width": 243, "height": 23 },
 
-    { "id": 13, "name": "court.case_number", "type": "text", "page": 4, "x": 500, "y": 147, "width": 150, "height": 28 },
+    { "id": 13, "name": "court.case_number", "type": "text", "page": 4, "x": 510, "y": 147, "width": 150, "height": 28 },
     { "id": 14, "name": "court.judge_name", "type": "text", "page": 4, "x": 495, "y": 177, "width": 161, "height": 23 },
 
     { "id": 15, "name": "petitioner.full_name", "type": "text", "page": 4, "x": 111, "y": 393, "width": 183, "height": 28 },
@@ -35,8 +35,7 @@
     { "id": 19, "name": "charges.2.charge_name", "type": "text", "page": 4, "x": 84, "y": 536, "width": 185, "height": 27, "fontSize": 9 },
     { "id": 20, "name": "charges.3.charge_name", "type": "text", "page": 4, "x": 84, "y": 565, "width": 185, "height": 27, "fontSize": 9 },
 
-    { "id": 21, "name": "charges.0.charge_code", "type": "text", "page": 4, "x": 330, "y": 478, "width": 120, "height": 27, "fontSize": 9 },
-    { "id": 22, "name": "charges.1.charge_code", "type": "text", "page": 4, "x": 330, "y": 508, "width": 120, "height": 27, "fontSize": 9 },
+    { "id": 21, "name": "charges.0.charge_code", "type": "text", "page": 4, "x": 350, "y": 478, "width": 105, "height": 27, "fontSize": 9 }    { "id": 22, "name": "charges.1.charge_code", "type": "text", "page": 4, "x": 330, "y": 508, "width": 120, "height": 27, "fontSize": 9 },
     { "id": 23, "name": "charges.2.charge_code", "type": "text", "page": 4, "x": 330, "y": 537, "width": 120, "height": 27, "fontSize": 9 },
     { "id": 24, "name": "charges.3.charge_code", "type": "text", "page": 4, "x": 330, "y": 566, "width": 120, "height": 27, "fontSize": 9 },
 
