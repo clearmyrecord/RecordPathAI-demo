@@ -1067,7 +1067,7 @@ document.addEventListener("DOMContentLoaded", function () {
             department: raw.court?.department || "",
             docket_number: raw.court?.docket_number || first.case_number || "",
             case_number: raw.court?.case_number || first.case_number || "",
-            judge_name: raw.court?.judge_name || "",
+            judge_name: first.judge_name || raw.court?.judge_name || "",
             case_type: "Record Sealing",
             address: {
               line1: "",
