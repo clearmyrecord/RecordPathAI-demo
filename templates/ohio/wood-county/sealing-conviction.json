@@ -35,7 +35,8 @@
     { "id": 19, "name": "charges.2.charge_name", "type": "text", "page": 4, "x": 84, "y": 536, "width": 185, "height": 27, "fontSize": 9 },
     { "id": 20, "name": "charges.3.charge_name", "type": "text", "page": 4, "x": 84, "y": 565, "width": 185, "height": 27, "fontSize": 9 },
 
-    { "id": 21, "name": "charges.0.charge_code", "type": "text", "page": 4, "x": 350, "y": 478, "width": 105, "height": 27, "fontSize": 9 }    { "id": 22, "name": "charges.1.charge_code", "type": "text", "page": 4, "x": 330, "y": 508, "width": 120, "height": 27, "fontSize": 9 },
+    { "id": 21, "name": "charges.0.charge_code", "type": "text", "page": 4, "x": 350, "y": 478, "width": 105, "height": 27, "fontSize": 9 },    
+    { "id": 22, "name": "charges.1.charge_code", "type": "text", "page": 4, "x": 330, "y": 508, "width": 120, "height": 27, "fontSize": 9 },
     { "id": 23, "name": "charges.2.charge_code", "type": "text", "page": 4, "x": 330, "y": 537, "width": 120, "height": 27, "fontSize": 9 },
     { "id": 24, "name": "charges.3.charge_code", "type": "text", "page": 4, "x": 330, "y": 566, "width": 120, "height": 27, "fontSize": 9 },
 
