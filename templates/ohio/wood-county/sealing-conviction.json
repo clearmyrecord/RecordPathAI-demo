@@ -34,7 +34,7 @@
     { "id": 22, "name": "charges.1.charge_code", "type": "text", "page": 4, "x": 330, "y": 508, "width": 166, "height": 27 },
     { "id": 23, "name": "charges.2.charge_code", "type": "text", "page": 4, "x": 330, "y": 537, "width": 165, "height": 27 },
     { "id": 24, "name": "charges.3.charge_code", "type": "text", "page": 4, "x": 330, "y": 566, "width": 164, "height": 27 },
-    { "id": 25, "name": "charges.0.level", "type": "text", "page": 4, "x": 535, "y": 477, "width": 80, "height": 28 }    
+    { "id": 25, "name": "charges.0.level", "type": "text", "page": 4, "x": 535, "y": 477, "width": 80, "height": 28 },    
     { "id": 26, "name": "charges.1.level", "type": "text", "page": 4, "x": 501, "y": 506, "width": 157, "height": 28 },
     { "id": 27, "name": "charges.2.level", "type": "text", "page": 4, "x": 501, "y": 536, "width": 157, "height": 28 },
     { "id": 28, "name": "charges.3.level", "type": "text", "page": 4, "x": 501, "y": 565, "width": 157, "height": 28 },
