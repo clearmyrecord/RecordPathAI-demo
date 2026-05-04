@@ -875,8 +875,8 @@ document.addEventListener("DOMContentLoaded", function () {
   // 🔥 Initialize data bridge FIRST (critical for loading saved data)
  
   // 🔗 Template + PDF sources (cache-busted)
-  const TEMPLATE_JSON_URL = "./templates/ohio/wood-county/sealing-conviction.json?v=6";
-  const SOURCE_PDF_URL = "./assets/wood-county-application-for-sealing-295332-conviction.pdf";
+  const TEMPLATE_REGISTRY_URL = "./templates/index.json";
+  const TEMPLATE_REGISTRY_STORAGE_KEY = "recordpathai-active-template-registry";
 
   // 💳 Local testing flag (no real payment yet)
   const PAYMENT_STORAGE_KEY = "recordPathPaymentComplete";
@@ -908,6 +908,44 @@ document.addEventListener("DOMContentLoaded", function () {
         return map[v] || v;
       }
 
+
+      function dispositionToFormType(value) {
+        const v = String(value || '').toLowerCase();
+        return v.includes('dismiss') ? 'sealing-dismissal' : 'sealing-conviction';
+      }
+
+      async function loadTemplateRegistry() {
+        let base = [];
+        try {
+          const response = await fetch(TEMPLATE_REGISTRY_URL, { cache: 'no-store' });
+          if (response.ok) base = await response.json();
+        } catch {}
+
+        try {
+          const local = JSON.parse(localStorage.getItem(TEMPLATE_REGISTRY_STORAGE_KEY) || '[]');
+          if (Array.isArray(local) && local.length) return local;
+        } catch {}
+
+        return base;
+      }
+
+      function selectTemplateForPacket(data, registry) {
+        const state = normalizeState(data?.court?.state);
+        const county = safe(data?.court?.county).replace(/ county$/i, '').toLowerCase();
+        const courtType = safe(data?.court?.name).toLowerCase().includes('common pleas')
+          ? 'court-of-common-pleas'
+          : 'unknown';
+        const disposition = data?.charges?.[0]?.final_disposition || data?.charges?.[0]?.disposition || '';
+        const formType = dispositionToFormType(disposition);
+
+        return registry.find((template) =>
+          String(template.status).toLowerCase() === 'active' &&
+          normalizeState(template.state) === state &&
+          safe(template.county).replace(/ county$/i, '').toLowerCase() === county &&
+          safe(template.courtType) === courtType &&
+          safe(template.formType) === formType
+        ) || null;
+      }
       function escapeHtml(str) {
         return String(str == null ? "" : str)
           .replaceAll("&", "&amp;")
@@ -1395,28 +1433,33 @@ document.addEventListener("DOMContentLoaded", function () {
         const el = document.getElementById("templateCallout");
 
         try {
-          const map = await fetchJson(TEMPLATE_JSON_URL);
+          const raw = readPacketData();
+          const data = buildNormalizedPacketData(raw);
+          const registry = await loadTemplateRegistry();
+          const selected = selectTemplateForPacket(data, registry);
+          if (!selected) throw new Error("No active template found for this state/county/court/disposition.");
+          const map = await fetchJson(`./${selected.mappingPath}`);
           const fields = normalizeFields(map);
 
           el.className = "callout success";
           el.innerHTML = `
             PDF mapper loaded.<br />
-            Template: <strong>${escapeHtml(map.document || map.templateId || "Ohio sealing conviction")}</strong><br />
-            Mapping JSON: <code>${escapeHtml(TEMPLATE_JSON_URL)}</code><br />
-            Source PDF: <code>${escapeHtml(SOURCE_PDF_URL)}</code><br />
+            Template: <strong>${escapeHtml(map.document || map.templateId || selected.formType)}</strong><br />
+            Mapping JSON: <code>${escapeHtml(selected.mappingPath)}</code><br />
+            Source PDF: <code>${escapeHtml(selected.pdfPath)}</code><br />
+
             Mapped fields: <strong>${fields.length}</strong>
           `;
         } catch (error) {
           el.className = "callout warning";
           el.innerHTML = `
             PDF mapper has not loaded yet.<br />
-            Expected JSON path: <code>${escapeHtml(TEMPLATE_JSON_URL)}</code><br />
+            Manual Filing Required. No active template found for this case.<br />
+            You can still export a data-only PDF summary.<br />
             Error: ${escapeHtml(error.message)}
           `;
         }
 
-        const raw = readPacketData();
-        const data = buildNormalizedPacketData(raw);
         const conflict = document.getElementById("stateConflictCallout");
 
         if (
@@ -1436,9 +1479,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
           if (!window.PDFLib) throw new Error("pdf-lib did not load.");
 
-          const map = await fetchJson(TEMPLATE_JSON_URL);
+          const registry = await loadTemplateRegistry();
+          const selected = selectTemplateForPacket(data, registry);
+          if (!selected) throw new Error("No active template found for this state/county/court/disposition.");
+          const map = await fetchJson(`./${selected.mappingPath}`);
           const fields = normalizeFields(map);
-          const pdfBytes = await fetchPdfBytes(SOURCE_PDF_URL);
+          const pdfBytes = await fetchPdfBytes(`./${selected.pdfPath}`);
           const pdfDoc = await window.PDFLib.PDFDocument.load(pdfBytes);
 
           setStatus(`Test passed. ${fields.length} mapped fields. ${pdfDoc.getPages().length} PDF pages.`);
@@ -1465,9 +1511,16 @@ document.addEventListener("DOMContentLoaded", function () {
             );
           }
 
-          const templateMap = await fetchJson(TEMPLATE_JSON_URL);
+          const selected = selectTemplateForPacket(data, await loadTemplateRegistry());
+          if (!selected) {
+            await exportManualFilingSummaryPdf(data);
+            setStatus("Manual Filing Required. Exported data-only PDF summary.", "error");
+            return;
+          }
+
+          const templateMap = await fetchJson(`./${selected.mappingPath}`);
           const fields = normalizeFields(templateMap);
-          const pdfBytes = await fetchPdfBytes(SOURCE_PDF_URL);
+          const pdfBytes = await fetchPdfBytes(`./${selected.pdfPath}`);
 
           const { PDFDocument, StandardFonts, rgb } = window.PDFLib;
           const pdfDoc = await PDFDocument.load(pdfBytes);
@@ -1599,6 +1652,39 @@ document.addEventListener("DOMContentLoaded", function () {
         }
       }
 
+
+      async function exportManualFilingSummaryPdf(data) {
+        if (!window.PDFLib) throw new Error('pdf-lib failed to load.');
+        const { PDFDocument, StandardFonts } = window.PDFLib;
+        const pdfDoc = await PDFDocument.create();
+        const page = pdfDoc.addPage([612, 792]);
+        const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+        const lines = [
+          'Manual Filing Required',
+          `State: ${data.court.state || ''}`,
+          `County: ${data.court.county || ''}`,
+          `Court: ${data.court.name || ''}`,
+          `Petitioner: ${data.petitioner.full_name || ''}`,
+          `Disposition: ${data.charges?.[0]?.final_disposition || data.charges?.[0]?.disposition || ''}`,
+          `Case Number: ${data.court.case_number || ''}`
+        ];
+        let y = 750;
+        for (const line of lines) {
+          page.drawText(String(line), { x: 48, y, size: 12, font });
+          y -= 24;
+        }
+        const bytes = await pdfDoc.save();
+        const blob = new Blob([bytes], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'manual-filing-required-summary.pdf';
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 5000);
+      }
+
       function formatMb(bytes) {
         return (bytes / (1024 * 1024)).toFixed(2);
       }
@@ -1627,7 +1713,14 @@ document.addEventListener("DOMContentLoaded", function () {
       }
 
       async function openSourcePdf() {
-        window.open(SOURCE_PDF_URL, "_blank");
+        const raw = readPacketData();
+        const data = buildNormalizedPacketData(raw);
+        const selected = selectTemplateForPacket(data, await loadTemplateRegistry());
+        if (!selected) {
+          alert("Manual Filing Required: no template source PDF available.");
+          return;
+        }
+        window.open(`./${selected.pdfPath}`, "_blank");
       }
 
       function handlePaymentToggle() {
@@ -1653,7 +1746,7 @@ document.addEventListener("DOMContentLoaded", function () {
       updateSummary(normalizedData);
       renderAllRecords(normalizedData);
       updateEligibilitySection(normalizedData);
-      updateTemplateCallout();
+      updateTemplateCallout(normalizedData);
 
       const sigInput = document.getElementById("typedSignature");
       if (sigInput) sigInput.value = normalizedData.petitioner.full_name || "";

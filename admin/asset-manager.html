@@ -31,6 +31,8 @@
 
   <script>
     const STORAGE_KEY = 'recordpathai-review-queue-state';
+    const TEMPLATE_REGISTRY_STORAGE_KEY = 'recordpathai-active-template-registry';
+    const TEMPLATE_REGISTRY_URL = '../templates/index.json';
 
     function loadLocalState() {
       try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); }
@@ -57,6 +59,75 @@
       }
     }
 
+
+    function normalizeState(value) {
+      const v = String(value || '').trim().toUpperCase();
+      return v === 'OHIO' ? 'OH' : v;
+    }
+
+    function normalizeCounty(value) {
+      return String(value || '').replace(/ county$/i, '').trim();
+    }
+
+    function inferFormType(item) {
+      const name = `${item.formTitle || ''} ${item.officialListingText || ''}`.toLowerCase();
+      if (name.includes('dismiss')) return 'sealing-dismissal';
+      return 'sealing-conviction';
+    }
+
+    async function loadTemplateRegistry() {
+      let base = [];
+      try {
+        const response = await fetch(TEMPLATE_REGISTRY_URL, { cache: 'no-store' });
+        if (response.ok) base = await response.json();
+      } catch {}
+
+      try {
+        const local = JSON.parse(localStorage.getItem(TEMPLATE_REGISTRY_STORAGE_KEY) || '[]');
+        return Array.isArray(local) ? local : base;
+      } catch {
+        return base;
+      }
+    }
+
+    function saveTemplateRegistry(registry) {
+      localStorage.setItem(TEMPLATE_REGISTRY_STORAGE_KEY, JSON.stringify(registry));
+    }
+
+    async function mappingExists(item) {
+      const formType = inferFormType(item);
+      const mappingPath = `../templates/ohio/${normalizeCounty(item.county).toLowerCase()}-county/${formType}.json`;
+      return localFileExists(mappingPath);
+    }
+
+    async function activateTemplate(item, status) {
+      const approved = status === 'approved';
+      const hasMapping = await mappingExists(item);
+      if (!approved || !hasMapping) return;
+
+      const registry = await loadTemplateRegistry();
+      const entry = {
+        state: normalizeState(item.state),
+        county: normalizeCounty(item.county),
+        courtType: item.courtType,
+        formType: inferFormType(item),
+        pdfPath: item.localPath,
+        mappingPath: `templates/ohio/${normalizeCounty(item.county).toLowerCase()}-county/${inferFormType(item)}.json`,
+        status: 'active'
+      };
+
+      const filtered = registry.filter((tpl) => !(
+        normalizeState(tpl.state) === entry.state &&
+        normalizeCounty(tpl.county).toLowerCase() === entry.county.toLowerCase() &&
+        String(tpl.courtType) === entry.courtType &&
+        String(tpl.formType) === entry.formType
+      ));
+
+      filtered.push(entry);
+      saveTemplateRegistry(filtered);
+      alert('Template activated and added to local active registry.');
+      render();
+    }
     async function render() {
       const response = await fetch('./review-queue.json');
       const queue = await response.json();
@@ -65,11 +136,14 @@
       tbody.innerHTML = '';
 
       const localPathStatus = await Promise.all(queue.map((item) => localFileExists(item.localPath)));
+      const mappingStatus = await Promise.all(queue.map((item) => mappingExists(item)));
 
       queue.forEach((item, idx) => {
         const id = `${item.court}|${item.sourceUrl}|${idx}`;
         const status = state[id] || item.status;
         const hasLocalCopy = localPathStatus[idx];
+        const hasMapping = mappingStatus[idx];
+        const canActivate = status === "approved" && hasMapping;
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td>${item.court}</td>
@@ -90,10 +164,17 @@
             <button data-action="approved">Approve</button>
             <button data-action="rejected">Reject</button>
             <button data-action="needs_mapping">Needs Mapping</button>
+            <button data-action="activate_template">Activate Template</button>
           </td>
         `;
 
         tr.querySelectorAll('button').forEach((button) => {
+          if (button.dataset.action === 'activate_template') {
+            button.disabled = !canActivate;
+            button.title = canActivate ? 'Activate this template' : 'Requires approved status and existing mapping';
+            button.addEventListener('click', () => activateTemplate(item, status));
+            return;
+          }
           button.addEventListener('click', () => setStatus(id, button.dataset.action));
         });
 
