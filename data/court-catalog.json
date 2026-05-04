@@ -1,0 +1,29 @@
+[
+  {
+    "state": "Ohio",
+    "county": "Wood",
+    "courtName": "Wood County Court of Common Pleas",
+    "courtType": "court-of-common-pleas",
+    "website": "https://www.co.wood.oh.us",
+    "formsPage": "https://www.co.wood.oh.us/clerk/forms.html",
+    "status": "active"
+  },
+  {
+    "state": "Ohio",
+    "county": "Franklin",
+    "courtName": "Franklin County Municipal Court",
+    "courtType": "municipal-court",
+    "website": "https://www.fcmcclerk.com",
+    "formsPage": "https://www.fcmcclerk.com/forms",
+    "status": "active"
+  },
+  {
+    "state": "Ohio",
+    "county": "Franklin",
+    "courtName": "Franklin County Court of Common Pleas",
+    "courtType": "court-of-common-pleas",
+    "website": "https://www.franklincountyohio.gov",
+    "formsPage": "https://clerk.franklincountyohio.gov/Forms",
+    "status": "active"
+  }
+]
