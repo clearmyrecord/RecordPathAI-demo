@@ -1,6 +1,7 @@
 import express from "express";
 import Stripe from "stripe";
 import cors from "cors";
+import path from "path";
 
 const app = express();
 const port = process.env.PORT || 8080;
@@ -18,7 +19,7 @@ app.use(cors({
 }));
 
 app.use(express.json());
-app.use(express.static("."));
+app.use(express.static(process.cwd()));
 
 const OFFICIAL_PACKET_HINTS = [
   "application for sealing",
@@ -54,10 +55,7 @@ function getBaseUrl(req) {
   }
 
   const protoHeader = safe(req.headers["x-forwarded-proto"]);
-  const hostHeader =
-    safe(req.headers["x-forwarded-host"]) ||
-    safe(req.get("host"));
-
+  const hostHeader = safe(req.headers["x-forwarded-host"]) || safe(req.get("host"));
   const protocol = protoHeader || req.protocol || "https";
 
   if (!hostHeader) {
@@ -201,14 +199,8 @@ app.post("/api/create-checkout-session", async (req, res) => {
 
     const baseUrl = getBaseUrl(req);
 
-    const finalSuccessUrl =
-      safe(successUrl) ||
-      `${baseUrl}/payment-success.html`;
-
-    const finalCancelUrl =
-      safe(cancelUrl) ||
-      `${baseUrl}/packet.html?payment=cancelled`;
-
+    const finalSuccessUrl = safe(successUrl) || `${baseUrl}/payment-success.html`;
+    const finalCancelUrl = safe(cancelUrl) || `${baseUrl}/packet.html?payment=cancelled`;
     const internalOrderId = `packet_${Date.now()}`;
 
     const session = await stripe.checkout.sessions.create({
@@ -394,6 +386,10 @@ app.get("/api/fetch-pdf", async (req, res) => {
 
     res.status(500).send("Failed to fetch PDF");
   }
+});
+
+app.get("/", (req, res) => {
+  res.sendFile(path.join(process.cwd(), "index.html"));
 });
 
 app.listen(port, () => {
