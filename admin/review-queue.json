@@ -5,7 +5,7 @@
     "state": "Ohio",
     "courtType": "court-of-common-pleas",
     "formTitle": "Application for Sealing 2953.32 (Conviction)",
-    "sourceUrl": "https://clerkofcourt.co.wood.oh.us/wp-content/uploads/2024/02/Application-for-Sealing-2953.32.pdf",
+    "sourceUrl": "https://clerkofcourt.co.wood.oh.us/174/Forms",
     "localPath": "assets/forms/ohio/wood/court-of-common-pleas/application-for-sealing-2953-32-conviction.pdf",
     "status": "pending_review",
     "discoveredAt": "2026-05-04T00:00:00.000Z",
@@ -13,7 +13,10 @@
     "discoveryMethod": "seeded_official_forms",
     "searchQuery": "Wood County Court of Common Pleas record sealing application PDF",
     "templateActivation": "none",
-    "sourcePageUrl": "https://clerkofcourt.co.wood.oh.us/174/Forms"
+    "sourcePageUrl": "https://clerkofcourt.co.wood.oh.us/174/Forms",
+    "pdfAccess": "manual_download_required",
+    "localCopyRequired": true,
+    "officialListingText": "Application for Sealing 2953.32 (Conviction) (PDF)"
   },
   {
     "court": "Franklin County Court of Common Pleas",
