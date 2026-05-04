@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { getDocument } from 'pdfjs-dist/legacy/build/pdf.mjs';
 
 const ROOT = process.cwd();
 const REQUIRED_FIELDS = [
@@ -32,7 +31,21 @@ const formType = args.formType || 'sealing-conviction';
 function slugCounty(value){const slug=value.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,''); return slug.endsWith('-county')?slug:`${slug}-county`;}
 function norm(s){return String(s||'').toLowerCase().replace(/[^a-z0-9]/g,'');}
 
+async function getPdfDocumentLoader() {
+  try {
+    const module = await import('pdfjs-dist/legacy/build/pdf.mjs');
+    return module.getDocument;
+  } catch (error) {
+    if (error && (error.code === 'ERR_MODULE_NOT_FOUND' || String(error.message || '').includes('pdfjs-dist'))) {
+      console.error('Missing pdfjs-dist. Run npm install pdfjs-dist.');
+      process.exit(1);
+    }
+    throw error;
+  }
+}
+
 async function extractTextItems(pdfPath){
+  const getDocument = await getPdfDocumentLoader();
   const data = new Uint8Array(await fs.readFile(pdfPath));
   const loadingTask = getDocument({ data, useSystemFonts: true });
   const pdf = await loadingTask.promise;
