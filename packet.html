@@ -757,25 +757,26 @@
 
             <div class="date-grid">
               <div class="date-box">
-                <p class="date-label">Case State</p>
-                <p class="date-value" id="stateValue">—</p>
+                <p class="date-label">Relief Type</p>
+                <p class="date-value" id="reliefTypeValue">—</p>
               </div>
               <div class="date-box">
-                <p class="date-label">Disposition Date</p>
-                <p class="date-value" id="convictionDateValue">—</p>
+                <p class="date-label">Discharge Date</p>
+                <p class="date-value" id="dischargeDateValue">—</p>
               </div>
               <div class="date-box">
-                <p class="date-label">Case Closed / Discharge</p>
-                <p class="date-value" id="probationCompletedValue">—</p>
+                <p class="date-label">Required Waiting Period</p>
+                <p class="date-value" id="waitingPeriodValue">—</p>
               </div>
               <div class="date-box">
-                <p class="date-label">Estimated Eligible On</p>
+                <p class="date-label">Estimated Eligible Date</p>
                 <p class="date-value" id="eligibleDateValue">—</p>
               </div>
             </div>
 
+            <p class="meta-note" id="eligibilityNowValue"></p>
             <p class="meta-note">
-              This page gives a screening result based on the saved data in your RecordPathAI flow. Final approval depends on the court, the statute, and the full case history.
+              This is a screening result, not legal advice. Final approval depends on the court.
             </p>
           </section>
 
@@ -1559,21 +1560,66 @@ document.addEventListener("DOMContentLoaded", function () {
       }
 
       function updateEligibilitySection(data) {
-        document.getElementById("stateValue").textContent = data.court.state || "—";
-        document.getElementById("convictionDateValue").textContent = formatDateForDisplay(data.charges[0]?.disposition_date);
-        document.getElementById("probationCompletedValue").textContent = formatDateForDisplay(data.charges[0]?.probation_end_date || data.charges[0]?.discharge_date);
-        document.getElementById("eligibleDateValue").textContent = data.eligibility.estimated_eligible_on || "Eligible Now";
+        const charge = data.charges[0] || {};
+        const eligibility = data.eligibility || {};
+
+        const dischargeRaw = charge.probation_end_date || charge.discharge_date || "";
+        const eligibleRaw = eligibility.estimated_eligible_on || charge.waiting_period_end_date || "";
+        const reliefRaw = safe(eligibility.relief_type || eligibility.filing_type || "").toLowerCase();
+        const reliefType = reliefRaw.includes("expung")
+          ? "Ohio expungement"
+          : reliefRaw.includes("seal")
+            ? "Ohio record sealing"
+            : "Needs review";
+
+        const waitingPeriodText = (() => {
+          if (safe(eligibility.required_waiting_period)) return eligibility.required_waiting_period;
+          if (dischargeRaw && eligibleRaw) {
+            const start = new Date(String(dischargeRaw).includes('/') ? dischargeRaw : dischargeRaw + 'T12:00:00');
+            const end = new Date(String(eligibleRaw).includes('/') ? eligibleRaw : eligibleRaw + 'T12:00:00');
+            if (!Number.isNaN(start.getTime()) && !Number.isNaN(end.getTime()) && end >= start) {
+              const years = Math.round(((end - start) / (1000 * 60 * 60 * 24 * 365.25)) * 10) / 10;
+              return years >= 1 ? `${years} year${years === 1 ? '' : 's'}` : 'Less than 1 year';
+            }
+          }
+          return "Needs review";
+        })();
+
+        document.getElementById("reliefTypeValue").textContent = reliefType;
+        document.getElementById("dischargeDateValue").textContent = formatDateForDisplay(dischargeRaw);
+        document.getElementById("waitingPeriodValue").textContent = waitingPeriodText;
+        document.getElementById("eligibleDateValue").textContent = formatDateForDisplay(eligibleRaw);
+
+        const nowEl = document.getElementById("eligibilityNowValue");
+        const eligibleDateObj = eligibleRaw ? new Date(String(eligibleRaw).includes('/') ? eligibleRaw : eligibleRaw + 'T12:00:00') : null;
+        const today = new Date();
+        nowEl.textContent = eligibleDateObj && !Number.isNaN(eligibleDateObj.getTime()) && today >= eligibleDateObj
+          ? "Eligible now"
+          : "";
 
         const pill = document.getElementById("statusPill");
         const headline = document.getElementById("eligibilityHeadline");
         const summary = document.getElementById("eligibilitySummary");
         const reasonList = document.getElementById("eligibilityReasons");
 
-        pill.className = "status-pill eligible";
-        pill.textContent = data.eligibility.eligibility_status || "Likely Eligible";
-        headline.textContent = `This ${data.court.state || "case"} appears likely eligible.`;
-        summary.textContent = data.eligibility.eligibility_reason || "The saved case data indicates the waiting period appears satisfied.";
-        reasonList.innerHTML = `<li>${escapeHtml("This screening is based on the data currently saved in RecordPathAI.")}</li>`;
+        const isEligible = Boolean(eligibility.is_eligible) || nowEl.textContent === "Eligible now";
+        pill.className = `status-pill ${isEligible ? "eligible" : "review"}`;
+        pill.textContent = isEligible ? "Likely Eligible" : "Eligibility Needs Review";
+        headline.textContent = `Screening result for ${data.court.state || "this"} case`;
+        summary.textContent = eligibility.eligibility_reason || "Review the checklist below before filing.";
+
+        const flags = [
+          ["Pending charges", Boolean(eligibility.has_pending_cases || charge.pending_charges)],
+          ["Traffic offense", /traffic/i.test(safe(charge.charge_name) + " " + safe(charge.charge_code))],
+          ["1st/2nd degree felony", /f[12]\b|felony\s*(1|2|first|second)/i.test(safe(charge.level || charge.offense_classification))],
+          ["3+ F3 felonies", Number(charge.f3_felony_count || eligibility.f3_felony_count || 0) >= 3],
+          ["domestic violence", /domestic\s+violence/i.test(safe(charge.charge_name))],
+          ["sex offense registry", Boolean(charge.sex_offense_registry || eligibility.sex_offense_registry)],
+          ["victim under 13", Boolean(charge.victim_under_13 || eligibility.victim_under_13)],
+          ["felony violence offense", Boolean(charge.felony_violence_offense || eligibility.felony_violence_offense)]
+        ];
+
+        reasonList.innerHTML = flags.map(([label, flagged]) => `<li>${escapeHtml(label)}: <strong>${flagged ? "Yes" : "No"}</strong></li>`).join("");
       }
 
       async function updateTemplateCallout() {
