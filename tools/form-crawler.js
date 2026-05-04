@@ -85,6 +85,7 @@ function buildMetadata(court, candidate, scored, pdfAccess, localPath = '') {
 
   const dedupe = new Set(existingQueue.map((q) => `${q.sourceUrl}|${q.localPath}`));
   const queue = [...existingQueue];
+  const discoveredInRun = [];
 
   for (const court of courts) {
     console.log(`Scanning: ${court.courtName}`);
@@ -129,8 +130,11 @@ function buildMetadata(court, candidate, scored, pdfAccess, localPath = '') {
     const metadata = buildMetadata(court, best.candidate, best.scored, pdfAccess, localPath);
     const key = `${metadata.sourceUrl}|${metadata.localPath}`;
     if (!dedupe.has(key)) {
-      queue.push(metadata);
-      dedupe.add(key);
+      discoveredInRun.push(metadata);
+      if (!DRY_RUN) {
+        queue.push(metadata);
+        dedupe.add(key);
+      }
     }
 
     if (!DRY_RUN && pdfAccess === 'downloaded') {
@@ -142,6 +146,10 @@ function buildMetadata(court, candidate, scored, pdfAccess, localPath = '') {
     console.log(`Candidate: ${metadata.sourceUrl} [score=${metadata.score}] [access=${metadata.pdfAccess}]`);
   }
 
-  await fs.writeFile(REVIEW_QUEUE_PATH, JSON.stringify(queue, null, 2) + '\n');
-  console.log(`Done (${DRY_RUN ? 'dry-run' : 'apply'}). Updated admin/review-queue.json`);
+  if (!DRY_RUN) {
+    await fs.writeFile(REVIEW_QUEUE_PATH, JSON.stringify(queue, null, 2) + '\n');
+    console.log(`Done (apply). Updated admin/review-queue.json with ${discoveredInRun.length} discovered items.`);
+  } else {
+    console.log(`Done (dry-run). Discovered ${discoveredInRun.length} candidate(s). No files were written.`);
+  }
 })();
