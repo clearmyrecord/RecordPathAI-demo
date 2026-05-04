@@ -1,6 +1,6 @@
 {
   "version": 6,
-  "exportedAt": "2026-05-04T06:22:18.031Z",
+  "exportedAt": "2026-05-04T06:49:31.125Z",
   "document": "Application for Sealing 2953.32 (Conviction).pdf",
   "pageCount": 4,
   "mappings": [
@@ -302,7 +302,7 @@
       "name": "charges.0.discharge_date",
       "type": "date",
       "page": 4,
-      "x": 140,
+      "x": 163,
       "y": 623,
       "width": 210,
       "height": 20
