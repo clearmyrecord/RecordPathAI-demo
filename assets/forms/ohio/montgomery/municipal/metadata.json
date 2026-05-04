@@ -1,0 +1,27 @@
+{
+  "state": "OH",
+  "county": "Montgomery",
+  "countySlug": "montgomery",
+  "courtName": "Montgomery County Municipal Court",
+  "courtType": "municipal",
+  "formType": "sealing-conviction",
+  "sourceUrl": "https://mcclerkofcourts.org/Forms/Municipal/Western/MuniFormWestern_Application_Sealing_Conviction.pdf",
+  "sourcePageUrl": "https://mcclerkofcourts.org/Forms/Municipal/Western/MuniFormWestern_Application_Sealing_Conviction.pdf",
+  "localPath": "assets/forms/ohio/montgomery/municipal/sealing-conviction.pdf",
+  "pdfAccess": "downloaded",
+  "status": "pending_review",
+  "requiresMapping": true,
+  "mapped": false,
+  "active": false,
+  "discoveredAt": "2026-05-04T16:26:39.627Z",
+  "lastVerified": "2026-05-04T16:26:39.627Z",
+  "score": 84,
+  "signals": [
+    "official-domain-signal",
+    "direct-pdf",
+    "county-match",
+    "court-type-match",
+    "keyword:application for sealing",
+    "keyword:conviction"
+  ]
+}

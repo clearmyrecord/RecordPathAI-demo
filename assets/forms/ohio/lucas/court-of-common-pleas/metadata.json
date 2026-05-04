@@ -1,0 +1,26 @@
+{
+  "state": "OH",
+  "county": "Lucas",
+  "countySlug": "lucas",
+  "courtName": "Lucas County Court of Common Pleas",
+  "courtType": "court-of-common-pleas",
+  "formType": "sealing-conviction",
+  "sourceUrl": "https://www.tmc-clerk.com/media/2168/pro-se-motion-to-seal-record-of-conviction.pdf",
+  "sourcePageUrl": "https://www.tmc-clerk.com/media/2168/pro-se-motion-to-seal-record-of-conviction.pdf",
+  "localPath": "assets/forms/ohio/lucas/court-of-common-pleas/sealing-conviction.pdf",
+  "pdfAccess": "downloaded",
+  "status": "pending_review",
+  "requiresMapping": true,
+  "mapped": false,
+  "active": false,
+  "discoveredAt": "2026-05-04T16:26:37.968Z",
+  "lastVerified": "2026-05-04T16:26:37.968Z",
+  "score": 76,
+  "signals": [
+    "official-domain-signal",
+    "direct-pdf",
+    "county-match",
+    "keyword:2953.32",
+    "keyword:conviction"
+  ]
+}

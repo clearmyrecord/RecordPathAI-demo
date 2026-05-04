@@ -1,0 +1,28 @@
+{
+  "state": "OH",
+  "county": "Cuyahoga",
+  "countySlug": "cuyahoga",
+  "courtName": "Cuyahoga County Court of Common Pleas",
+  "courtType": "court-of-common-pleas",
+  "formType": "sealing-conviction",
+  "sourceUrl": "https://publicdefender.cuyahogacounty.gov/docs/default-source/forms/proserecordsealingapplication.pdf?sfvrsn=30a6c118_3",
+  "sourcePageUrl": "https://publicdefender.cuyahogacounty.gov/docs/default-source/forms/proserecordsealingapplication.pdf?sfvrsn=30a6c118_3",
+  "localPath": "assets/forms/ohio/cuyahoga/court-of-common-pleas/sealing-conviction.pdf",
+  "pdfAccess": "downloaded",
+  "status": "pending_review",
+  "requiresMapping": true,
+  "mapped": false,
+  "active": false,
+  "discoveredAt": "2026-05-04T16:26:35.117Z",
+  "lastVerified": "2026-05-04T16:26:35.118Z",
+  "score": 82,
+  "signals": [
+    "official-domain-signal",
+    "direct-pdf",
+    "county-match",
+    "keyword:record sealing",
+    "keyword:application to seal",
+    "keyword:2953.32",
+    "keyword:conviction"
+  ]
+}

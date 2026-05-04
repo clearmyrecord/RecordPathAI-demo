@@ -1,0 +1,28 @@
+{
+  "state": "OH",
+  "county": "Cuyahoga",
+  "countySlug": "cuyahoga",
+  "courtName": "Cuyahoga County Municipal Court",
+  "courtType": "municipal",
+  "formType": "sealing-conviction",
+  "sourceUrl": "https://publicdefender.cuyahogacounty.gov/docs/default-source/forms/proserecordsealingapplication.pdf?sfvrsn=30a6c118_3",
+  "sourcePageUrl": "https://publicdefender.cuyahogacounty.gov/docs/default-source/forms/proserecordsealingapplication.pdf?sfvrsn=30a6c118_3",
+  "localPath": "assets/forms/ohio/cuyahoga/municipal/sealing-conviction.pdf",
+  "pdfAccess": "downloaded",
+  "status": "pending_review",
+  "requiresMapping": true,
+  "mapped": false,
+  "active": false,
+  "discoveredAt": "2026-05-04T16:26:35.424Z",
+  "lastVerified": "2026-05-04T16:26:35.424Z",
+  "score": 82,
+  "signals": [
+    "official-domain-signal",
+    "direct-pdf",
+    "county-match",
+    "keyword:record sealing",
+    "keyword:application to seal",
+    "keyword:2953.32",
+    "keyword:conviction"
+  ]
+}

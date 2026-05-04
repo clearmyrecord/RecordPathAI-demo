@@ -1,0 +1,26 @@
+{
+  "state": "OH",
+  "county": "Wood",
+  "countySlug": "wood",
+  "courtName": "Wood County Court of Common Pleas",
+  "courtType": "court-of-common-pleas",
+  "formType": "expungement",
+  "sourceUrl": "https://www.supremecourt.ohio.gov/Clerk/Local%20Rules/woodCoGd.pdf",
+  "sourcePageUrl": "https://www.supremecourt.ohio.gov/Clerk/Local%20Rules/woodCoGd.pdf",
+  "localPath": "assets/forms/ohio/wood/court-of-common-pleas/expungement.pdf",
+  "pdfAccess": "downloaded",
+  "status": "pending_review",
+  "requiresMapping": true,
+  "mapped": false,
+  "active": false,
+  "discoveredAt": "2026-05-04T16:26:43.174Z",
+  "lastVerified": "2026-05-04T16:26:43.174Z",
+  "score": 76,
+  "signals": [
+    "official-domain-signal",
+    "direct-pdf",
+    "county-match",
+    "keyword:expungement",
+    "keyword:application for sealing"
+  ]
+}

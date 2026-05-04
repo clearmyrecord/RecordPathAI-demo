@@ -1,0 +1,27 @@
+{
+  "state": "OH",
+  "county": "Hamilton",
+  "countySlug": "hamilton",
+  "courtName": "Hamilton County Court of Common Pleas",
+  "courtType": "court-of-common-pleas",
+  "formType": "sealing-conviction",
+  "sourceUrl": "https://www.courtclerk.org/forms/MuniSealExp_wInstructions.pdf",
+  "sourcePageUrl": "https://www.courtclerk.org/forms/MuniSealExp_wInstructions.pdf",
+  "localPath": "assets/forms/ohio/hamilton/court-of-common-pleas/sealing-conviction.pdf",
+  "pdfAccess": "downloaded",
+  "status": "pending_review",
+  "requiresMapping": true,
+  "mapped": false,
+  "active": false,
+  "discoveredAt": "2026-05-04T16:26:36.814Z",
+  "lastVerified": "2026-05-04T16:26:36.814Z",
+  "score": 79,
+  "signals": [
+    "official-domain-signal",
+    "direct-pdf",
+    "county-match",
+    "keyword:dismissal",
+    "keyword:no bill",
+    "keyword:conviction"
+  ]
+}

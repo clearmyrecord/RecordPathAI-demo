@@ -1,0 +1,27 @@
+{
+  "state": "OH",
+  "county": "Summit",
+  "countySlug": "summit",
+  "courtName": "Summit County Municipal Court",
+  "courtType": "municipal",
+  "formType": "sealing-conviction",
+  "sourceUrl": "https://www.akronmunicipalcourt.org/media/1219/sealing-dismissal-packet.pdf",
+  "sourcePageUrl": "https://www.akronmunicipalcourt.org/media/1219/sealing-dismissal-packet.pdf",
+  "localPath": "assets/forms/ohio/summit/municipal/sealing-conviction.pdf",
+  "pdfAccess": "downloaded",
+  "status": "pending_review",
+  "requiresMapping": true,
+  "mapped": false,
+  "active": false,
+  "discoveredAt": "2026-05-04T16:26:41.957Z",
+  "lastVerified": "2026-05-04T16:26:41.957Z",
+  "score": 77,
+  "signals": [
+    "official-domain-signal",
+    "direct-pdf",
+    "court-type-match",
+    "keyword:record sealing",
+    "keyword:dismissal",
+    "keyword:conviction"
+  ]
+}

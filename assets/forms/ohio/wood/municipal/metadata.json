@@ -1,0 +1,28 @@
+{
+  "state": "OH",
+  "county": "Wood",
+  "countySlug": "wood",
+  "courtName": "Wood County Municipal Court",
+  "courtType": "municipal",
+  "formType": "sealing-conviction",
+  "sourceUrl": "https://www.courtclerk.org/forms/Municipal%20Expungement%20Application%20Conviction.pdf",
+  "sourcePageUrl": "https://www.courtclerk.org/forms/Municipal%20Expungement%20Application%20Conviction.pdf",
+  "localPath": "assets/forms/ohio/wood/municipal/sealing-conviction.pdf",
+  "pdfAccess": "downloaded",
+  "status": "pending_review",
+  "requiresMapping": true,
+  "mapped": false,
+  "active": false,
+  "discoveredAt": "2026-05-04T16:26:43.345Z",
+  "lastVerified": "2026-05-04T16:26:43.345Z",
+  "score": 80,
+  "signals": [
+    "official-domain-signal",
+    "direct-pdf",
+    "court-type-match",
+    "keyword:expungement",
+    "keyword:application to seal",
+    "keyword:2953.32",
+    "keyword:conviction"
+  ]
+}

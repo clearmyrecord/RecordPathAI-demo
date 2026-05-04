@@ -1,0 +1,27 @@
+{
+  "state": "OH",
+  "county": "Hamilton",
+  "countySlug": "hamilton",
+  "courtName": "Hamilton County Municipal Court",
+  "courtType": "municipal",
+  "formType": "sealing-conviction",
+  "sourceUrl": "https://www.courtclerk.org/forms/Municipal%20Expungement%20Application%20Conviction.pdf",
+  "sourcePageUrl": "https://www.courtclerk.org/forms/Municipal%20Expungement%20Application%20Conviction.pdf",
+  "localPath": "assets/forms/ohio/hamilton/municipal/sealing-conviction.pdf",
+  "pdfAccess": "downloaded",
+  "status": "pending_review",
+  "requiresMapping": true,
+  "mapped": false,
+  "active": false,
+  "discoveredAt": "2026-05-04T16:26:37.278Z",
+  "lastVerified": "2026-05-04T16:26:37.278Z",
+  "score": 84,
+  "signals": [
+    "official-domain-signal",
+    "direct-pdf",
+    "county-match",
+    "court-type-match",
+    "keyword:expungement",
+    "keyword:conviction"
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "state": "OH",
+  "county": "Franklin",
+  "countySlug": "franklin",
+  "courtName": "Franklin County Municipal Court",
+  "courtType": "municipal",
+  "formType": "sealing-dismissal",
+  "sourceUrl": "https://www.franklincountymunicourt.org/files/sharedassets/municourt/v/1/documents/court-forms/record-sealing-and-expungement/franklin-county-common-pleas-sealing-application-for-dismissal-finding-of-not-guilty-or-no-bill.pdf",
+  "sourcePageUrl": "https://www.franklincountymunicourt.org/files/sharedassets/municourt/v/1/documents/court-forms/record-sealing-and-expungement/franklin-county-common-pleas-sealing-application-for-dismissal-finding-of-not-guilty-or-no-bill.pdf",
+  "localPath": "assets/forms/ohio/franklin/municipal/sealing-dismissal.pdf",
+  "pdfAccess": "downloaded",
+  "status": "pending_review",
+  "requiresMapping": true,
+  "mapped": false,
+  "active": false,
+  "discoveredAt": "2026-05-04T16:26:36.040Z",
+  "lastVerified": "2026-05-04T16:26:36.040Z",
+  "score": 90,
+  "signals": [
+    "official-domain-signal",
+    "direct-pdf",
+    "county-match",
+    "court-type-match",
+    "keyword:expungement",
+    "keyword:dismissal",
+    "keyword:no bill",
+    "keyword:not guilty"
+  ]
+}

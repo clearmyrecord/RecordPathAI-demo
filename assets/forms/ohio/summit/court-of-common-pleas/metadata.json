@@ -1,0 +1,28 @@
+{
+  "state": "OH",
+  "county": "Summit",
+  "countySlug": "summit",
+  "courtName": "Summit County Court of Common Pleas",
+  "courtType": "court-of-common-pleas",
+  "formType": "sealing-conviction",
+  "sourceUrl": "https://www.supremecourt.ohio.gov/docs/Boards/Sentencing/resources/judPractitioner/adultRightsRestoration.pdf",
+  "sourcePageUrl": "https://www.supremecourt.ohio.gov/docs/Boards/Sentencing/resources/judPractitioner/adultRightsRestoration.pdf",
+  "localPath": "assets/forms/ohio/summit/court-of-common-pleas/sealing-conviction.pdf",
+  "pdfAccess": "downloaded",
+  "status": "pending_review",
+  "requiresMapping": true,
+  "mapped": false,
+  "active": false,
+  "discoveredAt": "2026-05-04T16:26:40.516Z",
+  "lastVerified": "2026-05-04T16:26:40.516Z",
+  "score": 75,
+  "signals": [
+    "official-domain-signal",
+    "direct-pdf",
+    "keyword:record sealing",
+    "keyword:dismissal",
+    "keyword:no bill",
+    "keyword:not guilty",
+    "keyword:conviction"
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "state": "OH",
+  "county": "Montgomery",
+  "countySlug": "montgomery",
+  "courtName": "Montgomery County Court of Common Pleas",
+  "courtType": "court-of-common-pleas",
+  "formType": "sealing-conviction",
+  "sourceUrl": "https://mcclerkofcourts.org/Forms/Criminal/Application%20for%20Sealing%20of%20Misdemeanor_Record.pdf",
+  "sourcePageUrl": "https://mcclerkofcourts.org/Forms/Criminal/Application%20for%20Sealing%20of%20Misdemeanor_Record.pdf",
+  "localPath": "assets/forms/ohio/montgomery/court-of-common-pleas/sealing-conviction.pdf",
+  "pdfAccess": "downloaded",
+  "status": "pending_review",
+  "requiresMapping": true,
+  "mapped": false,
+  "active": false,
+  "discoveredAt": "2026-05-04T16:26:39.217Z",
+  "lastVerified": "2026-05-04T16:26:39.217Z",
+  "score": 79,
+  "signals": [
+    "official-domain-signal",
+    "direct-pdf",
+    "county-match",
+    "keyword:application for sealing",
+    "keyword:2953.32",
+    "keyword:conviction"
+  ]
+}
