@@ -1585,7 +1585,7 @@ document.addEventListener("DOMContentLoaded", function () {
           const registry = await loadTemplateRegistry();
           const selected = selectTemplateForPacket(data, registry);
           if (!selected) throw new Error("No active template found for this state/county/court/disposition.");
-          const map = await fetchJson(`./${selected.mappingPath}`);
+          const mappingResponse = await fetch(`./${selected.mappingPath}?v=${Date.now()}`);
           const fields = normalizeFields(map);
 
           el.className = "callout success";
