@@ -20,6 +20,7 @@ const FORM_KEYWORDS = [
 ];
 const ALLOWED_SOURCE_TOKENS = ['.gov', '.us', 'clerk', 'court', 'municipal', 'commonpleas', 'county'];
 const DRY_RUN = !process.argv.includes('--apply');
+const SERPAPI_KEY = process.env.SERPAPI_KEY;
 
 async function readJson(filePath, fallback) {
   try {
@@ -79,12 +80,81 @@ function discoverPdfLinks(html, baseUrl) {
     if (looksLikePdf && relevant && officialSource(url)) {
       links.push({
         sourceUrl: url,
-        formTitle: text || path.basename(new URL(url).pathname)
+        formTitle: text || path.basename(new URL(url).pathname),
+        discoveryMethod: 'formsPage'
       });
     }
   }
 
   return links;
+}
+
+
+function buildSerpQueries(court) {
+  return [
+    `${court.courtName} record sealing application PDF`,
+    `${court.courtName} expungement application PDF`,
+    `${court.courtName} application to seal record 2953.32 PDF`,
+    `${court.county} County Ohio clerk sealing records PDF`
+  ];
+}
+
+function normalizeDiscovery(item, fallbackTitle = '') {
+  const title = (item.title || fallbackTitle || '').trim();
+  const sourceUrl = (item.link || item.sourceUrl || '').trim();
+  if (!sourceUrl) return null;
+  const relevant = keywordMatch(`${title} ${sourceUrl}`);
+  const looksLikePdf = sourceUrl.toLowerCase().includes('.pdf');
+  if (!relevant || !looksLikePdf || !officialSource(sourceUrl)) return null;
+  return {
+    sourceUrl,
+    formTitle: title || path.basename(new URL(sourceUrl).pathname)
+  };
+}
+
+async function searchSerpApi(query) {
+  if (!SERPAPI_KEY) {
+    return [];
+  }
+
+  const searchUrl = new URL('https://serpapi.com/search.json');
+  searchUrl.searchParams.set('engine', 'google');
+  searchUrl.searchParams.set('q', query);
+  searchUrl.searchParams.set('api_key', SERPAPI_KEY);
+
+  const response = await fetch(searchUrl, { headers: { 'user-agent': 'RecordPathAI Form Crawler/1.0' } });
+  if (!response.ok) {
+    throw new Error(`SerpAPI request failed for "${query}": ${response.status}`);
+  }
+
+  const payload = await response.json();
+  const candidates = [
+    ...(payload.organic_results || []),
+    ...(payload.inline_videos || []),
+    ...(payload.related_results || [])
+  ];
+
+  return candidates
+    .map((candidate) => normalizeDiscovery(candidate, query))
+    .filter(Boolean);
+}
+
+async function discoverWithSerpApi(court) {
+  const queries = buildSerpQueries(court);
+  const discovered = [];
+
+  for (const query of queries) {
+    try {
+      const results = await searchSerpApi(query);
+      for (const result of results) {
+        discovered.push({ ...result, discoveryMethod: 'serpapi', searchQuery: query });
+      }
+    } catch (error) {
+      console.warn(`SerpAPI search failed for ${court.courtName} query "${query}": ${error.message}`);
+    }
+  }
+
+  return discovered;
 }
 
 async function saveFile(url, outPath) {
@@ -100,6 +170,9 @@ async function main() {
   const queue = [...existingQueue];
 
   console.log(`Form crawler running in ${DRY_RUN ? 'dry-run' : 'apply'} mode.`);
+  if (!SERPAPI_KEY) {
+    console.log('SERPAPI_KEY not set; SerpAPI fallback is disabled.');
+  }
 
   for (const court of courts) {
     if (court.status !== 'active') continue;
@@ -108,7 +181,12 @@ async function main() {
 
     try {
       const html = await fetchHtml(court.formsPage);
-      const found = discoverPdfLinks(html, court.formsPage);
+      let found = discoverPdfLinks(html, court.formsPage);
+
+      if (!found.length) {
+        console.log(`No form PDFs found on forms page for ${court.courtName}; trying SerpAPI fallback.`);
+        found = await discoverWithSerpApi(court);
+      }
 
       for (const item of found) {
         const stateSlug = slugify(court.state);
@@ -129,7 +207,9 @@ async function main() {
           localPath: path.relative(repoRoot, pdfPath),
           status: 'pending_review',
           discoveredAt: new Date().toISOString(),
-          requiresMapping: true
+          requiresMapping: true,
+          discoveryMethod: item.discoveryMethod || 'formsPage',
+          searchQuery: item.searchQuery || null
         };
 
         const duplicate = queue.some((existing) => existing.sourceUrl === queueItem.sourceUrl && existing.court === queueItem.court);
