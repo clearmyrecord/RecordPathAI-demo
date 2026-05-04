@@ -87,10 +87,10 @@
       "type": "text",
       "placeholder": "",
       "page": 4,
-      "x": 508,
-      "y": 149,
-      "width": 143,
-      "height": 25
+      "x": 472,
+      "y": 150,
+      "width": 178,
+      "height": 22
     },
     {
       "id": 9,
@@ -98,10 +98,10 @@
       "type": "text",
       "placeholder": "",
       "page": 4,
-      "x": 490,
-      "y": 174,
-      "width": 160,
-      "height": 25
+      "x": 472,
+      "y": 178,
+      "width": 178,
+      "height": 22
     },
     {
       "id": 10,

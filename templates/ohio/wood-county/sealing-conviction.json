@@ -129,10 +129,10 @@
       "name": "court.case_number",
       "type": "text",
       "page": 4,
-      "x": 498,
-      "y": 148,
-      "width": 143,
-      "height": 25,
+      "x": 472,
+      "y": 150,
+      "width": 178,
+      "height": 22,
       "fontSize": 9
     },
     {
@@ -140,9 +140,9 @@
       "name": "court.judge_name",
       "type": "text",
       "page": 4,
-      "x": 585,
-      "y": 160,
-      "width": 150,
+      "x": 472,
+      "y": 178,
+      "width": 178,
       "height": 22,
       "fontSize": 9
     },
