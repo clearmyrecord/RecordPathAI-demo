@@ -1429,12 +1429,10 @@ document.addEventListener("DOMContentLoaded", function () {
         reasonList.innerHTML = `<li>${escapeHtml("This screening is based on the data currently saved in RecordPathAI.")}</li>`;
       }
 
-      async function updateTemplateCallout(data) {
+      async function updateTemplateCallout() {
         const el = document.getElementById("templateCallout");
 
         try {
-          const raw = readPacketData();
-          const data = buildNormalizedPacketData(raw);
           const raw = readPacketData();
           const data = buildNormalizedPacketData(raw);
           const registry = await loadTemplateRegistry();
