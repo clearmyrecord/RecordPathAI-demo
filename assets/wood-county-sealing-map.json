@@ -82,27 +82,25 @@
       "height": 31
     },
     {
-      "id": 8,
-      "name": "court.case_number",
-      "type": "text",
-      "placeholder": "",
-      "page": 4,
-      "x": 472,
-      "y": 150,
-      "width": 178,
-      "height": 22
-    },
+  "name": "court.case_number",
+  "type": "text",
+  "page": 4,
+  "x": 510,
+  "y": 158,
+  "width": 150,
+  "height": 22,
+  "fontSize": 9
+},
     {
-      "id": 9,
-      "name": "court.judge_name",
-      "type": "text",
-      "placeholder": "",
-      "page": 4,
-      "x": 472,
-      "y": 178,
-      "width": 178,
-      "height": 22
-    },
+  "name": "court.judge_name",
+  "type": "text",
+  "page": 4,
+  "x": 510,
+  "y": 186,
+  "width": 150,
+  "height": 22,
+  "fontSize": 9
+},
     {
       "id": 10,
       "name": "petitioner.full_name",
