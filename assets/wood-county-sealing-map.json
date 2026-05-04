@@ -1,6 +1,6 @@
 {
   "version": 5,
-  "exportedAt": "2026-05-04T10:53:53.803Z",
+  "exportedAt": "2026-05-04T11:18:08.350Z",
   "document": "Application for Sealing 2953.32 (Conviction).pdf",
   "pageCount": 4,
   "mappings": [
@@ -93,13 +93,15 @@
       "height": 25
     },
     {
+      "id": 9,
       "name": "judge_name",
       "type": "text",
+      "placeholder": "",
       "page": 4,
-      "x": 585,
-      "y": 160,
-      "width": 150,
-      "height": 22
+      "x": 515,
+      "y": 175,
+      "width": 180,
+      "height": 25
     },
     {
       "id": 10,
