@@ -1028,5 +1028,46 @@
       RecordPathDataBridge.initPage(document);
     });
   </script>
+  <script>
+document.addEventListener("DOMContentLoaded", function () {
+  const caseStateField = document.querySelector("#caseState, #state");
+
+  if (caseStateField) {
+    caseStateField.value = localStorage.getItem("caseState") || "Ohio";
+  }
+
+  const savedFields = [
+    "fullName",
+    "email",
+    "caseState",
+    "state",
+    "caseType",
+    "yearsSinceCaseClosed"
+  ];
+
+  savedFields.forEach(key => {
+    const field = document.getElementById(key);
+    const savedValue = localStorage.getItem(key);
+
+    if (field && savedValue) {
+      field.value = savedValue;
+    }
+  });
+});
+
+function continueToPacket() {
+  const fields = document.querySelectorAll("input, select, textarea");
+
+  fields.forEach(field => {
+    if (field.id) {
+      localStorage.setItem(field.id, field.value);
+    }
+  });
+
+  localStorage.setItem("caseState", "Ohio");
+
+  window.location.href = "packet.html";
+}
+</script>
 </body>
 </html>
