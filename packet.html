@@ -182,6 +182,44 @@
       padding: 30px;
     }
 
+
+
+    .instructions-grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .instruction-block h3 {
+      margin: 0 0 8px;
+      font-size: 16px;
+      color: #2f4674;
+    }
+
+    .instruction-block p,
+    .instruction-block li {
+      color: #4e607f;
+      line-height: 1.6;
+      font-size: 15px;
+    }
+
+    .filing-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .filing-badge {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 7px 12px;
+      background: var(--blue-soft);
+      color: var(--blue-dark);
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: capitalize;
+    }
+
     .section-title {
       margin: 0 0 18px;
       color: var(--text);
@@ -818,6 +856,13 @@
   and does not offer legal advice. All sales are final.
 </p>
             
+            <div id="courtInstructionsCard" class="status-banner" style="margin-top:18px;">
+              <h3 style="margin:0 0 14px; font-size:22px; letter-spacing:-0.01em;">How to File Your Packet</h3>
+              <div id="courtInstructionsContent" class="instructions-grid">
+                <p class="status-copy" style="margin:0; font-size:16px;">Loading filing instructions...</p>
+              </div>
+            </div>
+
             <div class="button-stack">
               <button type="button" class="packet-btn packet-btn-primary" id="generateSealingBtn" disabled>
                 Generate PDF Packet
@@ -929,6 +974,75 @@ document.addEventListener("DOMContentLoaded", function () {
       }
 
 
+      const COURT_INSTRUCTIONS_URL = "./data/court-instructions.json";
+
+      function normalizeCounty(value) {
+        return safe(value).replace(/ county$/i, '').trim().toLowerCase();
+      }
+
+      function deriveCourtType(courtName) {
+        return safe(courtName).toLowerCase().includes('common pleas')
+          ? 'court-of-common-pleas'
+          : 'unknown';
+      }
+
+      async function getInstructions(state, county, courtType) {
+        try {
+          const response = await fetch(COURT_INSTRUCTIONS_URL, { cache: 'no-store' });
+          if (!response.ok) return null;
+          const all = await response.json();
+          if (!Array.isArray(all)) return null;
+
+          return all.find((entry) =>
+            normalizeState(entry.state) === normalizeState(state) &&
+            normalizeCounty(entry.county) === normalizeCounty(county) &&
+            safe(entry.courtType).toLowerCase() === safe(courtType).toLowerCase()
+          ) || null;
+        } catch {
+          return null;
+        }
+      }
+
+      function renderCourtInstructionsContent(match) {
+        const content = document.getElementById('courtInstructionsContent');
+        if (!content) return;
+
+        if (!match || !match.instructions) {
+          content.innerHTML = '<p class="status-copy" style="margin:0; font-size:16px;">This court requires manual filing. Contact the clerk for instructions.</p>';
+          return;
+        }
+
+        const instructions = match.instructions;
+        const methods = Array.isArray(instructions.filingMethods) ? instructions.filingMethods : [];
+        const forms = Array.isArray(instructions.formsRequired) ? instructions.formsRequired : [];
+        const steps = Array.isArray(instructions.steps) ? instructions.steps : [];
+        const notes = Array.isArray(instructions.notes) ? instructions.notes : [];
+        const methodLabel = (m) => safe(m).replaceAll('_', ' ');
+
+        content.innerHTML = `
+          <div class="instruction-block">
+            <h3>Filing Method</h3>
+            <div class="filing-badges">
+              ${methods.map((m) => `<span class="filing-badge">${escapeHtml(methodLabel(m))}</span>`).join('') || '<span class="filing-badge">Manual filing</span>'}
+            </div>
+          </div>
+          <div class="instruction-block"><h3>Address</h3><p>${escapeHtml(safe(instructions.address, 'Contact clerk'))}</p></div>
+          <div class="instruction-block"><h3>Filing Fee</h3><p>${escapeHtml(safe(instructions.filingFee, 'Verify with clerk'))}</p></div>
+          <div class="instruction-block"><h3>Required Forms</h3><ul>${forms.map((f) => `<li>${escapeHtml(f)}</li>`).join('')}</ul></div>
+          <div class="instruction-block"><h3>Step-by-step Instructions</h3><ol>${steps.map((step) => `<li>${escapeHtml(step)}</li>`).join('')}</ol></div>
+          <div class="instruction-block"><h3>Timeline</h3><p>${escapeHtml(safe(instructions.timeline, 'Varies by court'))}</p></div>
+          <div class="instruction-block"><h3>Notes</h3><ul>${notes.map((note) => `<li>${escapeHtml(note)}</li>`).join('')}</ul></div>
+        `;
+      }
+
+      async function loadAndRenderCourtInstructions(data) {
+        const state = data?.court?.state;
+        const county = data?.court?.county;
+        const courtType = deriveCourtType(data?.court?.name);
+        const match = await getInstructions(state, county, courtType);
+        renderCourtInstructionsContent(match);
+      }
+
       function dispositionToFormType(value) {
         const v = String(value || '').toLowerCase();
         return v.includes('dismiss') ? 'sealing-dismissal' : 'sealing-conviction';
@@ -952,9 +1066,7 @@ document.addEventListener("DOMContentLoaded", function () {
       function selectTemplateForPacket(data, registry) {
         const state = normalizeState(data?.court?.state);
         const county = safe(data?.court?.county).replace(/ county$/i, '').toLowerCase();
-        const courtType = safe(data?.court?.name).toLowerCase().includes('common pleas')
-          ? 'court-of-common-pleas'
-          : 'unknown';
+        const courtType = deriveCourtType(data?.court?.name);
         const disposition = data?.charges?.[0]?.final_disposition || data?.charges?.[0]?.disposition || '';
         const formType = dispositionToFormType(disposition);
 
@@ -1860,6 +1972,7 @@ document.addEventListener("DOMContentLoaded", function () {
       renderAllRecords(normalizedData);
       updateEligibilitySection(normalizedData);
       updateTemplateCallout(normalizedData);
+      loadAndRenderCourtInstructions(normalizedData);
 
       const sigInput = document.getElementById("typedSignature");
       if (sigInput) sigInput.value = normalizedData.petitioner.full_name || "";
