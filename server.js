@@ -3,13 +3,20 @@ import Stripe from "stripe";
 import cors from "cors";
 
 const app = express();
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+const port = process.env.PORT || 8080;
+
+const stripe = process.env.STRIPE_SECRET_KEY
+  ? new Stripe(process.env.STRIPE_SECRET_KEY)
+  : null;
 
 app.use(cors({
   origin: [
-    "https://clearmyrecord.github.io"
+    "https://clearmyrecord.github.io",
+    "https://recordpathai.com",
+    "https://www.recordpathai.com"
   ]
 }));
+
 app.use(express.json());
 app.use(express.static("."));
 
@@ -41,19 +48,27 @@ function safe(value, fallback = "") {
 
 function getBaseUrl(req) {
   const envUrl = safe(process.env.PUBLIC_APP_URL);
+
   if (envUrl) {
     return envUrl.replace(/\/+$/, "");
   }
 
   const protoHeader = safe(req.headers["x-forwarded-proto"]);
-  const hostHeader = safe(req.headers["x-forwarded-host"]) || safe(req.get("host"));
-  const protocol = protoHeader || req.protocol || "http";
+  const hostHeader =
+    safe(req.headers["x-forwarded-host"]) ||
+    safe(req.get("host"));
+
+  const protocol = protoHeader || req.protocol || "https";
 
   if (!hostHeader) {
-    return "http://localhost:3000";
+    return "http://localhost:8080";
   }
 
   return `${protocol}://${hostHeader}`;
+}
+
+function normalizeCourtName(input) {
+  return String(input || "").trim().replace(/\s+/g, " ");
 }
 
 function scoreResult(result, courtQuery) {
@@ -64,26 +79,34 @@ function scoreResult(result, courtQuery) {
   let score = 0;
 
   for (const hint of OFFICIAL_PACKET_HINTS) {
-    if (title.includes(hint) || url.includes(hint.replace(/\./g, ""))) score += 2;
+    if (title.includes(hint) || url.includes(hint.replace(/\./g, ""))) {
+      score += 2;
+    }
   }
 
   for (const hint of OFFICIAL_DOMAIN_HINTS) {
-    if (url.includes(hint)) score += 2;
+    if (url.includes(hint)) {
+      score += 2;
+    }
   }
 
   if (url.endsWith(".pdf") || url.includes("/view/")) score += 4;
   if (title.includes("application for sealing")) score += 5;
   if (title.includes("conviction")) score += 2;
-  if (query && (title.includes(query) || url.includes(query.replace(/\s+/g, "-")))) score += 4;
 
-  if (url.includes("law") && !url.includes("clerk") && !url.includes("court")) score -= 4;
-  if (url.includes("blog")) score -= 4;
+  if (query && (title.includes(query) || url.includes(query.replace(/\s+/g, "-")))) {
+    score += 4;
+  }
+
+  if (url.includes("law") && !url.includes("clerk") && !url.includes("court")) {
+    score -= 4;
+  }
+
+  if (url.includes("blog")) {
+    score -= 4;
+  }
 
   return score;
-}
-
-function normalizeCourtName(input) {
-  return String(input || "").trim().replace(/\s+/g, " ");
 }
 
 function buildSearchQueries(court, state, type) {
@@ -96,34 +119,42 @@ function buildSearchQueries(court, state, type) {
 
 async function searchWeb(query) {
   const apiKey = process.env.SERPAPI_KEY;
+
   if (!apiKey) {
     throw new Error("Missing SERPAPI_KEY");
   }
 
   const url = new URL("https://serpapi.com/search.json");
+
   url.searchParams.set("engine", "google");
   url.searchParams.set("q", query);
   url.searchParams.set("api_key", apiKey);
   url.searchParams.set("num", "10");
 
-  const res = await fetch(url);
-  if (!res.ok) {
-    throw new Error(`Search failed: ${res.status}`);
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    throw new Error(`Search failed: ${response.status}`);
   }
 
-  const json = await res.json();
-  const results = Array.isArray(json.organic_results) ? json.organic_results : [];
+  const json = await response.json();
+  const results = Array.isArray(json.organic_results)
+    ? json.organic_results
+    : [];
 
-  return results.map((r) => ({
-    title: r.title || "",
-    url: r.link || "",
-    snippet: r.snippet || ""
+  return results.map((result) => ({
+    title: result.title || "",
+    url: result.link || "",
+    snippet: result.snippet || ""
   }));
 }
 
 function woodCountyShortcut(court) {
   const c = court.toLowerCase();
-  if (!c.includes("wood")) return null;
+
+  if (!c.includes("wood")) {
+    return null;
+  }
 
   return {
     court: "Wood County Court of Common Pleas",
@@ -134,10 +165,19 @@ function woodCountyShortcut(court) {
   };
 }
 
+app.get("/health", (req, res) => {
+  res.status(200).json({
+    status: "ok",
+    app: "RecordPathAI"
+  });
+});
+
 app.post("/api/create-checkout-session", async (req, res) => {
   try {
-    if (!process.env.STRIPE_SECRET_KEY) {
-      return res.status(500).json({ error: "Missing STRIPE_SECRET_KEY" });
+    if (!stripe) {
+      return res.status(500).json({
+        error: "Missing STRIPE_SECRET_KEY"
+      });
     }
 
     const {
@@ -152,18 +192,28 @@ app.post("/api/create-checkout-session", async (req, res) => {
     } = req.body || {};
 
     const numericAmount = Number(amount);
+
     if (!Number.isFinite(numericAmount) || numericAmount <= 0) {
-      return res.status(400).json({ error: "Invalid amount" });
+      return res.status(400).json({
+        error: "Invalid amount"
+      });
     }
 
     const baseUrl = getBaseUrl(req);
-    const finalSuccessUrl = safe(successUrl) || `${baseUrl}/payment-success.html`;
-    const finalCancelUrl = safe(cancelUrl) || `${baseUrl}/packet.html?payment=cancelled`;
+
+    const finalSuccessUrl =
+      safe(successUrl) ||
+      `${baseUrl}/payment-success.html`;
+
+    const finalCancelUrl =
+      safe(cancelUrl) ||
+      `${baseUrl}/packet.html?payment=cancelled`;
+
     const internalOrderId = `packet_${Date.now()}`;
 
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
-      ui_mode: "hosted_page",
+      ui_mode: "hosted",
       success_url: finalSuccessUrl,
       cancel_url: finalCancelUrl,
       client_reference_id: internalOrderId,
@@ -218,6 +268,7 @@ app.post("/api/create-checkout-session", async (req, res) => {
     });
   } catch (error) {
     console.error("Stripe checkout error:", error);
+
     return res.status(500).json({
       error: error?.message || "Failed to create Stripe checkout session"
     });
@@ -231,10 +282,13 @@ app.get("/api/find-packet", async (req, res) => {
     const type = normalizeCourtName(req.query.type || "sealing");
 
     if (!court) {
-      return res.status(400).json({ error: "Missing court" });
+      return res.status(400).json({
+        error: "Missing court"
+      });
     }
 
     const shortcut = woodCountyShortcut(court);
+
     if (shortcut) {
       return res.json(shortcut);
     }
@@ -242,22 +296,26 @@ app.get("/api/find-packet", async (req, res) => {
     const queries = buildSearchQueries(court, state, type);
     const allResults = [];
 
-    for (const q of queries) {
-      const results = await searchWeb(q);
+    for (const query of queries) {
+      const results = await searchWeb(query);
       allResults.push(...results);
     }
 
     const deduped = [];
     const seen = new Set();
 
-    for (const r of allResults) {
-      if (!r.url || seen.has(r.url)) continue;
-      seen.add(r.url);
-      deduped.push(r);
+    for (const result of allResults) {
+      if (!result.url || seen.has(result.url)) continue;
+
+      seen.add(result.url);
+      deduped.push(result);
     }
 
     const ranked = deduped
-      .map((r) => ({ ...r, _score: scoreResult(r, court) }))
+      .map((result) => ({
+        ...result,
+        _score: scoreResult(result, court)
+      }))
       .sort((a, b) => b._score - a._score);
 
     const best = ranked[0];
@@ -273,6 +331,7 @@ app.get("/api/find-packet", async (req, res) => {
     }
 
     let source = "Official court source";
+
     try {
       source = new URL(best.url).hostname;
     } catch {}
@@ -285,14 +344,18 @@ app.get("/api/find-packet", async (req, res) => {
       confidence: Math.min(0.98, 0.5 + best._score / 20)
     });
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ error: "Could not search for packet" });
+    console.error("Packet search error:", error);
+
+    return res.status(500).json({
+      error: error?.message || "Could not search for packet"
+    });
   }
 });
 
 app.get("/api/fetch-pdf", async (req, res) => {
   try {
     const url = String(req.query.url || "");
+
     if (!url.startsWith("http")) {
       return res.status(400).send("Invalid URL");
     }
@@ -310,26 +373,29 @@ app.get("/api/fetch-pdf", async (req, res) => {
       return res.status(403).send("Only official court sources are allowed");
     }
 
-    const pdfRes = await fetch(url);
-    if (!pdfRes.ok) {
+    const pdfResponse = await fetch(url);
+
+    if (!pdfResponse.ok) {
       return res.status(502).send("Could not fetch PDF");
     }
 
-    const contentType = pdfRes.headers.get("content-type") || "";
+    const contentType = pdfResponse.headers.get("content-type") || "";
+
     if (!contentType.includes("pdf")) {
       return res.status(400).send("Source is not a PDF");
     }
 
-    const bytes = Buffer.from(await pdfRes.arrayBuffer());
+    const bytes = Buffer.from(await pdfResponse.arrayBuffer());
+
     res.setHeader("Content-Type", "application/pdf");
     res.send(bytes);
   } catch (error) {
-    console.error(error);
+    console.error("PDF fetch error:", error);
+
     res.status(500).send("Failed to fetch PDF");
   }
 });
 
-const port = process.env.PORT || 3000;
 app.listen(port, () => {
-  console.log(`Server listening on ${port}`);
+  console.log(`RecordPathAI server listening on port ${port}`);
 });
