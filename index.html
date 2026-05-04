@@ -40,47 +40,88 @@
       margin: 0 auto;
     }
 
-    header { padding: 22px 0 10px; }
+    /* HEADER - matched to RecordPathAI pages */
+    .site-header {
+      padding: 18px 0 10px;
+    }
 
-    .nav-shell {
+    .header-shell {
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid rgba(219, 227, 240, 0.9);
+      box-shadow: 0 10px 30px rgba(50, 78, 128, 0.08);
+      border-radius: 22px;
+      padding: 14px 18px;
+    }
+
+    .header-inner {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 18px;
-      background: rgba(255,255,255,.82);
-      border: 1px solid var(--line);
-      border-radius: 24px;
-      padding: 14px 18px;
-      box-shadow: 0 12px 34px rgba(78,110,167,.10);
-      backdrop-filter: blur(10px);
+      gap: 20px;
     }
 
-    ..brand {
-  display: inline-flex;
-  align-items: center;
-  gap: 12px;
-  font-weight: 800;
-  font-size: 20px;
-  color: #3b6db4;
-  letter-spacing: -0.02em;
-  text-decoration: none;
-}
-
-    .nav-links {
-      display: flex;
+    .brand {
+      display: inline-flex;
       align-items: center;
       gap: 12px;
-      flex-wrap: wrap;
-      font-size: 15px;
       font-weight: 800;
+      font-size: 20px;
+      color: #3b6db4;
+      letter-spacing: -0.02em;
+      text-decoration: none;
     }
 
-    .nav-links a {
-      padding: 10px 12px;
+    .brand-icon {
+      width: 28px;
+      height: 34px;
+      border: 2px solid #22345f;
+      border-radius: 4px;
+      background: #ffffff;
+      position: relative;
+      flex: 0 0 auto;
+    }
+
+    .brand-icon::before {
+      content: "";
+      position: absolute;
+      left: 5px;
+      right: 5px;
+      top: 9px;
+      height: 2px;
+      background: #97a4bb;
+      box-shadow: 0 6px 0 #97a4bb, 0 12px 0 #97a4bb;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .nav a {
+      padding: 10px 14px;
       border-radius: 14px;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      transition: background 0.2s ease, color 0.2s ease;
     }
 
-    .nav-links a:hover { background: var(--blue-soft); }
+    .nav a:hover {
+      background: var(--blue-soft);
+      color: var(--blue-2);
+    }
+
+    .nav-cta {
+      background: var(--blue-soft);
+      color: var(--blue-2) !important;
+      font-weight: 800 !important;
+    }
+
+    .nav-cta:hover {
+      background: #d4e3fd;
+    }
 
     .btn {
       display: inline-flex;
@@ -451,11 +492,60 @@
 
     .cta { text-align: center; padding-bottom: 60px; }
 
-    footer {
-      padding: 28px 0 42px;
-      color: var(--muted);
-      text-align: center;
+    /* FOOTER - matched to RecordPathAI pages */
+    .site-footer {
+      padding: 0 0 26px;
+    }
+
+    .footer-shell {
+      background: #ffffff;
+      border: 1px solid var(--line);
+      box-shadow: 0 10px 30px rgba(50, 78, 128, 0.08);
+      border-radius: 22px;
+      padding: 20px 22px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .footer-brand {
       font-weight: 800;
+      color: #3b6db4;
+    }
+
+    .footer-copy {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .footer-disclaimer {
+      font-size: 13px;
+      color: #6a7894;
+      margin-top: 10px;
+      max-width: 520px;
+      line-height: 1.5;
+    }
+
+    .footer-links {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a {
+      padding: 8px 12px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .footer-links a:hover {
+      background: var(--blue-soft);
+      color: var(--blue-2);
     }
 
     @media (max-width: 920px) {
@@ -465,10 +555,22 @@
 
       .hero-copy { padding: 32px 22px; }
 
-      .nav-shell, .nav-links {
+      .header-inner {
         flex-direction: column;
-        align-items: stretch;
+        align-items: flex-start;
+      }
+
+      .nav {
+        width: 100%;
+      }
+
+      .nav a {
+        width: 100%;
         text-align: center;
+      }
+
+      .hero-actions .btn {
+        width: 100%;
       }
 
       .floating-card {
@@ -480,20 +582,44 @@
       }
 
       .doc-page { width: 100%; }
+
+      .footer-shell {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .footer-links {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .footer-links a {
+        width: 100%;
+        text-align: center;
+      }
     }
   </style>
 </head>
 
 <body>
-  <header>
-    <div class="container nav-shell">
-      <a class="brand" href="index.html">RecordPathAI</a>
-      <nav class="nav-links">
-        <a href="how-it-works.html">How It Works</a>
-        <a href="eligibility.html">Eligibility</a>
-        <a href="record-details.html">Record Details</a>
-        <a class="btn" href="eligibility.html">Check Eligibility</a>
-      </nav>
+  <header class="site-header">
+    <div class="container">
+      <div class="header-shell">
+        <div class="header-inner">
+          <a href="index.html" class="brand">
+            <span class="brand-icon" aria-hidden="true"></span>
+            <span>RecordPathAI</span>
+          </a>
+
+          <nav class="nav">
+            <a href="index.html">Home</a>
+            <a href="how-it-works.html">How It Works</a>
+            <a href="eligibility.html">Eligibility</a>
+            <a href="record-details.html">Record Details</a>
+            <a href="eligibility.html" class="nav-cta">Check Eligibility</a>
+          </nav>
+        </div>
+      </div>
     </div>
   </header>
 
@@ -648,33 +774,31 @@
     </section>
   </main>
 
-<footer class="site-footer">
-  <div class="container">
-    <div class="footer-shell">
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-shell">
+        <div>
+          <div class="footer-brand">RecordPathAI</div>
+          <div class="footer-copy">
+            Guided record relief workflow and court packet preparation.
+          </div>
 
-      <div>
-        <div class="footer-brand">RecordPathAI</div>
-        <div class="footer-copy">
-          Guided record relief workflow and court packet preparation.
+          <div class="footer-disclaimer">
+            RecordPathAI is not a law firm and does not provide legal advice.
+            Documents are generated based on user input and publicly available forms.
+          </div>
         </div>
 
-        <div style="font-size:13px; color:#6a7894; margin-top:10px; max-width:520px;">
-          RecordPathAI is not a law firm and does not provide legal advice.
-          Documents are generated based on user input and publicly available forms.
+        <div class="footer-links">
+          <a href="index.html">Home</a>
+          <a href="how-it-works.html">How It Works</a>
+          <a href="eligibility.html">Eligibility</a>
+          <a href="terms.html">Terms</a>
+          <a href="privacy.html">Privacy</a>
+          <a href="disclaimer.html">Disclaimer</a>
         </div>
       </div>
-
-      <div class="footer-links">
-        <a href="index.html">Home</a>
-        <a href="how-it-works.html">How It Works</a>
-        <a href="eligibility.html">Eligibility</a>
-        <a href="terms.html">Terms</a>
-        <a href="privacy.html">Privacy</a>
-        <a href="disclaimer.html">Disclaimer</a>
-      </div>
-
     </div>
-  </div>
-</footer>
+  </footer>
 </body>
-</html>
+</html></html>
