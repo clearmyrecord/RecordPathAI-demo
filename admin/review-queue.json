@@ -12,7 +12,8 @@
     "requiresMapping": true,
     "discoveryMethod": "seeded_official_forms",
     "searchQuery": "Wood County Court of Common Pleas record sealing application PDF",
-    "templateActivation": "none"
+    "templateActivation": "none",
+    "sourcePageUrl": "https://clerkofcourt.co.wood.oh.us/174/Forms"
   },
   {
     "court": "Franklin County Court of Common Pleas",
@@ -27,6 +28,7 @@
     "requiresMapping": true,
     "discoveryMethod": "seeded_official_forms",
     "searchQuery": "Franklin County Court of Common Pleas application to seal record 2953.32 PDF",
-    "templateActivation": "none"
+    "templateActivation": "none",
+    "sourcePageUrl": "https://clerk.franklincountyohio.gov/Legal-Divisions/General-Civil-Criminal"
   }
 ]
