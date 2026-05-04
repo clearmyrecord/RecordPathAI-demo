@@ -93,16 +93,16 @@
       "height": 25
     },
     {
-      "id": 9,
-      "name": "judge_name",
-      "type": "text",
-      "placeholder": "",
-      "page": 4,
-      "x": 494,
-      "y": 176,
-      "width": 180,
-      "height": 25
-    },
+  "id": 9,
+  "name": "judge_name",
+  "type": "text",
+  "placeholder": "",
+  "page": 4,
+  "x": 489,
+  "y": 175,
+  "width": 145,
+  "height": 25
+},
     {
       "id": 10,
       "name": "petitioner.full_name",
