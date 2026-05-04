@@ -1,0 +1,970 @@
+[
+  {
+    "state": "OH",
+    "county": "Adams",
+    "slug": "adams",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Allen",
+    "slug": "allen",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Ashland",
+    "slug": "ashland",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Ashtabula",
+    "slug": "ashtabula",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Athens",
+    "slug": "athens",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Auglaize",
+    "slug": "auglaize",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Belmont",
+    "slug": "belmont",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Brown",
+    "slug": "brown",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Butler",
+    "slug": "butler",
+    "tier": "tier2",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Carroll",
+    "slug": "carroll",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Champaign",
+    "slug": "champaign",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Clark",
+    "slug": "clark",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Clermont",
+    "slug": "clermont",
+    "tier": "tier2",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Clinton",
+    "slug": "clinton",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Columbiana",
+    "slug": "columbiana",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Coshocton",
+    "slug": "coshocton",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Crawford",
+    "slug": "crawford",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Cuyahoga",
+    "slug": "cuyahoga",
+    "tier": "tier1",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Darke",
+    "slug": "darke",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Defiance",
+    "slug": "defiance",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Delaware",
+    "slug": "delaware",
+    "tier": "tier2",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Erie",
+    "slug": "erie",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Fairfield",
+    "slug": "fairfield",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Fayette",
+    "slug": "fayette",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Franklin",
+    "slug": "franklin",
+    "tier": "tier1",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Fulton",
+    "slug": "fulton",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Gallia",
+    "slug": "gallia",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Geauga",
+    "slug": "geauga",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Greene",
+    "slug": "greene",
+    "tier": "tier2",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Guernsey",
+    "slug": "guernsey",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Hamilton",
+    "slug": "hamilton",
+    "tier": "tier1",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Hancock",
+    "slug": "hancock",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Hardin",
+    "slug": "hardin",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Harrison",
+    "slug": "harrison",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Henry",
+    "slug": "henry",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Highland",
+    "slug": "highland",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Hocking",
+    "slug": "hocking",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Holmes",
+    "slug": "holmes",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Huron",
+    "slug": "huron",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Jackson",
+    "slug": "jackson",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Jefferson",
+    "slug": "jefferson",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Knox",
+    "slug": "knox",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Lake",
+    "slug": "lake",
+    "tier": "tier2",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Lawrence",
+    "slug": "lawrence",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Licking",
+    "slug": "licking",
+    "tier": "tier2",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Logan",
+    "slug": "logan",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Lorain",
+    "slug": "lorain",
+    "tier": "tier2",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Lucas",
+    "slug": "lucas",
+    "tier": "tier1",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Madison",
+    "slug": "madison",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Mahoning",
+    "slug": "mahoning",
+    "tier": "tier2",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Marion",
+    "slug": "marion",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Medina",
+    "slug": "medina",
+    "tier": "tier2",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Meigs",
+    "slug": "meigs",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Mercer",
+    "slug": "mercer",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Miami",
+    "slug": "miami",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Monroe",
+    "slug": "monroe",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Montgomery",
+    "slug": "montgomery",
+    "tier": "tier1",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Morgan",
+    "slug": "morgan",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Morrow",
+    "slug": "morrow",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Muskingum",
+    "slug": "muskingum",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Noble",
+    "slug": "noble",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Ottawa",
+    "slug": "ottawa",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Paulding",
+    "slug": "paulding",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Perry",
+    "slug": "perry",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Pickaway",
+    "slug": "pickaway",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Pike",
+    "slug": "pike",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Portage",
+    "slug": "portage",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Preble",
+    "slug": "preble",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Putnam",
+    "slug": "putnam",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Richland",
+    "slug": "richland",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Ross",
+    "slug": "ross",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Sandusky",
+    "slug": "sandusky",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Scioto",
+    "slug": "scioto",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Seneca",
+    "slug": "seneca",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Shelby",
+    "slug": "shelby",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Stark",
+    "slug": "stark",
+    "tier": "tier2",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Summit",
+    "slug": "summit",
+    "tier": "tier1",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Trumbull",
+    "slug": "trumbull",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Tuscarawas",
+    "slug": "tuscarawas",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Union",
+    "slug": "union",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Van Wert",
+    "slug": "van-wert",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Vinton",
+    "slug": "vinton",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Warren",
+    "slug": "warren",
+    "tier": "tier2",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Washington",
+    "slug": "washington",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Wayne",
+    "slug": "wayne",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Williams",
+    "slug": "williams",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Wood",
+    "slug": "wood",
+    "tier": "tier1",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  },
+  {
+    "state": "OH",
+    "county": "Wyandot",
+    "slug": "wyandot",
+    "tier": "tier3",
+    "courtTypes": [
+      "court-of-common-pleas",
+      "municipal"
+    ],
+    "status": "pending_discovery"
+  }
+]
