@@ -1,0 +1,16 @@
+{
+  "name": "recordpathai",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.3",
+    "stripe": "^14.25.0"
+  },
+  "engines": {
+    "node": "20"
+  }
+}
