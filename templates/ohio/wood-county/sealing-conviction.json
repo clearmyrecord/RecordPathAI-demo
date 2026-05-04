@@ -129,10 +129,10 @@
       "name": "court.case_number",
       "type": "text",
       "page": 4,
-      "x": 536,
-      "y": 153,
-      "width": 120,
-      "height": 24,
+      "x": 498,
+      "y": 148,
+      "width": 143,
+      "height": 25,
       "fontSize": 9
     },
     {
@@ -140,10 +140,11 @@
       "name": "court.judge_name",
       "type": "text",
       "page": 4,
-      "x": 495,
-      "y": 177,
-      "width": 161,
-      "height": 23
+      "x": 585,
+      "y": 160,
+      "width": 150,
+      "height": 22,
+      "fontSize": 9
     },
     {
       "id": 15,
