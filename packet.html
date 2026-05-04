@@ -788,7 +788,7 @@
             </div>
 
             <div id="paymentCallout" class="callout warning">
-              Testing mode: payment is not required while validating PDF mapping.
+              Packet is locked until payment is complete. Your eligibility summary and filing checklist remain visible.
             </div>
 
             <div id="stateConflictCallout" class="callout warning" style="display:none;">
@@ -813,7 +813,7 @@
             </div>
 
             <div class="button-stack">
-              <button type="button" class="packet-btn packet-btn-primary" id="generateSealingBtn">
+              <button type="button" class="packet-btn packet-btn-primary" id="generateSealingBtn" disabled>
                 Generate PDF Packet
               </button>
               <button type="button" class="packet-btn packet-btn-secondary" id="testPdfBtn">
@@ -823,7 +823,7 @@
                 Open Source PDF
               </button>
               <button type="button" class="packet-btn packet-btn-muted" id="payAndSubmitBtn">
-                Mark Payment Complete
+                Unlock Packet — $50
               </button>
             </div>
 
@@ -834,7 +834,7 @@
             </div>
 
             <p class="meta-note">
-              This page supports dynamic court-ready PDF generation from mapped JSON templates. RecordPathAI does not file directly with the court. You can use an e-filing-ready packet with your court integration partner.
+              RecordPathAI prepares court-ready documents. It does not file directly with the court and is not a law firm. You can use an e-filing-ready packet with your court integration partner.
             </p>
           </section>
 
@@ -878,7 +878,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const TEMPLATE_REGISTRY_URL = "./templates/index.json";
   const TEMPLATE_REGISTRY_STORAGE_KEY = "recordpathai-active-template-registry";
 
-  // 💳 Local testing flag (no real payment yet)
+  // 💳 Payment completion tracking
   const PAYMENT_STORAGE_KEY = "recordPathPaymentComplete";
 
   // ✍️ Signature storage (typed or drawn)
@@ -1723,11 +1723,89 @@ document.addEventListener("DOMContentLoaded", function () {
         window.open(`./${selected.pdfPath}`, "_blank");
       }
 
-      function handlePaymentToggle() {
-        localStorage.setItem(PAYMENT_STORAGE_KEY, "true");
-        document.getElementById("paymentCallout").className = "callout success";
-        document.getElementById("paymentCallout").innerHTML = "Payment marked complete locally for testing.";
-        setStatus("Testing mode: payment marked complete locally.");
+      function setPacketLockState(isUnlocked, message) {
+        const paymentCallout = document.getElementById("paymentCallout");
+        const generateBtn = document.getElementById("generateSealingBtn");
+        const unlockBtn = document.getElementById("payAndSubmitBtn");
+
+        if (generateBtn) generateBtn.disabled = !isUnlocked;
+
+        if (unlockBtn) {
+          unlockBtn.disabled = isUnlocked;
+          unlockBtn.textContent = isUnlocked ? "Packet unlocked" : "Unlock Packet — $50";
+        }
+
+        if (paymentCallout) {
+          paymentCallout.className = isUnlocked ? "callout success" : "callout warning";
+          paymentCallout.innerHTML = message;
+        }
+      }
+
+      function getCheckoutEndpoint() {
+        const host = window.location.hostname || "";
+        if (host.includes("github.io")) {
+          return "https://recordpathai-790902013328.us-west1.run.app/api/create-checkout-session";
+        }
+        return "/api/create-checkout-session";
+      }
+
+      async function startCheckout() {
+        try {
+          setStatus("Opening secure checkout...");
+          const raw = readPacketData();
+          const normalizedData = buildNormalizedPacketData(raw);
+
+          const payload = {
+            applicant: {
+              fullName: safe(normalizedData?.petitioner?.full_name),
+              email: safe(normalizedData?.petitioner?.email),
+              phone: safe(normalizedData?.petitioner?.phone),
+              street: safe(normalizedData?.petitioner?.address_line_1),
+              apartment: safe(normalizedData?.petitioner?.address_line_2),
+              city: safe(normalizedData?.petitioner?.city),
+              residenceState: safe(normalizedData?.petitioner?.state),
+              zip: safe(normalizedData?.petitioner?.zip)
+            },
+            caseInfo: {
+              caseState: safe(normalizedData?.court?.state),
+              caseNumber: safe(normalizedData?.court?.case_number),
+              chargeName: safe(normalizedData?.charges?.[0]?.offense_name),
+              offenseCode: safe(normalizedData?.charges?.[0]?.statute_citation),
+              chargeLevel: safe(normalizedData?.charges?.[0]?.level),
+              disposition: safe(normalizedData?.charges?.[0]?.disposition || normalizedData?.charges?.[0]?.final_disposition),
+              dispositionDate: safe(normalizedData?.charges?.[0]?.disposition_date),
+              dischargeDate: safe(normalizedData?.charges?.[0]?.discharge_date),
+              court: safe(normalizedData?.court?.name),
+              county: safe(normalizedData?.court?.county),
+              estimatedEligibleDate: safe(normalizedData?.eligibility?.estimatedEligibleDate)
+            },
+            eligibility: {
+              status: safe(normalizedData?.eligibility?.status),
+              reliefType: safe(normalizedData?.eligibility?.reliefType),
+              manualReview: Boolean(normalizedData?.eligibility?.manualReview)
+            },
+            amount: 5000,
+            currency: "usd"
+          };
+
+          const checkoutEndpoint = getCheckoutEndpoint();
+          const response = await fetch(checkoutEndpoint, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          });
+
+          const data = await response.json();
+          if (!response.ok || !data?.url) {
+            throw new Error(data?.error || "Could not start checkout.");
+          }
+
+          window.location.href = data.url;
+        } catch (error) {
+          console.error(error);
+          setStatus(error.message || "Checkout failed.", "error");
+          alert(error.message || "Unable to open checkout.");
+        }
       }
 
       const raw = readPacketData();
@@ -1736,7 +1814,7 @@ document.addEventListener("DOMContentLoaded", function () {
       document.getElementById("testPdfBtn").addEventListener("click", testPdfAccess);
       document.getElementById("generateSealingBtn").addEventListener("click", generateSealingPdf);
       document.getElementById("openSourceBtn").addEventListener("click", openSourcePdf);
-      document.getElementById("payAndSubmitBtn").addEventListener("click", handlePaymentToggle);
+      document.getElementById("payAndSubmitBtn").addEventListener("click", startCheckout);
       document.getElementById("useTypedSigBtn").addEventListener("click", setTypedSignature);
       document.getElementById("useDrawnSigBtn").addEventListener("click", setDrawnSignature);
       document.getElementById("clearSigBtn").addEventListener("click", clearSignature);
@@ -1751,8 +1829,23 @@ document.addEventListener("DOMContentLoaded", function () {
       const sigInput = document.getElementById("typedSignature");
       if (sigInput) sigInput.value = normalizedData.petitioner.full_name || "";
 
+      const params = new URLSearchParams(window.location.search);
+      const paymentSuccess = params.get("payment") === "success" || localStorage.getItem(PAYMENT_STORAGE_KEY) === "true";
+      const paymentCancelled = params.get("payment") === "cancelled";
+
+      if (paymentSuccess) {
+        localStorage.setItem(PAYMENT_STORAGE_KEY, "true");
+        setPacketLockState(true, "Payment received. Packet unlocked.");
+        setStatus("Packet unlocked. You can now generate your court-ready packet.");
+      } else if (paymentCancelled) {
+        setPacketLockState(false, "Payment cancelled. Your data is saved.");
+        setStatus("Payment cancelled. Your packet remains locked.");
+      } else {
+        setPacketLockState(false, "Packet is locked until payment is complete. Your eligibility summary and filing checklist remain visible.");
+        setStatus("Packet locked until payment is complete.");
+      }
+
       setTypedSignature();
-      setStatus("PDF engine ready.");
     });
 
     if (window.RecordPathDataBridge && RecordPathDataBridge.initPage) {
