@@ -1376,6 +1376,37 @@ document.addEventListener("DOMContentLoaded", function () {
         throw new Error("Template JSON must include fields or mappings.");
       }
 
+      async function loadActiveTemplateForPacket(data) {
+        const response = await fetch(`./templates/index.json?v=${Date.now()}`);
+        if (!response.ok) throw new Error("Could not load template index.");
+        const registry = await response.json();
+        const selectedTemplate = selectTemplateForPacket(data, registry);
+        console.log("[Packet Generator] Selected template:", selectedTemplate || null);
+        return selectedTemplate || null;
+      }
+
+      async function loadTemplateMapping(template) {
+        if (!template?.mappingPath) throw new Error("Template mapping path is missing.");
+        console.log("[Packet Generator] Mapping path:", template.mappingPath);
+        const response = await fetch(`./${template.mappingPath}?v=${Date.now()}`);
+        if (!response.ok) throw new Error("The form mapping could not be loaded.");
+        const mappingJson = await response.json();
+        if (!Array.isArray(mappingJson?.mappings) && !Array.isArray(mappingJson?.fields)) {
+          throw new Error("The form mapping could not be loaded.");
+        }
+        const fields = normalizeFields(mappingJson);
+        console.log("[Packet Generator] Number of mapped fields loaded:", fields.length);
+        return mappingJson;
+      }
+
+      async function loadTemplatePdf(template) {
+        if (!template?.pdfPath) throw new Error("Template PDF path is missing.");
+        console.log("[Packet Generator] PDF path:", template.pdfPath);
+        const response = await fetch(`./${template.pdfPath}?v=${Date.now()}`);
+        if (!response.ok) throw new Error("The court PDF template could not be loaded.");
+        return response.arrayBuffer();
+      }
+
       function fieldPath(field) {
         const rawPath = field.dataPath || field.name || "";
         if (rawPath === "charge.judge_name") return "charges.0.judge_name";
@@ -1639,20 +1670,19 @@ document.addEventListener("DOMContentLoaded", function () {
 
       async function updateTemplateCallout() {
         const el = document.getElementById("templateCallout");
+        const raw = readPacketData();
+        const data = buildNormalizedPacketData(raw);
 
         try {
-          const raw = readPacketData();
-          const data = buildNormalizedPacketData(raw);
-          const registry = await loadTemplateRegistry();
-          const selected = selectTemplateForPacket(data, registry);
+          const selected = await loadActiveTemplateForPacket(data);
           if (!selected) throw new Error("No active template found for this state/county/court/disposition.");
-          const mappingResponse = await fetch(`./${selected.mappingPath}?v=${Date.now()}`);
-          const fields = normalizeFields(map);
+          const activeMapping = await loadTemplateMapping(selected);
+          const fields = normalizeFields(activeMapping);
 
           el.className = "callout success";
           el.innerHTML = `
             PDF mapper loaded.<br />
-            Template: <strong>${escapeHtml(map.document || map.templateId || selected.formType)}</strong><br />
+            Template: <strong>${escapeHtml(activeMapping.document || activeMapping.templateId || selected.formType)}</strong><br />
             Mapping JSON: <code>${escapeHtml(selected.mappingPath)}</code><br />
             Source PDF: <code>${escapeHtml(selected.pdfPath)}</code><br />
 
@@ -1662,7 +1692,7 @@ document.addEventListener("DOMContentLoaded", function () {
           el.className = "callout warning";
           el.innerHTML = `
             PDF mapper has not loaded yet.<br />
-            Manual Filing Required. No active template found for this case.<br />
+            No active template is available for this court yet. You can still export a data-only packet summary.<br />
             You can still export a data-only PDF summary.<br />
             Error: ${escapeHtml(error.message)}
           `;
@@ -1687,12 +1717,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
           if (!window.PDFLib) throw new Error("pdf-lib did not load.");
 
-          const registry = await loadTemplateRegistry();
-          const selected = selectTemplateForPacket(data, registry);
+          const raw = readPacketData();
+          const data = buildNormalizedPacketData(raw);
+          const selected = await loadActiveTemplateForPacket(data);
           if (!selected) throw new Error("No active template found for this state/county/court/disposition.");
-          const map = await fetchJson(`./${selected.mappingPath}`);
-          const fields = normalizeFields(map);
-          const pdfBytes = await fetchPdfBytes(`./${selected.pdfPath}`);
+          const templateMapping = await loadTemplateMapping(selected);
+          const fields = normalizeFields(templateMapping);
+          const pdfBytes = await loadTemplatePdf(selected);
           const pdfDoc = await window.PDFLib.PDFDocument.load(pdfBytes);
 
           setStatus(`Test passed. ${fields.length} mapped fields. ${pdfDoc.getPages().length} PDF pages.`);
@@ -1708,6 +1739,9 @@ document.addEventListener("DOMContentLoaded", function () {
           setStatus("Generating PDF packet...");
 
           if (!window.PDFLib) throw new Error("pdf-lib failed to load.");
+          if (localStorage.getItem(PAYMENT_STORAGE_KEY) !== "true") {
+            throw new Error("Packet is locked until payment is complete.");
+          }
 
           const raw = readPacketData();
           const data = buildNormalizedPacketData(raw);
@@ -1719,16 +1753,16 @@ document.addEventListener("DOMContentLoaded", function () {
             );
           }
 
-          const selected = selectTemplateForPacket(data, await loadTemplateRegistry());
+          const selected = await loadActiveTemplateForPacket(data);
           if (!selected) {
             await exportManualFilingSummaryPdf(data);
-            setStatus("Manual Filing Required. Exported data-only PDF summary.", "error");
+            setStatus("No active template is available for this court yet. You can still export a data-only packet summary.", "error");
             return;
           }
 
-          const templateMap = await fetchJson(`./${selected.mappingPath}`);
-          const fields = normalizeFields(templateMap);
-          const pdfBytes = await fetchPdfBytes(`./${selected.pdfPath}`);
+          const templateMapping = await loadTemplateMapping(selected);
+          const fields = normalizeFields(templateMapping);
+          const pdfBytes = await loadTemplatePdf(selected);
 
           const { PDFDocument, StandardFonts, rgb } = window.PDFLib;
           const pdfDoc = await PDFDocument.load(pdfBytes);
@@ -1772,8 +1806,8 @@ document.addEventListener("DOMContentLoaded", function () {
               return;
             }
 
-            const sourcePageWidth = Number(templateMap.pageWidth || 768);
-            const sourcePageHeight = Number(templateMap.pageHeight || 994);
+            const sourcePageWidth = Number(templateMapping.pageWidth || 768);
+            const sourcePageHeight = Number(templateMapping.pageHeight || 994);
 
             const scaleX = page.getWidth() / sourcePageWidth;
             const scaleY = page.getHeight() / sourcePageHeight;
@@ -1856,9 +1890,9 @@ document.addEventListener("DOMContentLoaded", function () {
             hasSignature: Boolean(signatureImageBytes || (typedSignature?.value || "").trim())
           });
         } catch (error) {
-          console.error(error);
-          setStatus(error.message, "error");
-          alert(error.message);
+          console.error("PDF generation failed:", error);
+          setStatus("Unable to generate the PDF packet. Please try again.", "error");
+          alert("Unable to generate the PDF packet. Please try again.");
         }
       }
 
