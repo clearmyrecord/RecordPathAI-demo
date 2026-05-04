@@ -1681,14 +1681,14 @@ document.addEventListener("DOMContentLoaded", function () {
             sigImage = await pdfDoc.embedPng(signatureImageBytes);
           }
 
-          function drawFit(page, text, x, y, maxWidth, size = 11, font = helvetica) {
+          function drawFit(page, text, x, y, maxWidth, size = 10, minSize = 7, font = helvetica) {
             const content = String(text || "");
             if (!content) return;
 
             let currentSize = size;
             let width = font.widthOfTextAtSize(content, currentSize);
 
-            while (width > maxWidth && currentSize > 7) {
+            while (width > maxWidth && currentSize > minSize) {
               currentSize -= 0.5;
               width = font.widthOfTextAtSize(content, currentSize);
             }
@@ -1721,7 +1721,8 @@ document.addEventListener("DOMContentLoaded", function () {
             const yTop = Number(field.y || 0) * scaleY;
             const width = Number(field.width || 200) * scaleX;
             const height = Number(field.height || 18) * scaleY;
-            const fontSize = Number(field.fontSize || 11) * Math.min(scaleX, scaleY);
+            const preferredFontSize = Number(field.fontSize || 10) * Math.min(scaleX, scaleY);
+            const fontSize = Math.min(preferredFontSize, Math.max(9 * Math.min(scaleX, scaleY), Math.min(10 * Math.min(scaleX, scaleY), height - 2)));
 
             const pdfY = page.getHeight() - yTop - height;
             const textY = pdfY + Math.max(2, (height - fontSize) / 2);
@@ -1741,7 +1742,7 @@ document.addEventListener("DOMContentLoaded", function () {
                   height
                 });
               } else {
-                drawFit(page, value, x, textY, width, fontSize, helveticaBold);
+                drawFit(page, value, x, textY, width, fontSize, 7, helveticaBold);
               }
               return;
             }
@@ -1756,7 +1757,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
               if (checked) {
                 const checkX = x + width / 4;
-                drawFit(page, "X", checkX, textY, width || 20, Math.max(fontSize, 13), helveticaBold);
+                drawFit(page, "X", checkX, textY, width || 20, Math.max(fontSize, 13), 7, helveticaBold);
               }
               return;
             }
@@ -1768,6 +1769,7 @@ document.addEventListener("DOMContentLoaded", function () {
               textY,
               width,
               fontSize,
+              7,
               field.bold ? helveticaBold : helvetica
             );
           });
