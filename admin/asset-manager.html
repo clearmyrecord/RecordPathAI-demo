@@ -76,7 +76,9 @@
           <td>${item.county}, ${item.state}</td>
           <td>${item.courtType}</td>
           <td class="links">
-            <a href="${item.sourceUrl}" target="_blank" rel="noopener noreferrer">Open PDF</a>
+            ${item.pdfAccess === 'manual_download_required'
+              ? '<span>Download from source page, then upload local copy</span>'
+              : `<a href="${item.sourceUrl}" target="_blank" rel="noopener noreferrer">Open PDF</a>`}
             <a href="${item.sourcePageUrl}" target="_blank" rel="noopener noreferrer">Open Source Page</a>
             ${hasLocalCopy
               ? `<a href="${item.localPath}" target="_blank" rel="noopener noreferrer">Open Local Copy</a>`
