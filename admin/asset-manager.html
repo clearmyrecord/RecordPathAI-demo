@@ -11,6 +11,7 @@
     th { background: #f3f3f3; }
     button { margin: 0.15rem; }
     .note { margin: 1rem 0; padding: 0.75rem; border-left: 4px solid #d35400; background: #fff7ed; }
+    .links a { display: inline-block; margin-right: 0.5rem; }
   </style>
 </head>
 <body>
@@ -22,7 +23,7 @@
   <table>
     <thead>
       <tr>
-        <th>Court</th><th>County</th><th>Court Type</th><th>Source URL</th><th>Local PDF Path</th><th>Status</th><th>Actions</th>
+        <th>Court</th><th>County</th><th>Court Type</th><th>Links</th><th>Local PDF Path</th><th>Status</th><th>Actions</th>
       </tr>
     </thead>
     <tbody id="queue-body"></tbody>
@@ -47,6 +48,15 @@
       render();
     }
 
+    async function localFileExists(localPath) {
+      try {
+        const response = await fetch(localPath, { method: 'HEAD' });
+        return response.ok;
+      } catch {
+        return false;
+      }
+    }
+
     async function render() {
       const response = await fetch('./review-queue.json');
       const queue = await response.json();
@@ -54,22 +64,30 @@
       const tbody = document.getElementById('queue-body');
       tbody.innerHTML = '';
 
+      const localPathStatus = await Promise.all(queue.map((item) => localFileExists(item.localPath)));
+
       queue.forEach((item, idx) => {
         const id = `${item.court}|${item.sourceUrl}|${idx}`;
         const status = state[id] || item.status;
+        const hasLocalCopy = localPathStatus[idx];
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td>${item.court}</td>
           <td>${item.county}, ${item.state}</td>
           <td>${item.courtType}</td>
-          <td><a href="${item.sourceUrl}" target="_blank" rel="noopener noreferrer">source</a></td>
+          <td class="links">
+            <a href="${item.sourceUrl}" target="_blank" rel="noopener noreferrer">Open PDF</a>
+            <a href="${item.sourcePageUrl}" target="_blank" rel="noopener noreferrer">Open Source Page</a>
+            ${hasLocalCopy
+              ? `<a href="${item.localPath}" target="_blank" rel="noopener noreferrer">Open Local Copy</a>`
+              : '<span>Local copy not downloaded yet</span>'}
+          </td>
           <td>${item.localPath}</td>
           <td><strong>${status}</strong></td>
           <td>
             <button data-action="approved">Approve</button>
             <button data-action="rejected">Reject</button>
             <button data-action="needs_mapping">Needs Mapping</button>
-            <button data-action="template_activated">Activate Template</button>
           </td>
         `;
 
