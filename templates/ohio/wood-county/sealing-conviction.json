@@ -125,26 +125,26 @@
       "height": 23
     },
     {
-      "id": 13,
+      "id": 8,
       "name": "court.case_number",
       "type": "text",
+      "placeholder": "",
       "page": 4,
-      "x": 472,
-      "y": 150,
-      "width": 178,
-      "height": 22,
-      "fontSize": 9
+      "x": 559,
+      "y": 146,
+      "width": 134,
+      "height": 24
     },
     {
-      "id": 14,
+      "id": 9,
       "name": "court.judge_name",
       "type": "text",
+      "placeholder": "",
       "page": 4,
-      "x": 472,
-      "y": 178,
-      "width": 178,
-      "height": 22,
-      "fontSize": 9
+      "x": 559,
+      "y": 175,
+      "width": 160,
+      "height": 25
     },
     {
       "id": 15,
