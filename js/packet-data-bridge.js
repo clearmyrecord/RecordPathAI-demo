@@ -76,6 +76,8 @@
         }
       },
 
+      judge_name: "",
+
       eligibility: {
         state_ruleset: "",
         filing_type: "",
@@ -187,6 +189,26 @@
     data.meta.updated_at = nowIso();
   }
 
+  function normalizeJudgeName(data) {
+    if (!data || typeof data !== "object") return;
+    if (!data.court || typeof data.court !== "object") data.court = {};
+    if (!Array.isArray(data.charges)) data.charges = [];
+
+    const normalize = (value) => normalizeString(value).trim();
+    const first = data.charges[0] || {};
+    const fromCourt = normalize(data.court.judge_name);
+    const fromTopLevel = normalize(data.judge_name);
+    const fromCharge = normalize(first.judge_name);
+    const resolved = fromCourt || fromTopLevel || fromCharge;
+
+    if (!resolved) return;
+    data.court.judge_name = resolved;
+    data.judge_name = resolved;
+    if (!fromCharge && first && typeof first === "object") {
+      first.judge_name = resolved;
+    }
+  }
+
   function loadPacketData() {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
@@ -200,6 +222,7 @@
 
       const parsed = JSON.parse(raw);
       const merged = deepMerge(base, parsed || {});
+      normalizeJudgeName(merged);
       ensureMeta(merged);
 
       if (!Array.isArray(merged.charges)) merged.charges = [];
@@ -215,6 +238,7 @@
   }
 
   function savePacketData(data) {
+    normalizeJudgeName(data);
     ensureMeta(data);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     return data;
@@ -408,6 +432,7 @@
   }
 
   function derivePacketData(data) {
+    normalizeJudgeName(data);
     buildFullName(data);
     buildSsnLast4(data);
     syncSelfRepresentedAttorney(data);
@@ -416,6 +441,7 @@
     buildAgencySummaries(data);
     buildSignatureNames(data);
     buildGeneratedDates(data);
+    normalizeJudgeName(data);
 
     return data;
   }

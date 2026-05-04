@@ -765,6 +765,7 @@
                   <div class="summary-row"><strong>Level</strong><span id="summaryLevel">—</span></div>
                   <div class="summary-row"><strong>Case Number</strong><span id="summaryCaseNumber">—</span></div>
                   <div class="summary-row"><strong>Court</strong><span id="summaryCourt">—</span></div>
+                  <div class="summary-row" id="summaryJudgeRow" style="display:none;"><strong>Judge</strong><span id="summaryJudge">—</span></div>
                   <div class="summary-row"><strong>County</strong><span id="summaryCounty">—</span></div>
                   <div class="summary-row"><strong>Disposition</strong><span id="summaryDisposition">—</span></div>
                 </div>
@@ -1027,6 +1028,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const address = petitioner.address || {};
         const charges = Array.isArray(raw.charges) ? raw.charges : [];
         const primary = charges[0] || {};
+        const judgeName = primary.judge_name || raw.court?.judge_name || raw.judge_name || "";
         const today = new Date();
 
         const fullName =
@@ -1056,6 +1058,7 @@ document.addEventListener("DOMContentLoaded", function () {
           case_number: charge.case_number || "",
           court_name: charge.court_name || "",
           court_county: charge.court_county || "",
+          judge_name: charge.judge_name || judgeName || "",
           case_state: charge.case_state || state,
           arresting_agency: charge.arresting_agency || "",
           prosecutor_agency: charge.prosecutor_agency || "",
@@ -1143,7 +1146,7 @@ document.addEventListener("DOMContentLoaded", function () {
             department: raw.court?.department || "",
             docket_number: raw.court?.docket_number || first.case_number || "",
             case_number: raw.court?.case_number || first.case_number || "",
-            judge_name: first.judge_name || raw.court?.judge_name || "",
+            judge_name: judgeName,
             case_type: "Record Sealing",
             address: {
               line1: "",
@@ -1185,6 +1188,7 @@ document.addEventListener("DOMContentLoaded", function () {
           },
 
           charges: normalizedCharges,
+          judge_name: judgeName,
 
           agencies: {
             to_seal_records: [
@@ -1260,7 +1264,9 @@ document.addEventListener("DOMContentLoaded", function () {
       }
 
       function fieldPath(field) {
-        return field.dataPath || field.name || "";
+        const rawPath = field.dataPath || field.name || "";
+        if (rawPath === "charge.judge_name") return "charges.0.judge_name";
+        return rawPath;
       }
 
       function dataUrlToBytes(dataUrl) {
@@ -1392,6 +1398,16 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("summaryCourt").textContent = data.court.name || "—";
         document.getElementById("summaryCounty").textContent = data.court.county || "—";
         document.getElementById("summaryDisposition").textContent = primary.final_disposition || primary.disposition || "—";
+        const judge = data.court.judge_name || data.judge_name || primary.judge_name || "";
+        const judgeRow = document.getElementById("summaryJudgeRow");
+        const judgeValue = document.getElementById("summaryJudge");
+        if (judge) {
+          judgeValue.textContent = judge;
+          judgeRow.style.display = "";
+        } else {
+          judgeValue.textContent = "—";
+          judgeRow.style.display = "none";
+        }
       }
 
       function renderAllRecords(data) {
