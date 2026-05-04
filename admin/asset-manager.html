@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RecordPathAI Asset Manager</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 1.5rem; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #ddd; padding: 0.5rem; vertical-align: top; }
+    th { background: #f3f3f3; }
+    button { margin: 0.15rem; }
+    .note { margin: 1rem 0; padding: 0.75rem; border-left: 4px solid #d35400; background: #fff7ed; }
+  </style>
+</head>
+<body>
+  <h1>Form Review Queue</h1>
+  <div class="note">
+    <strong>Important:</strong> This static prototype stores status changes in browser localStorage only.
+    Production requires backend persistence and audit logging.
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>Court</th><th>County</th><th>Court Type</th><th>Source URL</th><th>Local PDF Path</th><th>Status</th><th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="queue-body"></tbody>
+  </table>
+
+  <script>
+    const STORAGE_KEY = 'recordpathai-review-queue-state';
+
+    function loadLocalState() {
+      try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); }
+      catch { return {}; }
+    }
+
+    function saveLocalState(state) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function setStatus(itemId, newStatus) {
+      const state = loadLocalState();
+      state[itemId] = newStatus;
+      saveLocalState(state);
+      render();
+    }
+
+    async function render() {
+      const response = await fetch('./review-queue.json');
+      const queue = await response.json();
+      const state = loadLocalState();
+      const tbody = document.getElementById('queue-body');
+      tbody.innerHTML = '';
+
+      queue.forEach((item, idx) => {
+        const id = `${item.court}|${item.sourceUrl}|${idx}`;
+        const status = state[id] || item.status;
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${item.court}</td>
+          <td>${item.county}, ${item.state}</td>
+          <td>${item.courtType}</td>
+          <td><a href="${item.sourceUrl}" target="_blank" rel="noopener noreferrer">source</a></td>
+          <td>${item.localPath}</td>
+          <td><strong>${status}</strong></td>
+          <td>
+            <button data-action="approved">Approve</button>
+            <button data-action="rejected">Reject</button>
+            <button data-action="needs_mapping">Needs Mapping</button>
+            <button data-action="template_activated">Activate Template</button>
+          </td>
+        `;
+
+        tr.querySelectorAll('button').forEach((button) => {
+          button.addEventListener('click', () => setStatus(id, button.dataset.action));
+        });
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    render();
+  </script>
+</body>
+</html>
