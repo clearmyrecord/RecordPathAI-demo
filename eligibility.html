@@ -7,30 +7,23 @@
   <link rel="stylesheet" href="css/styles.css" />
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     :root {
       --bg: #eef2f8;
       --surface: #ffffff;
-      --surface-soft: #f7faff;
       --text: #233d70;
       --muted: #667796;
       --line: #dbe3f0;
       --blue: #6da7ff;
       --blue-dark: #4f88e8;
       --blue-soft: #dfe9fb;
-      --navy: #143d8f;
-      --navy-dark: #102f6c;
       --shadow: 0 10px 30px rgba(50, 78, 128, 0.08);
       --radius: 24px;
       --container: 1180px;
     }
 
-    html {
-      scroll-behavior: smooth;
-    }
+    html { scroll-behavior: smooth; }
 
     body {
       margin: 0;
@@ -49,14 +42,13 @@
       margin: 0 auto;
     }
 
-    /* HEADER */
     .site-header {
       padding: 18px 0 10px;
     }
 
     .header-shell {
-      background: rgba(255, 255, 255, 0.72);
-      border: 1px solid rgba(219, 227, 240, 0.9);
+      background: rgba(255,255,255,0.72);
+      border: 1px solid var(--line);
       box-shadow: var(--shadow);
       border-radius: 22px;
       padding: 14px 18px;
@@ -76,7 +68,6 @@
       font-weight: 800;
       font-size: 20px;
       color: #3b6db4;
-      letter-spacing: -0.02em;
     }
 
     .brand-icon {
@@ -84,9 +75,8 @@
       height: 34px;
       border: 2px solid #22345f;
       border-radius: 4px;
-      background: #ffffff;
+      background: #fff;
       position: relative;
-      flex: 0 0 auto;
     }
 
     .brand-icon::before {
@@ -113,31 +103,20 @@
       font-size: 15px;
       font-weight: 600;
       color: var(--text);
-      transition: background 0.2s ease, color 0.2s ease;
     }
 
-    .nav a:hover {
-      background: var(--blue-soft);
-      color: var(--blue-dark);
-    }
-
+    .nav a:hover,
     .nav-cta {
       background: var(--blue-soft);
       color: var(--blue-dark);
-      font-weight: 800;
     }
 
-    .nav-cta:hover {
-      background: #d4e3fd;
-    }
-
-    /* PAGE HERO */
     .page-hero {
       padding: 30px 0 24px;
     }
 
     .hero-card {
-      background: linear-gradient(180deg, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.80) 100%);
+      background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0.82));
       border: 1px solid var(--line);
       border-radius: 34px;
       box-shadow: var(--shadow);
@@ -153,7 +132,6 @@
       color: var(--blue-dark);
       font-size: 13px;
       font-weight: 800;
-      letter-spacing: 0.04em;
       text-transform: uppercase;
     }
 
@@ -163,7 +141,6 @@
       line-height: 0.98;
       font-weight: 800;
       letter-spacing: -0.04em;
-      color: var(--text);
     }
 
     .page-subtitle {
@@ -174,13 +151,12 @@
       color: var(--muted);
     }
 
-    /* MAIN CARD */
     .page-section {
       padding: 0 0 34px;
     }
 
     .page-card {
-      background: rgba(255,255,255,0.72);
+      background: rgba(255,255,255,0.78);
       border: 1px solid var(--line);
       border-radius: 30px;
       box-shadow: var(--shadow);
@@ -198,46 +174,29 @@
       margin-bottom: 26px;
     }
 
-    .section-block + .section-block {
-      margin-top: 28px;
-      padding-top: 28px;
-      border-top: 1px solid var(--line);
-    }
-
     .section-title {
       margin: 0 0 12px;
       font-size: clamp(28px, 3vw, 36px);
-      line-height: 1.08;
       font-weight: 800;
       letter-spacing: -0.02em;
-      color: var(--text);
     }
 
     .section-copy {
       margin: 0 0 20px;
-      max-width: 760px;
+      max-width: 780px;
       color: var(--muted);
       font-size: 16px;
       line-height: 1.65;
     }
 
-    /* FORM */
     .form-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 18px;
     }
 
-    .field {
-      display: block;
-    }
-
     .field-full {
       grid-column: 1 / -1;
-    }
-
-    .field-spacer {
-      visibility: hidden;
     }
 
     .field label {
@@ -246,7 +205,6 @@
       color: #3f5a87;
       font-size: 15px;
       font-weight: 700;
-      line-height: 1.2;
     }
 
     .field input,
@@ -257,17 +215,15 @@
       padding: 14px 16px;
       border: 1px solid #d5e0ef;
       border-radius: 14px;
-      background: #ffffff;
+      background: #fff;
       color: #243755;
       font-size: 16px;
-      line-height: 1.2;
       outline: none;
       font-family: Arial, Helvetica, sans-serif;
-      transition: border-color 0.2s ease, box-shadow 0.2s ease;
     }
 
     .field textarea {
-      min-height: 110px;
+      min-height: 105px;
       resize: vertical;
       line-height: 1.5;
     }
@@ -276,7 +232,7 @@
     .field select:focus,
     .field textarea:focus {
       border-color: #7eaef3;
-      box-shadow: 0 0 0 4px rgba(126, 174, 243, 0.15);
+      box-shadow: 0 0 0 4px rgba(126,174,243,0.15);
     }
 
     .field-helper {
@@ -292,7 +248,6 @@
       color: #7283a1;
     }
 
-    /* BUTTONS */
     .button-row {
       display: flex;
       gap: 14px;
@@ -311,29 +266,21 @@
       font-weight: 800;
       border: none;
       cursor: pointer;
-      text-decoration: none;
-      transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.2s ease;
-    }
-
-    .btn:hover {
-      transform: translateY(-1px);
     }
 
     .btn-primary {
-      background: linear-gradient(180deg, #7fb2ff 0%, #5b93eb 100%);
-      color: #ffffff;
-      box-shadow: 0 12px 24px rgba(91, 147, 235, 0.22);
+      background: linear-gradient(180deg, #7fb2ff, #5b93eb);
+      color: #fff;
+      box-shadow: 0 12px 24px rgba(91,147,235,0.22);
       flex: 1 1 260px;
     }
 
     .btn-secondary {
-      background: #ffffff;
+      background: #fff;
       color: var(--text);
       border: 1px solid var(--line);
-      flex: 0 0 auto;
     }
 
-    /* SUMMARY */
     .summary-box {
       margin-top: 26px;
       background: #f8fbff;
@@ -344,7 +291,6 @@
 
     .summary-title {
       margin: 0 0 10px;
-      color: var(--text);
       font-size: 20px;
       font-weight: 800;
     }
@@ -356,13 +302,12 @@
       line-height: 1.65;
     }
 
-    /* FOOTER */
     .site-footer {
       padding: 0 0 26px;
     }
 
     .footer-shell {
-      background: #ffffff;
+      background: #fff;
       border: 1px solid var(--line);
       box-shadow: var(--shadow);
       border-radius: 22px;
@@ -386,7 +331,6 @@
 
     .footer-links {
       display: flex;
-      align-items: center;
       gap: 10px;
       flex-wrap: wrap;
     }
@@ -396,7 +340,6 @@
       border-radius: 12px;
       font-size: 14px;
       font-weight: 700;
-      color: var(--text);
     }
 
     .footer-links a:hover {
@@ -404,21 +347,13 @@
       color: var(--blue-dark);
     }
 
-    /* MOBILE */
     @media (max-width: 760px) {
-      .site-header {
-        padding-top: 14px;
-      }
-
       .header-inner {
         flex-direction: column;
         align-items: flex-start;
       }
 
-      .nav {
-        width: 100%;
-      }
-
+      .nav,
       .nav a {
         width: 100%;
         text-align: center;
@@ -426,16 +361,6 @@
 
       .hero-card {
         padding: 38px 24px;
-      }
-
-      .page-title {
-        font-size: 42px;
-      }
-
-      .page-subtitle,
-      .section-copy,
-      .summary-copy {
-        font-size: 16px;
       }
 
       .page-card {
@@ -446,17 +371,11 @@
         grid-template-columns: 1fr;
       }
 
-      .field-spacer {
-        display: none;
-      }
-
       .button-row {
         flex-direction: column;
       }
 
-      .btn,
-      .btn-primary,
-      .btn-secondary {
+      .btn {
         width: 100%;
       }
 
@@ -465,10 +384,7 @@
         align-items: flex-start;
       }
 
-      .footer-links {
-        width: 100%;
-      }
-
+      .footer-links,
       .footer-links a {
         width: 100%;
         text-align: center;
@@ -476,6 +392,7 @@
     }
   </style>
 </head>
+
 <body>
   <header class="site-header">
     <div class="container">
@@ -504,7 +421,7 @@
           <span class="eyebrow">Step 1 of the workflow</span>
           <h1 class="page-title">Start Your Eligibility Intake</h1>
           <p class="page-subtitle">
-            Enter your personal and mailing information so RecordPathAI can carry it through the workflow and use it later in your packet and court-ready forms.
+            Enter your personal and mailing information. RecordPathAI will carry this information into your record details and packet generation workflow.
           </p>
         </div>
       </div>
@@ -514,88 +431,111 @@
       <div class="container">
         <section class="page-card">
           <div class="info-banner">
-            <strong>Important:</strong> This page is only for your personal and mailing information. Case details, offense details, and court details belong on the <strong>Record Details</strong> page. Eligibility results and packet output should be handled later on the packet page.
+            <strong>Important:</strong> This page collects your personal and mailing information only.
+            Case details, charge details, court details, and eligibility results are handled in the next steps.
           </div>
 
-          <section class="section-block">
-            <h2 class="section-title">Your Contact Information</h2>
-            <p class="section-copy">
-              This intake is designed to collect the personal information needed throughout the RecordPathAI workflow. The data entered here can be reused later to help populate packet fields and court-facing forms.
+          <h2 class="section-title">Your Contact Information</h2>
+          <p class="section-copy">
+            This information helps RecordPathAI prepare your packet profile and avoid duplicate entry later.
+          </p>
+
+          <form id="user-profile-form" class="form-grid" onsubmit="return false;">
+            <div class="field">
+              <label for="firstName">First Name</label>
+              <input id="firstName" data-path="petitioner.first_name" type="text" placeholder="First name" />
+            </div>
+
+            <div class="field">
+              <label for="lastName">Last Name</label>
+              <input id="lastName" data-path="petitioner.last_name" type="text" placeholder="Last name" />
+            </div>
+
+            <div class="field field-full">
+              <label for="fullName">Full Legal Name</label>
+              <input id="fullName" data-path="petitioner.full_name" type="text" placeholder="Full legal name" />
+              <div class="field-helper">This can be auto-filled from the Ohio landing page.</div>
+            </div>
+
+            <div class="field">
+              <label for="email">Email</label>
+              <input id="email" data-path="petitioner.email" type="email" placeholder="Email address" />
+            </div>
+
+            <div class="field">
+              <label for="phone">Phone</label>
+              <input id="phone" data-path="petitioner.phone" type="text" placeholder="Phone number" />
+            </div>
+
+            <div class="field field-full">
+              <label for="address1">Street Address</label>
+              <input id="address1" data-path="petitioner.address.line1" type="text" placeholder="Street address" />
+            </div>
+
+            <div class="field">
+              <label for="address2">Apartment / Unit</label>
+              <input id="address2" data-path="petitioner.address.line2" type="text" placeholder="Apartment, suite, unit, etc." />
+            </div>
+
+            <div class="field">
+              <label for="city">City</label>
+              <input id="city" data-path="petitioner.address.city" type="text" placeholder="City" />
+            </div>
+
+            <div class="field">
+              <label for="residenceState">Residence State</label>
+              <select id="residenceState" data-path="petitioner.address.state">
+                <option value="">Select residence state</option>
+                <option value="OH">Ohio</option>
+                <option value="NV">Nevada</option>
+                <option value="CA">California</option>
+                <option value="AZ">Arizona</option>
+                <option value="TX">Texas</option>
+                <option value="FL">Florida</option>
+              </select>
+              <div class="field-helper">This is where you live now. It can be different from the case state.</div>
+            </div>
+
+            <div class="field">
+              <label for="zip">ZIP</label>
+              <input id="zip" data-path="petitioner.address.zip" type="text" placeholder="ZIP code" />
+            </div>
+
+            <div class="field">
+              <label for="caseState">Case State</label>
+              <select id="caseState" data-path="case.state">
+                <option value="">Select case state</option>
+                <option value="Ohio">Ohio</option>
+                <option value="Nevada">Nevada</option>
+                <option value="California">California</option>
+                <option value="Arizona">Arizona</option>
+                <option value="Texas">Texas</option>
+                <option value="Florida">Florida</option>
+              </select>
+              <div class="field-helper">This controls which state rules and packet flow should be used.</div>
+            </div>
+
+            <div class="field field-full">
+              <label for="intakeNotes">Optional Notes</label>
+              <textarea id="intakeNotes" data-path="petitioner.notes" placeholder="Anything important you want to remember before entering record details."></textarea>
+            </div>
+          </form>
+
+          <div class="autosave-note">
+            Your intake information saves locally in this browser for the RecordPathAI workflow.
+          </div>
+
+          <div class="button-row">
+            <button type="button" id="save-profile" class="btn btn-secondary">Save Intake</button>
+            <button type="button" id="eligibility-continue" class="btn btn-primary">Save and Continue</button>
+          </div>
+
+          <div class="summary-box">
+            <h3 class="summary-title">What happens next</h3>
+            <p class="summary-copy">
+              Next, you will enter your case number, court, county, charge, offense level, disposition date, and other record details. The packet page will use all saved information to determine eligibility timing and generate your filing packet.
             </p>
-
-            <form id="user-profile-form" class="form-grid" onsubmit="return false;">
-              <div class="field">
-                <label for="firstName">First Name</label>
-                <input id="firstName" data-path="petitioner.first_name" type="text" placeholder="First name" />
-              </div>
-
-              <div class="field">
-                <label for="lastName">Last Name</label>
-                <input id="lastName" data-path="petitioner.last_name" type="text" placeholder="Last name" />
-              </div>
-
-              <div class="field">
-                <label for="email">Email</label>
-                <input id="email" data-path="petitioner.email" type="email" placeholder="Email address" />
-              </div>
-
-              <div class="field">
-                <label for="phone">Phone</label>
-                <input id="phone" data-path="petitioner.phone" type="text" placeholder="Phone number" />
-              </div>
-
-              <div class="field field-full">
-                <label for="address1">Street Address</label>
-                <input id="address1" data-path="petitioner.address.line1" type="text" placeholder="Street address" />
-              </div>
-
-              <div class="field">
-                <label for="address2">Apartment / Unit</label>
-                <input id="address2" data-path="petitioner.address.line2" type="text" placeholder="Apartment, suite, unit, etc." />
-              </div>
-
-              <div class="field field-spacer" aria-hidden="true"></div>
-
-              <div class="field">
-                <label for="city">City</label>
-                <input id="city" data-path="petitioner.address.city" type="text" placeholder="City" />
-              </div>
-
-              <div class="field">
-                <label for="residenceState">Residence State</label>
-                <select id="residenceState" data-path="petitioner.address.state">
-                  <option value="">Select</option>
-                  <option value="OH">Ohio</option>
-                  <option value="NV">Nevada</option>
-                  <option value="CA">California</option>
-                  <option value="AZ">Arizona</option>
-                  <option value="TX">Texas</option>
-                  <option value="FL">Florida</option>
-                </select>
-              </div>
-
-              <div class="field">
-                <label for="zip">ZIP</label>
-                <input id="zip" data-path="petitioner.address.zip" type="text" placeholder="ZIP code" />
-              </div>
-            </form>
-
-            <div class="autosave-note">
-              Your personal information auto-saves into the RecordPathAI packet profile.
-            </div>
-
-            <div class="button-row">
-              <button type="button" id="save-profile" class="btn btn-secondary">Save Intake</button>
-              <a href="record-details.html" id="eligibility-continue" class="btn btn-primary">Save and Continue</a>
-            </div>
-
-            <div class="summary-box">
-              <h3 class="summary-title">What happens next</h3>
-              <p class="summary-copy">
-                After this step, you will enter your case, charge, court, and filing details on the Record Details page. RecordPathAI should determine eligibility and generate packet output only after that information is brought together on the packet page.
-              </p>
-            </div>
-          </section>
+          </div>
         </section>
       </div>
     </section>
@@ -621,27 +561,182 @@
   <script src="js/rules.js"></script>
   <script src="js/app.js"></script>
   <script src="js/packet-data-bridge.js"></script>
+
   <script>
     document.addEventListener("DOMContentLoaded", function () {
-      RecordPathDataBridge.initPage(document);
+      hydrateFromLandingPage();
+      hydrateFromLocalStorage();
+
+      if (window.RecordPathDataBridge && typeof RecordPathDataBridge.initPage === "function") {
+        RecordPathDataBridge.initPage(document);
+      }
 
       const saveBtn = document.getElementById("save-profile");
       const continueBtn = document.getElementById("eligibility-continue");
 
-      function saveNow() {
-        const data = RecordPathDataBridge.loadPacketData();
-        RecordPathDataBridge.derivePacketData(data);
-        RecordPathDataBridge.savePacketData(data);
-      }
-
       if (saveBtn) {
-        saveBtn.addEventListener("click", saveNow);
+        saveBtn.addEventListener("click", function () {
+          saveEligibilityIntake();
+          alert("Intake saved.");
+        });
       }
 
       if (continueBtn) {
-        continueBtn.addEventListener("click", saveNow);
+        continueBtn.addEventListener("click", function () {
+          saveEligibilityIntake();
+          window.location.href = "record-details.html";
+        });
       }
+
+      document.querySelectorAll("input, select, textarea").forEach(function (field) {
+        field.addEventListener("change", saveEligibilityIntake);
+        field.addEventListener("blur", saveEligibilityIntake);
+      });
     });
+
+    function hydrateFromLandingPage() {
+      const savedLandingData = localStorage.getItem("recordPathLandingData");
+      if (!savedLandingData) return;
+
+      try {
+        const data = JSON.parse(savedLandingData);
+
+        if (data.fullName) {
+          setValue("fullName", data.fullName);
+
+          const parts = data.fullName.trim().split(" ");
+          if (parts.length > 0 && !getValue("firstName")) {
+            setValue("firstName", parts[0]);
+          }
+
+          if (parts.length > 1 && !getValue("lastName")) {
+            setValue("lastName", parts.slice(1).join(" "));
+          }
+        }
+
+        if (data.email) setValue("email", data.email);
+
+        if (data.caseState) {
+          setValue("caseState", data.caseState);
+          localStorage.setItem("caseState", data.caseState);
+          localStorage.setItem("state", data.caseState);
+        }
+
+        if (data.residenceState) {
+          setValue("residenceState", data.residenceState);
+        }
+      } catch (error) {
+        console.warn("Could not load RecordPathAI landing data:", error);
+      }
+    }
+
+    function hydrateFromLocalStorage() {
+      const fields = document.querySelectorAll("input, select, textarea");
+
+      fields.forEach(function (field) {
+        if (!field.id) return;
+
+        const savedValue = localStorage.getItem(field.id);
+        if (savedValue && !field.value) {
+          field.value = savedValue;
+        }
+      });
+
+      const fullName = localStorage.getItem("fullName");
+      const email = localStorage.getItem("email");
+      const caseState = localStorage.getItem("caseState") || localStorage.getItem("state");
+
+      if (fullName && !getValue("fullName")) setValue("fullName", fullName);
+      if (email && !getValue("email")) setValue("email", email);
+      if (caseState && !getValue("caseState")) setValue("caseState", caseState);
+    }
+
+    function saveEligibilityIntake() {
+      const fields = document.querySelectorAll("input, select, textarea");
+
+      fields.forEach(function (field) {
+        if (!field.id) return;
+        localStorage.setItem(field.id, field.value);
+      });
+
+      const fullName = getValue("fullName") || buildFullName();
+      const firstName = getValue("firstName");
+      const lastName = getValue("lastName");
+      const email = getValue("email");
+      const phone = getValue("phone");
+      const residenceState = getValue("residenceState");
+      const caseState = getValue("caseState") || "Ohio";
+
+      if (fullName) localStorage.setItem("fullName", fullName);
+      if (firstName) localStorage.setItem("firstName", firstName);
+      if (lastName) localStorage.setItem("lastName", lastName);
+      if (email) localStorage.setItem("email", email);
+      if (phone) localStorage.setItem("phone", phone);
+
+      localStorage.setItem("caseState", caseState);
+      localStorage.setItem("state", caseState);
+      localStorage.setItem("residenceState", residenceState);
+
+      const packetProfile = {
+        petitioner: {
+          first_name: firstName,
+          last_name: lastName,
+          full_name: fullName,
+          email: email,
+          phone: phone,
+          address: {
+            line1: getValue("address1"),
+            line2: getValue("address2"),
+            city: getValue("city"),
+            state: residenceState,
+            zip: getValue("zip")
+          },
+          notes: getValue("intakeNotes")
+        },
+        case: {
+          state: caseState
+        },
+        workflow: {
+          current_step: "eligibility",
+          updated_at: new Date().toISOString()
+        }
+      };
+
+      localStorage.setItem("recordPathEligibilityIntake", JSON.stringify(packetProfile));
+
+      if (window.RecordPathDataBridge && typeof RecordPathDataBridge.loadPacketData === "function") {
+        try {
+          const data = RecordPathDataBridge.loadPacketData();
+          if (typeof RecordPathDataBridge.derivePacketData === "function") {
+            RecordPathDataBridge.derivePacketData(data);
+          }
+          if (typeof RecordPathDataBridge.savePacketData === "function") {
+            RecordPathDataBridge.savePacketData(data);
+          }
+        } catch (error) {
+          console.warn("RecordPathDataBridge save skipped:", error);
+        }
+      }
+    }
+
+    function buildFullName() {
+      return [getValue("firstName"), getValue("lastName")]
+        .filter(Boolean)
+        .join(" ")
+        .trim();
+    }
+
+    function getValue(id) {
+      const field = document.getElementById(id);
+      return field ? field.value.trim() : "";
+    }
+
+    function setValue(id, value) {
+      const field = document.getElementById(id);
+      if (field && value) {
+        field.value = value;
+      }
+    }
   </script>
 </body>
 </html>
