@@ -1602,12 +1602,6 @@ document.addEventListener("DOMContentLoaded", function () {
         const summary = document.getElementById("eligibilitySummary");
         const reasonList = document.getElementById("eligibilityReasons");
 
-        const isEligible = Boolean(eligibility.is_eligible) || nowEl.textContent === "Eligible now";
-        pill.className = `status-pill ${isEligible ? "eligible" : "review"}`;
-        pill.textContent = isEligible ? "Likely Eligible" : "Eligibility Needs Review";
-        headline.textContent = `Screening result for ${data.court.state || "this"} case`;
-        summary.textContent = eligibility.eligibility_reason || "Review the checklist below before filing.";
-
         const flags = [
           ["Pending charges", Boolean(eligibility.has_pending_cases || charge.pending_charges)],
           ["Traffic offense", /traffic/i.test(safe(charge.charge_name) + " " + safe(charge.charge_code))],
@@ -1618,6 +1612,27 @@ document.addEventListener("DOMContentLoaded", function () {
           ["victim under 13", Boolean(charge.victim_under_13 || eligibility.victim_under_13)],
           ["felony violence offense", Boolean(charge.felony_violence_offense || eligibility.felony_violence_offense)]
         ];
+
+        const hasDisqualifyingFlag = flags.some(([, flagged]) => flagged);
+        const waitingPeriodSatisfied = eligibleDateObj && !Number.isNaN(eligibleDateObj.getTime()) && today >= eligibleDateObj;
+        const isEligible = waitingPeriodSatisfied && !hasDisqualifyingFlag;
+
+        if (waitingPeriodSatisfied && hasDisqualifyingFlag) {
+          pill.className = "status-pill review";
+          pill.textContent = "Needs Review";
+          headline.textContent = "Screening needs review";
+          summary.textContent = "Waiting period appears satisfied, but one or more screening flags may affect eligibility.";
+        } else if (isEligible) {
+          pill.className = "status-pill eligible";
+          pill.textContent = "Likely Eligible";
+          headline.textContent = `Screening result for ${data.court.state || "this"} case`;
+          summary.textContent = eligibility.eligibility_reason || "The waiting period appears satisfied with no disqualifying screening flags.";
+        } else {
+          pill.className = "status-pill review";
+          pill.textContent = "Eligibility Needs Review";
+          headline.textContent = "Screening needs review";
+          summary.textContent = eligibility.eligibility_reason || "Review the checklist below before filing.";
+        }
 
         reasonList.innerHTML = flags.map(([label, flagged]) => `<li>${escapeHtml(label)}: <strong>${flagged ? "Yes" : "No"}</strong></li>`).join("");
       }
