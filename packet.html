@@ -1598,10 +1598,94 @@ document.addEventListener("DOMContentLoaded", function () {
       function updateEligibilitySection(data) {
         const charge = data.charges[0] || {};
         const eligibility = data.eligibility || {};
+        const today = new Date();
 
-        const dischargeRaw = charge.probation_end_date || charge.discharge_date || "";
-        const eligibleRaw = eligibility.estimated_eligible_on || charge.waiting_period_end_date || "";
-        const reliefRaw = safe(eligibility.relief_type || eligibility.filing_type || "").toLowerCase();
+        function toIsoDate(value) {
+          if (!value) return "";
+          const parsed = new Date(String(value).includes("/") ? value : `${value}T12:00:00`);
+          if (Number.isNaN(parsed.getTime())) return "";
+          return `${parsed.getFullYear()}-${String(parsed.getMonth() + 1).padStart(2, "0")}-${String(parsed.getDate()).padStart(2, "0")}`;
+        }
+
+        function addYearsIso(isoDate, yearsToAdd) {
+          const base = new Date(`${isoDate}T12:00:00`);
+          if (Number.isNaN(base.getTime())) return "";
+          base.setFullYear(base.getFullYear() + yearsToAdd);
+          return toIsoDate(base.toISOString().slice(0, 10));
+        }
+
+        function computeOhioEligibility(record) {
+          const finalDischarge = toIsoDate(record.probation_end_date || record.discharge_date || record.case_closed_date || "");
+          const levelRaw = safe(record.level || record.charge_level || record.offense_classification || "").toUpperCase();
+          const chargeText = `${safe(record.charge_name)} ${safe(record.charge_code)}`.toLowerCase();
+          const flags = [];
+
+          if (!finalDischarge) {
+            flags.push("Missing discharge date");
+            return {
+              relief_type: "Ohio record sealing",
+              required_waiting_period: "",
+              estimated_eligible_on: "",
+              is_eligible: false,
+              eligibility_status: "Needs Review",
+              eligibility_reason: "Final discharge date is missing.",
+              flags
+            };
+          }
+
+          if (/\bF1\b|\bF2\b/.test(levelRaw) || /felony\s*(1|2|first|second)/i.test(levelRaw)) {
+            flags.push("F1/F2 disqualifying level");
+            return {
+              relief_type: "Ohio record sealing",
+              required_waiting_period: "",
+              estimated_eligible_on: "",
+              is_eligible: false,
+              eligibility_status: "Needs Review",
+              eligibility_reason: "F1/F2 convictions require manual review and may be disqualifying.",
+              flags
+            };
+          }
+
+          let waitYears = 1;
+          let requiredPeriod = "1 year";
+          if (/\bF3\b/.test(levelRaw)) {
+            waitYears = 3;
+            requiredPeriod = "3 years";
+          } else if (/2921\.43/.test(chargeText) || /soliciting improper compensation/.test(chargeText)) {
+            waitYears = 7;
+            requiredPeriod = "7 years";
+          }
+
+          const estimatedEligible = addYearsIso(finalDischarge, waitYears);
+          const eligibleDateObj = estimatedEligible ? new Date(`${estimatedEligible}T12:00:00`) : null;
+          const waitingSatisfied = Boolean(eligibleDateObj) && !Number.isNaN(eligibleDateObj.getTime()) && today >= eligibleDateObj;
+
+          return {
+            relief_type: "Ohio record sealing",
+            required_waiting_period: requiredPeriod,
+            estimated_eligible_on: estimatedEligible,
+            is_eligible: Boolean(estimatedEligible) && waitingSatisfied,
+            eligibility_status: waitingSatisfied ? "Likely Eligible" : "Not Eligible",
+            eligibility_reason: waitingSatisfied ? "Waiting period appears satisfied." : "Waiting period is not yet satisfied.",
+            flags
+          };
+        }
+
+        const computed = computeOhioEligibility(charge);
+        const merged = {
+          ...eligibility,
+          relief_type: eligibility.relief_type || computed.relief_type,
+          required_waiting_period: eligibility.required_waiting_period || computed.required_waiting_period,
+          estimated_eligible_on: eligibility.estimated_eligible_on || computed.estimated_eligible_on,
+          is_eligible: typeof eligibility.is_eligible === "boolean" ? eligibility.is_eligible : computed.is_eligible,
+          eligibility_status: eligibility.eligibility_status || computed.eligibility_status,
+          eligibility_reason: eligibility.eligibility_reason || computed.eligibility_reason,
+          flags: Array.isArray(eligibility.flags) ? eligibility.flags : computed.flags
+        };
+
+        const dischargeRaw = charge.probation_end_date || charge.discharge_date || charge.case_closed_date || "";
+        const eligibleRaw = merged.estimated_eligible_on || charge.waiting_period_end_date || "";
+        const reliefRaw = safe(merged.relief_type || merged.filing_type || "").toLowerCase();
         const reliefType = reliefRaw.includes("expung")
           ? "Ohio expungement"
           : reliefRaw.includes("seal")
@@ -1609,7 +1693,7 @@ document.addEventListener("DOMContentLoaded", function () {
             : "Needs review";
 
         const waitingPeriodText = (() => {
-          if (safe(eligibility.required_waiting_period)) return eligibility.required_waiting_period;
+          if (safe(merged.required_waiting_period)) return merged.required_waiting_period;
           if (dischargeRaw && eligibleRaw) {
             const start = new Date(String(dischargeRaw).includes('/') ? dischargeRaw : dischargeRaw + 'T12:00:00');
             const end = new Date(String(eligibleRaw).includes('/') ? eligibleRaw : eligibleRaw + 'T12:00:00');
@@ -1628,7 +1712,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const nowEl = document.getElementById("eligibilityNowValue");
         const eligibleDateObj = eligibleRaw ? new Date(String(eligibleRaw).includes('/') ? eligibleRaw : eligibleRaw + 'T12:00:00') : null;
-        const today = new Date();
         nowEl.textContent = eligibleDateObj && !Number.isNaN(eligibleDateObj.getTime()) && today >= eligibleDateObj
           ? "Eligible now"
           : "";
@@ -1657,17 +1740,17 @@ document.addEventListener("DOMContentLoaded", function () {
           pill.className = "status-pill review";
           pill.textContent = "Needs Review";
           headline.textContent = "Screening needs review";
-          summary.textContent = "Waiting period appears satisfied, but one or more screening flags may affect eligibility.";
+          summary.textContent = merged.eligibility_reason || "Waiting period appears satisfied, but one or more screening flags may affect eligibility.";
         } else if (isEligible) {
           pill.className = "status-pill eligible";
           pill.textContent = "Likely Eligible";
           headline.textContent = `Screening result for ${data.court.state || "this"} case`;
-          summary.textContent = eligibility.eligibility_reason || "The waiting period appears satisfied with no disqualifying screening flags.";
+          summary.textContent = merged.eligibility_reason || "The waiting period appears satisfied with no disqualifying screening flags.";
         } else {
           pill.className = "status-pill review";
           pill.textContent = "Eligibility Needs Review";
           headline.textContent = "Screening needs review";
-          summary.textContent = eligibility.eligibility_reason || "Review the checklist below before filing.";
+          summary.textContent = merged.eligibility_reason || "Review the checklist below before filing.";
         }
 
         reasonList.innerHTML = flags.map(([label, flagged]) => `<li>${escapeHtml(label)}: <strong>${flagged ? "Yes" : "No"}</strong></li>`).join("");
