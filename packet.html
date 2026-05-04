@@ -1140,7 +1140,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const address = petitioner.address || {};
         const charges = Array.isArray(raw.charges) ? raw.charges : [];
         const primary = charges[0] || {};
-        const judgeName = primary.judge_name || raw.court?.judge_name || raw.judge_name || "";
+        const judgeName = raw.court?.judge_name || primary.judge_name || "";
         const today = new Date();
 
         const fullName =
@@ -1510,7 +1510,7 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("summaryCourt").textContent = data.court.name || "—";
         document.getElementById("summaryCounty").textContent = data.court.county || "—";
         document.getElementById("summaryDisposition").textContent = primary.final_disposition || primary.disposition || "—";
-        const judge = data.court.judge_name || data.judge_name || primary.judge_name || "";
+        const judge = data.court.judge_name || "";
         const judgeRow = document.getElementById("summaryJudgeRow");
         const judgeValue = document.getElementById("summaryJudge");
         if (judge) {
