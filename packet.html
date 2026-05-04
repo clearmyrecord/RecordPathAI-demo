@@ -1648,12 +1648,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
           let waitYears = 1;
           let requiredPeriod = "1 year";
-          if (/\bF3\b/.test(levelRaw)) {
-            waitYears = 3;
-            requiredPeriod = "3 years";
-          } else if (/2921\.43/.test(chargeText) || /soliciting improper compensation/.test(chargeText)) {
+          if (/2921\.43/.test(chargeText) || /soliciting improper compensation/.test(chargeText)) {
             waitYears = 7;
             requiredPeriod = "7 years";
+          } else if (/\bF3\b/.test(levelRaw)) {
+            waitYears = 3;
+            requiredPeriod = "3 years";
           }
 
           const estimatedEligible = addYearsIso(finalDischarge, waitYears);
@@ -1721,7 +1721,10 @@ document.addEventListener("DOMContentLoaded", function () {
         const summary = document.getElementById("eligibilitySummary");
         const reasonList = document.getElementById("eligibilityReasons");
 
+        const computedFlagSet = new Set(Array.isArray(merged.flags) ? merged.flags : []);
         const flags = [
+          ["Missing discharge date", computedFlagSet.has("Missing discharge date")],
+          ["F1/F2 disqualifying level", computedFlagSet.has("F1/F2 disqualifying level")],
           ["Pending charges", Boolean(eligibility.has_pending_cases || charge.pending_charges)],
           ["Traffic offense", /traffic/i.test(safe(charge.charge_name) + " " + safe(charge.charge_code))],
           ["1st/2nd degree felony", /f[12]\b|felony\s*(1|2|first|second)/i.test(safe(charge.level || charge.offense_classification))],
@@ -1732,11 +1735,19 @@ document.addEventListener("DOMContentLoaded", function () {
           ["felony violence offense", Boolean(charge.felony_violence_offense || eligibility.felony_violence_offense)]
         ];
 
+        const hasComputedNeedsReviewFlag = computedFlagSet.has("Missing discharge date") || computedFlagSet.has("F1/F2 disqualifying level");
         const hasDisqualifyingFlag = flags.some(([, flagged]) => flagged);
         const waitingPeriodSatisfied = eligibleDateObj && !Number.isNaN(eligibleDateObj.getTime()) && today >= eligibleDateObj;
         const isEligible = waitingPeriodSatisfied && !hasDisqualifyingFlag;
 
-        if (waitingPeriodSatisfied && hasDisqualifyingFlag) {
+        if (hasComputedNeedsReviewFlag) {
+          pill.className = "status-pill review";
+          pill.textContent = "Needs Review";
+          headline.textContent = "Screening needs review";
+          summary.textContent = computedFlagSet.has("Missing discharge date")
+            ? "Needs review: missing final discharge date, so an estimated eligibility date cannot be calculated."
+            : "Needs review: F1/F2 disqualifying level detected for this Ohio case.";
+        } else if (waitingPeriodSatisfied && hasDisqualifyingFlag) {
           pill.className = "status-pill review";
           pill.textContent = "Needs Review";
           headline.textContent = "Screening needs review";
