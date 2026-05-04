@@ -1,285 +1,155 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { detectFormType, scoreFormCandidate } from './form-source-scorer.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const repoRoot = path.resolve(__dirname, '..');
 
 const CATALOG_PATH = path.join(repoRoot, 'data', 'court-catalog.json');
+const COUNTIES_PATH = path.join(repoRoot, 'data', 'ohio-counties.json');
 const REVIEW_QUEUE_PATH = path.join(repoRoot, 'admin', 'review-queue.json');
-const FORM_KEYWORDS = [
-  'record sealing',
-  'expungement',
-  'application to seal',
-  '2953.32',
-  '2953.33',
-  'dismissal',
-  'non-conviction',
-  'no bill'
-];
-const ALLOWED_SOURCE_TOKENS = ['.gov', '.us', 'clerk', 'court', 'municipal', 'commonpleas', 'county'];
-const DRY_RUN = !process.argv.includes('--apply');
+
+const args = process.argv.slice(2);
+const getArg = (name) => args.find((a) => a.startsWith(`--${name}=`))?.split('=')[1];
+const DRY_RUN = !args.includes('--apply');
+const filters = { state: getArg('state'), county: getArg('county'), tier: getArg('tier') };
+
 const SERPAPI_KEY = process.env.SERPAPI_KEY;
+const SEARCH_QUERIES = (court) => [
+  `${court.courtName} record sealing application PDF`,
+  `${court.courtName} expungement application PDF`,
+  `${court.county} County Ohio application for sealing 2953.32 PDF`,
+  `${court.county} County Clerk of Courts sealing records forms PDF`,
+  `${court.courtName} dismissal not guilty no bill sealing PDF`
+];
 
-const SAFE_SEED_DISCOVERIES = {
-  'Wood County Court of Common Pleas': [
-    {
-      sourceUrl: 'https://clerkofcourt.co.wood.oh.us/wp-content/uploads/2024/02/Application-for-Sealing-2953.32.pdf',
-      formTitle: 'Application for Sealing 2953.32 (Conviction)',
-      discoveryMethod: 'safeSeed'
-    }
-  ],
-  'Franklin County Court of Common Pleas': [
-    {
-      sourceUrl: 'https://clerk.franklincountyohio.gov/CLCT-website/media/docs/general/Application-to-Seal-Record-of-Conviction-2953-32-B1a.pdf',
-      formTitle: 'Application to Seal Record of Conviction (R.C. 2953.32)',
-      discoveryMethod: 'safeSeed'
-    }
-  ]
-};
+async function readJson(filePath, fallback) { try { return JSON.parse(await fs.readFile(filePath, 'utf8')); } catch { return fallback; } }
+const nowIso = () => new Date().toISOString();
 
-async function readJson(filePath, fallback) {
-  try {
-    const content = await fs.readFile(filePath, 'utf8');
-    return JSON.parse(content);
-  } catch {
-    return fallback;
-  }
+async function searchSerp(query) {
+  if (!SERPAPI_KEY) return [];
+  const u = new URL('https://serpapi.com/search.json');
+  u.searchParams.set('engine', 'google'); u.searchParams.set('q', query); u.searchParams.set('api_key', SERPAPI_KEY);
+  const r = await fetch(u); if (!r.ok) return [];
+  const p = await r.json();
+  return (p.organic_results || []).map((x) => ({ title: x.title, link: x.link, snippet: x.snippet || '' }));
 }
 
-function slugify(value) {
-  return value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+async function tryDownloadPdf(url, localPath) {
+  const r = await fetch(url, { headers: { 'user-agent': 'RecordPathAI Form Crawler/2.0' } });
+  if (!r.ok) throw new Error(`Download failed: ${r.status}`);
+  const type = (r.headers.get('content-type') || '').toLowerCase();
+  if (!url.toLowerCase().includes('.pdf') && !type.includes('pdf')) throw new Error('Not a PDF content-type');
+  const bytes = Buffer.from(await r.arrayBuffer());
+  await fs.mkdir(path.dirname(localPath), { recursive: true });
+  await fs.writeFile(localPath, bytes);
 }
 
-function officialSource(url) {
-  try {
-    const lower = new URL(url).hostname.toLowerCase();
-    return ALLOWED_SOURCE_TOKENS.some((token) => lower.includes(token));
-  } catch {
-    return false;
-  }
-}
-
-function keywordMatch(text) {
-  const normalized = text.toLowerCase();
-  return FORM_KEYWORDS.some((keyword) => normalized.includes(keyword));
-}
-
-async function fetchHtml(url) {
-  const response = await fetch(url, { headers: { 'user-agent': 'RecordPathAI Form Crawler/1.0' } });
-  if (!response.ok) {
-    throw new Error(`Failed to fetch ${url}: ${response.status}`);
-  }
-  return response.text();
-}
-
-function discoverPdfLinks(html, baseUrl) {
-  const links = [];
-  const anchorPattern = /<a\b[^>]*href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi;
-
-  let match;
-  while ((match = anchorPattern.exec(html)) !== null) {
-    const href = (match[1] || '').trim();
-    const text = (match[2] || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
-    if (!href) continue;
-
-    let url;
-    try {
-      url = new URL(href, baseUrl).toString();
-    } catch {
-      continue;
-    }
-
-    const looksLikePdf = url.toLowerCase().includes('.pdf');
-    const relevant = keywordMatch(`${text} ${url}`);
-
-    if (looksLikePdf && relevant && officialSource(url)) {
-      links.push({
-        sourceUrl: url,
-        formTitle: text || path.basename(new URL(url).pathname),
-        discoveryMethod: 'formsPage'
-      });
-    }
-  }
-
-  return links;
-}
-
-
-function buildSerpQueries(court) {
-  return [
-    `${court.courtName} record sealing application PDF`,
-    `${court.courtName} expungement application PDF`,
-    `${court.courtName} application to seal record 2953.32 PDF`,
-    `${court.county} County Ohio clerk sealing records PDF`
-  ];
-}
-
-function normalizeDiscovery(item, fallbackTitle = '') {
-  const title = (item.title || fallbackTitle || '').trim();
-  const sourceUrl = (item.link || item.sourceUrl || '').trim();
-  if (!sourceUrl) return null;
-  const relevant = keywordMatch(`${title} ${sourceUrl}`);
-  const looksLikePdf = sourceUrl.toLowerCase().includes('.pdf');
-  if (!relevant || !looksLikePdf || !officialSource(sourceUrl)) return null;
+function buildMetadata(court, candidate, scored, pdfAccess, localPath = '') {
   return {
-    sourceUrl,
-    formTitle: title || path.basename(new URL(sourceUrl).pathname)
+    state: court.state,
+    county: court.county,
+    countySlug: court.countySlug,
+    courtName: court.courtName,
+    courtType: court.courtType,
+    formType: scored.formType || detectFormType(candidate.title, candidate.link, candidate.snippet),
+    sourceUrl: candidate.link || '',
+    sourcePageUrl: candidate.sourcePageUrl || candidate.link || '',
+    localPath,
+    pdfAccess,
+    status: 'pending_review',
+    requiresMapping: true,
+    mapped: false,
+    active: false,
+    discoveredAt: nowIso(),
+    lastVerified: nowIso(),
+    score: scored.score,
+    signals: scored.signals
   };
 }
 
-async function searchSerpApi(query) {
-  if (!SERPAPI_KEY) {
-    return [];
-  }
+(async function main() {
+  const [catalog, counties, existingQueue] = await Promise.all([
+    readJson(CATALOG_PATH, []), readJson(COUNTIES_PATH, []), readJson(REVIEW_QUEUE_PATH, [])
+  ]);
 
-  const searchUrl = new URL('https://serpapi.com/search.json');
-  searchUrl.searchParams.set('engine', 'google');
-  searchUrl.searchParams.set('q', query);
-  searchUrl.searchParams.set('api_key', SERPAPI_KEY);
+  const countyBySlug = new Map(counties.map((c) => [c.slug, c]));
+  const courts = catalog.filter((court) => {
+    if (filters.state && court.state !== filters.state) return false;
+    if (filters.county && court.countySlug !== filters.county.toLowerCase()) return false;
+    if (filters.tier) return countyBySlug.get(court.countySlug)?.tier === filters.tier;
+    return true;
+  });
 
-  const response = await fetch(searchUrl, { headers: { 'user-agent': 'RecordPathAI Form Crawler/1.0' } });
-  if (!response.ok) {
-    throw new Error(`SerpAPI request failed for "${query}": ${response.status}`);
-  }
-
-  const payload = await response.json();
-  const candidates = [
-    ...(payload.organic_results || []),
-    ...(payload.inline_videos || []),
-    ...(payload.related_results || [])
-  ];
-
-  return candidates
-    .map((candidate) => normalizeDiscovery(candidate, query))
-    .filter(Boolean);
-}
-
-async function discoverWithSerpApi(court) {
-  const queries = buildSerpQueries(court);
-  const discovered = [];
-
-  for (const query of queries) {
-    try {
-      const results = await searchSerpApi(query);
-      for (const result of results) {
-        discovered.push({ ...result, discoveryMethod: 'serpapi', searchQuery: query });
-      }
-    } catch (error) {
-      console.warn(`SerpAPI search failed for ${court.courtName} query "${query}": ${error.message}`);
-    }
-  }
-
-  return discovered;
-}
-
-async function saveFile(url, outPath) {
-  const response = await fetch(url, { headers: { 'user-agent': 'RecordPathAI Form Crawler/1.0' } });
-  if (!response.ok) throw new Error(`Download failed ${url}: ${response.status}`);
-  const bytes = Buffer.from(await response.arrayBuffer());
-  await fs.writeFile(outPath, bytes);
-}
-
-async function main() {
-  const courts = await readJson(CATALOG_PATH, []);
-  const existingQueue = await readJson(REVIEW_QUEUE_PATH, []);
+  const dedupe = new Set(existingQueue.map((q) => `${q.sourceUrl}|${q.localPath}`));
   const queue = [...existingQueue];
-
-  console.log(`Form crawler running in ${DRY_RUN ? 'dry-run' : 'apply'} mode.`);
-  if (!SERPAPI_KEY) {
-    console.log('SERPAPI_KEY not set; SerpAPI fallback is disabled.');
-  }
+  const discoveredInRun = [];
 
   for (const court of courts) {
-    if (court.status !== 'active') continue;
-
-    console.log(`Scanning ${court.courtName}...`);
-
-    try {
-      let found = [];
+    console.log(`Scanning: ${court.courtName}`);
+    let best = null;
+    for (const query of SEARCH_QUERIES(court)) {
       try {
-        const html = await fetchHtml(court.formsPage);
-        found = discoverPdfLinks(html, court.formsPage);
-      } catch (error) {
-        console.warn(`Unable to fetch forms page for ${court.courtName}: ${error.message}`);
-      }
-
-      if (!found.length) {
-        const seeded = SAFE_SEED_DISCOVERIES[court.courtName] || [];
-        if (seeded.length) {
-          console.log(`Using safe seed discovery for ${court.courtName}.`);
-          found = seeded;
+        const results = await searchSerp(query);
+        for (const candidate of results) {
+          const scored = scoreFormCandidate(candidate, court);
+          if (scored.score < 10) continue;
+          if (!best || scored.score > best.scored.score) best = { candidate: { ...candidate, searchQuery: query }, scored };
         }
+      } catch (e) {
+        console.warn(`Query failed (${query}): ${e.message}`);
       }
-
-      if (!found.length) {
-        console.log(`No form PDFs found on forms page for ${court.courtName}; trying SerpAPI fallback.`);
-        found = await discoverWithSerpApi(court);
-      }
-
-      for (const item of found) {
-        const stateSlug = slugify(court.state);
-        const countySlug = slugify(court.county);
-        const courtTypeSlug = slugify(court.courtType);
-        const formsDir = path.join(repoRoot, 'assets', 'forms', stateSlug, countySlug, courtTypeSlug);
-        const fileName = slugify(item.formTitle) || path.basename(new URL(item.sourceUrl).pathname);
-        const pdfPath = path.join(formsDir, `${fileName}.pdf`);
-        const metadataPath = path.join(formsDir, `${fileName}.metadata.json`);
-
-        const queueItem = {
-          court: court.courtName,
-          county: court.county,
-          state: court.state,
-          courtType: court.courtType,
-          formTitle: item.formTitle,
-          sourceUrl: item.sourceUrl,
-          localPath: path.relative(repoRoot, pdfPath),
-          status: 'pending_review',
-          discoveredAt: new Date().toISOString(),
-          requiresMapping: true,
-          discoveryMethod: item.discoveryMethod || 'formsPage',
-          searchQuery: item.searchQuery || null
-        };
-
-        const duplicate = queue.some((existing) => existing.sourceUrl === queueItem.sourceUrl && existing.court === queueItem.court);
-        if (duplicate) continue;
-
-        queue.push(queueItem);
-
-        if (DRY_RUN) {
-          console.log(`[DRY RUN] Queued ${item.formTitle} (${item.sourceUrl})`);
-          continue;
-        }
-
-        await fs.mkdir(formsDir, { recursive: true });
-
-        const alreadyExists = await fs.access(pdfPath).then(() => true).catch(() => false);
-        if (alreadyExists) {
-          console.log(`Skipping existing file ${pdfPath}`);
-          continue;
-        }
-
-        await saveFile(item.sourceUrl, pdfPath);
-
-        const metadata = {
-          ...queueItem,
-          downloadedAt: new Date().toISOString(),
-          crawlerVersion: '1.0.0'
-        };
-        await fs.writeFile(metadataPath, JSON.stringify(metadata, null, 2));
-        console.log(`Downloaded ${pdfPath}`);
-      }
-    } catch (error) {
-      console.warn(`Unable to scan ${court.courtName}: ${error.message}`);
     }
+
+    if (!best) { console.warn(`No viable candidates for ${court.courtName}`); continue; }
+
+    const formType = best.scored.formType || 'unknown';
+    const localPathRel = `assets/forms/ohio/${court.countySlug}/${court.courtType}/${formType}.pdf`;
+    const localPathAbs = path.join(repoRoot, localPathRel);
+    let pdfAccess = 'unknown';
+    let localPath = '';
+
+    if ((best.candidate.link || '').toLowerCase().includes('.pdf')) {
+      if (!DRY_RUN) {
+        try {
+          await tryDownloadPdf(best.candidate.link, localPathAbs);
+          pdfAccess = 'downloaded';
+          localPath = localPathRel;
+        } catch {
+          pdfAccess = 'manual_download_required';
+        }
+      } else {
+        pdfAccess = 'unknown';
+      }
+    } else {
+      pdfAccess = 'manual_download_required';
+    }
+
+    const metadata = buildMetadata(court, best.candidate, best.scored, pdfAccess, localPath);
+    const key = `${metadata.sourceUrl}|${metadata.localPath}`;
+    if (!dedupe.has(key)) {
+      discoveredInRun.push(metadata);
+      if (!DRY_RUN) {
+        queue.push(metadata);
+        dedupe.add(key);
+      }
+    }
+
+    if (!DRY_RUN && pdfAccess === 'downloaded') {
+      const metaPath = path.join(repoRoot, `assets/forms/ohio/${court.countySlug}/${court.courtType}/metadata.json`);
+      await fs.mkdir(path.dirname(metaPath), { recursive: true });
+      await fs.writeFile(metaPath, JSON.stringify(metadata, null, 2));
+    }
+
+    console.log(`Candidate: ${metadata.sourceUrl} [score=${metadata.score}] [access=${metadata.pdfAccess}]`);
   }
 
-  await fs.writeFile(REVIEW_QUEUE_PATH, JSON.stringify(queue, null, 2));
-  console.log(`Review queue updated: ${REVIEW_QUEUE_PATH}`);
-}
-
-main().catch((error) => {
-  console.error(error);
-  process.exit(1);
-});
+  if (!DRY_RUN) {
+    await fs.writeFile(REVIEW_QUEUE_PATH, JSON.stringify(queue, null, 2) + '\n');
+    console.log(`Done (apply). Updated admin/review-queue.json with ${discoveredInRun.length} discovered items.`);
+  } else {
+    console.log(`Done (dry-run). Discovered ${discoveredInRun.length} candidate(s). No files were written.`);
+  }
+})();
