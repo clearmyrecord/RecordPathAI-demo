@@ -345,6 +345,40 @@
       min-height: 180px;
     }
 
+
+    .grid-overlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+      display: none;
+    }
+
+    .grid-overlay.visible {
+      display: block;
+    }
+
+    .coord-label {
+      position: absolute;
+      font-size: 10px;
+      color: rgba(30, 41, 59, 0.85);
+      background: rgba(255, 255, 255, 0.75);
+      padding: 1px 3px;
+      border-radius: 4px;
+      pointer-events: none;
+    }
+
+    #overlay {
+      z-index: 2;
+    }
+
+    .nudge-controls {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      max-width: 180px;
+    }
+
     @media (max-width: 1200px) {
       .app {
         grid-template-columns: 1fr;
@@ -432,6 +466,9 @@
           <button class="btn btn-secondary" id="zoomOutBtn">-</button>
           <button class="btn btn-secondary" id="zoomInBtn">+</button>
           <button class="btn btn-secondary" id="fitWidthBtn">Fit Width</button>
+          <button class="btn btn-secondary" id="showGridBtn">Show Grid</button>
+          <button class="btn btn-secondary" id="hideGridBtn">Hide Grid</button>
+          <span class="badge" id="coordStatus">X: 0 Y: 0 Page: 0</span>
         </div>
       </div>
 
@@ -439,6 +476,7 @@
         <div class="pdf-stage-wrap">
           <div class="pdf-stage" id="pdfStage">
             <canvas id="pdfCanvas"></canvas>
+            <canvas id="gridOverlay" class="grid-overlay"></canvas>
             <div id="overlay"></div>
           </div>
         </div>
@@ -507,6 +545,22 @@
           <button class="btn btn-secondary" id="clearSelectionBtn">Clear</button>
         </div>
 
+        <div>
+          <div class="section-title">Nudge Selected Field</div>
+          <div class="nudge-controls">
+            <div></div><button class="btn btn-secondary" id="nudgeUpBtn">↑</button><div></div>
+            <button class="btn btn-secondary" id="nudgeLeftBtn">←</button><button class="btn btn-secondary" id="nudgeFiveBtn">+5px</button><button class="btn btn-secondary" id="nudgeRightBtn">→</button>
+            <div></div><button class="btn btn-secondary" id="nudgeDownBtn">↓</button><div></div>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn btn-secondary" id="copyFieldJsonBtn">Copy Field JSON</button>
+          <button class="btn btn-secondary" id="applyJudgeFixBtn">Apply Judge Fix</button>
+        </div>
+
+        <p class="muted"><strong>Align fields to the underline, not the printed label.</strong></p>
+
         <p class="muted">
           Drag and resize fields directly on the PDF, or edit their values here.
         </p>
@@ -532,6 +586,10 @@
     const zoomInBtn = document.getElementById("zoomInBtn");
     const zoomOutBtn = document.getElementById("zoomOutBtn");
     const fitWidthBtn = document.getElementById("fitWidthBtn");
+    const showGridBtn = document.getElementById("showGridBtn");
+    const hideGridBtn = document.getElementById("hideGridBtn");
+    const coordStatus = document.getElementById("coordStatus");
+    const gridOverlay = document.getElementById("gridOverlay");
 
     const addTextFieldBtn = document.getElementById("addTextFieldBtn");
     const addCheckboxBtn = document.getElementById("addCheckboxBtn");
@@ -555,6 +613,13 @@
     const fieldPageInput = document.getElementById("fieldPage");
     const updateFieldBtn = document.getElementById("updateFieldBtn");
     const clearSelectionBtn = document.getElementById("clearSelectionBtn");
+    const nudgeUpBtn = document.getElementById("nudgeUpBtn");
+    const nudgeDownBtn = document.getElementById("nudgeDownBtn");
+    const nudgeLeftBtn = document.getElementById("nudgeLeftBtn");
+    const nudgeRightBtn = document.getElementById("nudgeRightBtn");
+    const nudgeFiveBtn = document.getElementById("nudgeFiveBtn");
+    const copyFieldJsonBtn = document.getElementById("copyFieldJsonBtn");
+    const applyJudgeFixBtn = document.getElementById("applyJudgeFixBtn");
 
     let pdfDoc = null;
     let currentPage = 1;
@@ -562,6 +627,7 @@
     let mappings = [];
     let selectedFieldId = null;
     let nextFieldId = 1;
+    let showGrid = false;
 
     let interaction = {
       mode: null,
@@ -659,6 +725,59 @@
       pageStatus.textContent = `Page ${currentPage} / ${pdfDoc.numPages}`;
       zoomStatus.textContent = `Zoom ${Math.round(currentScale * 100)}%`;
 
+      drawGrid();
+      renderOverlay();
+      renderFieldList();
+      populateFieldEditor();
+    }
+
+    function drawGrid() {
+      const width = pdfCanvas.width;
+      const height = pdfCanvas.height;
+      gridOverlay.width = width;
+      gridOverlay.height = height;
+      gridOverlay.style.width = width + "px";
+      gridOverlay.style.height = height + "px";
+      const ctx = gridOverlay.getContext("2d");
+      ctx.clearRect(0, 0, width, height);
+
+      for (let x = 0; x <= width; x += 25) {
+        const major = x % 100 === 0;
+        ctx.strokeStyle = major ? "rgba(15,23,42,0.35)" : "rgba(148,163,184,0.35)";
+        ctx.lineWidth = major ? 1.2 : 0.6;
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, height);
+        ctx.stroke();
+        if (major) {
+          ctx.fillStyle = "rgba(15,23,42,0.85)";
+          ctx.font = "10px Arial";
+          ctx.fillText(String(x), x + 2, 10);
+        }
+      }
+
+      for (let y = 0; y <= height; y += 25) {
+        const major = y % 100 === 0;
+        ctx.strokeStyle = major ? "rgba(15,23,42,0.35)" : "rgba(148,163,184,0.35)";
+        ctx.lineWidth = major ? 1.2 : 0.6;
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(width, y);
+        ctx.stroke();
+        if (major) {
+          ctx.fillStyle = "rgba(15,23,42,0.85)";
+          ctx.font = "10px Arial";
+          ctx.fillText(String(y), 2, y + 10);
+        }
+      }
+      gridOverlay.classList.toggle("visible", showGrid);
+    }
+
+    function nudgeSelectedField(dx, dy, step = 1) {
+      const field = getSelectedField();
+      if (!field) return;
+      field.x = clamp(field.x + dx * step, 0, Math.max(0, overlay.clientWidth - field.width));
+      field.y = clamp(field.y + dy * step, 0, Math.max(0, overlay.clientHeight - field.height));
       renderOverlay();
       renderFieldList();
       populateFieldEditor();
@@ -921,6 +1040,13 @@
       }
     });
 
+    overlay.addEventListener("mousemove", (e) => {
+      const rect = overlay.getBoundingClientRect();
+      const x = clamp(Math.round(e.clientX - rect.left), 0, overlay.clientWidth);
+      const y = clamp(Math.round(e.clientY - rect.top), 0, overlay.clientHeight);
+      coordStatus.textContent = `X: ${x} Y: ${y} Page: ${currentPage || 0}`;
+    });
+
     pdfUpload.addEventListener("change", async (e) => {
       const file = e.target.files[0];
       if (!file) return;
@@ -971,6 +1097,61 @@
       if (!pdfDoc) return;
       currentScale = Math.max(currentScale - 0.2, 0.4);
       await renderPage(currentPage);
+    });
+
+
+    showGridBtn.addEventListener("click", () => {
+      showGrid = true;
+      gridOverlay.classList.add("visible");
+    });
+
+    hideGridBtn.addEventListener("click", () => {
+      showGrid = false;
+      gridOverlay.classList.remove("visible");
+    });
+
+    [
+      [nudgeUpBtn, 0, -1],
+      [nudgeDownBtn, 0, 1],
+      [nudgeLeftBtn, -1, 0],
+      [nudgeRightBtn, 1, 0]
+    ].forEach(([btn, dx, dy]) => {
+      btn.addEventListener("click", (e) => {
+        const step = e.shiftKey ? 5 : 1;
+        nudgeSelectedField(dx, dy, step);
+      });
+    });
+
+    nudgeFiveBtn.addEventListener("click", () => nudgeSelectedField(1, 0, 5));
+
+    copyFieldJsonBtn.addEventListener("click", async () => {
+      const field = getSelectedField();
+      if (!field) {
+        alert("Select a field first.");
+        return;
+      }
+      const payload = JSON.stringify(field, null, 2);
+      try {
+        await navigator.clipboard.writeText(payload);
+        alert("Selected field JSON copied.");
+      } catch {
+        jsonInput.value = payload;
+        alert("Clipboard unavailable. JSON placed in textarea.");
+      }
+    });
+
+    applyJudgeFixBtn.addEventListener("click", () => {
+      const target = mappings.find((f) => f.name === "judge_name");
+      const fix = { name: "judge_name", page: 4, x: 535, y: 175, width: 160, height: 25 };
+      if (target) {
+        Object.assign(target, fix);
+      } else {
+        mappings.push({ id: nextFieldId++, type: "text", placeholder: "", ...fix });
+      }
+      renderOverlay();
+      renderFieldList();
+      populateFieldEditor();
+      alert("Judge field fix applied.");
     });
 
     fitWidthBtn.addEventListener("click", async () => {
