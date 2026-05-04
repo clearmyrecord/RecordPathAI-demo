@@ -857,8 +857,8 @@
   and does not offer legal advice. All sales are final.
 </p>
             
-            <div id="courtInstructionsCard" class="status-banner" style="margin-top:18px;">
-              <h3 style="margin:0 0 14px; font-size:22px; letter-spacing:-0.01em;">How to File Your Packet</h3>
+            <div id="courtInstructionsCard" class="status-banner" style="margin-top:18px; display:none;">
+              <h3 style="margin:0 0 14px; font-size:22px; letter-spacing:-0.01em;">Next Step: File Your Packet</h3>
               <div id="courtInstructionsContent" class="instructions-grid">
                 <p class="status-copy" style="margin:0; font-size:16px;">Loading filing instructions...</p>
               </div>
@@ -1008,35 +1008,40 @@ document.addEventListener("DOMContentLoaded", function () {
         const content = document.getElementById('courtInstructionsContent');
         if (!content) return;
 
-        if (!match || !match.instructions) {
-          content.innerHTML = '<p class="status-copy" style="margin:0; font-size:16px;">This court requires manual filing. Contact the clerk for instructions.</p>';
+        if (!match) {
+          content.innerHTML = '<p class="status-copy" style="margin:0; font-size:16px;">Filing instructions are not available for this court yet. Contact the clerk before filing.</p>';
           return;
         }
 
-        const instructions = match.instructions;
-        const methods = Array.isArray(instructions.filingMethods) ? instructions.filingMethods : [];
-        const forms = Array.isArray(instructions.formsRequired) ? instructions.formsRequired : [];
-        const steps = Array.isArray(instructions.steps) ? instructions.steps : [];
-        const notes = Array.isArray(instructions.notes) ? instructions.notes : [];
+        const methods = Array.isArray(match.filingMethods) ? match.filingMethods : [];
+        const requiredDocuments = Array.isArray(match.requiredDocuments) ? match.requiredDocuments : [];
+        const steps = Array.isArray(match.steps) ? match.steps : [];
+        const notes = Array.isArray(match.notes) ? match.notes : [];
         const methodLabel = (m) => safe(m).replaceAll('_', ' ');
 
         content.innerHTML = `
+          <div class="instruction-block"><h3>Court name</h3><p>${escapeHtml(safe(match.courtName, 'Contact clerk'))}</p></div>
+          <div class="instruction-block"><h3>Clerk address</h3><p>${escapeHtml(safe(match.clerkAddress, 'Contact clerk'))}</p></div>
+          <div class="instruction-block"><h3>Filing fee</h3><p>${escapeHtml(safe(match.filingFee, 'Verify with clerk'))}</p></div>
           <div class="instruction-block">
-            <h3>Filing Method</h3>
+            <h3>Filing methods</h3>
             <div class="filing-badges">
-              ${methods.map((m) => `<span class="filing-badge">${escapeHtml(methodLabel(m))}</span>`).join('') || '<span class="filing-badge">Manual filing</span>'}
+              ${methods.map((m) => `<span class="filing-badge">${escapeHtml(methodLabel(m))}</span>`).join('') || '<span class="filing-badge">manual filing</span>'}
             </div>
           </div>
-          <div class="instruction-block"><h3>Address</h3><p>${escapeHtml(safe(instructions.address, 'Contact clerk'))}</p></div>
-          <div class="instruction-block"><h3>Filing Fee</h3><p>${escapeHtml(safe(instructions.filingFee, 'Verify with clerk'))}</p></div>
-          <div class="instruction-block"><h3>Required Forms</h3><ul>${forms.map((f) => `<li>${escapeHtml(f)}</li>`).join('')}</ul></div>
-          <div class="instruction-block"><h3>Step-by-step Instructions</h3><ol>${steps.map((step) => `<li>${escapeHtml(step)}</li>`).join('')}</ol></div>
-          <div class="instruction-block"><h3>Timeline</h3><p>${escapeHtml(safe(instructions.timeline, 'Varies by court'))}</p></div>
-          <div class="instruction-block"><h3>Notes</h3><ul>${notes.map((note) => `<li>${escapeHtml(note)}</li>`).join('')}</ul></div>
+          <div class="instruction-block"><h3>Required documents</h3><ul>${requiredDocuments.map((d) => `<li>${escapeHtml(d)}</li>`).join('') || '<li>Verify with clerk</li>'}</ul></div>
+          <div class="instruction-block"><h3>Step-by-step filing instructions</h3><ol>${steps.map((step) => `<li>${escapeHtml(step)}</li>`).join('') || '<li>Contact the clerk for filing steps.</li>'}</ol></div>
+          <div class="instruction-block"><h3>Notes / warnings</h3><ul>${notes.map((note) => `<li>${escapeHtml(note)}</li>`).join('') || '<li>Verify filing requirements with the clerk before submitting.</li>'}</ul></div>
+          <div class="instruction-block"><p><strong>Verify filing requirements with the clerk before submitting.</strong></p></div>
         `;
       }
 
-      async function loadAndRenderCourtInstructions(data) {
+      async function loadAndRenderCourtInstructions(data, shouldShow) {
+        const card = document.getElementById('courtInstructionsCard');
+        if (!card) return;
+        card.style.display = shouldShow ? 'block' : 'none';
+        if (!shouldShow) return;
+
         const state = data?.court?.state;
         const county = data?.court?.county;
         const courtType = deriveCourtType(data?.court?.name);
@@ -2069,7 +2074,6 @@ document.addEventListener("DOMContentLoaded", function () {
       renderAllRecords(normalizedData);
       updateEligibilitySection(normalizedData);
       updateTemplateCallout(normalizedData);
-      loadAndRenderCourtInstructions(normalizedData);
 
       const sigInput = document.getElementById("typedSignature");
       if (sigInput) sigInput.value = normalizedData.petitioner.full_name || "";
@@ -2077,6 +2081,8 @@ document.addEventListener("DOMContentLoaded", function () {
       const params = new URLSearchParams(window.location.search);
       const paymentSuccess = params.get("payment") === "success" || localStorage.getItem(PAYMENT_STORAGE_KEY) === "true";
       const paymentCancelled = params.get("payment") === "cancelled";
+
+      loadAndRenderCourtInstructions(normalizedData, paymentSuccess);
 
       if (paymentSuccess) {
         localStorage.setItem(PAYMENT_STORAGE_KEY, "true");
