@@ -22,6 +22,23 @@ const ALLOWED_SOURCE_TOKENS = ['.gov', '.us', 'clerk', 'court', 'municipal', 'co
 const DRY_RUN = !process.argv.includes('--apply');
 const SERPAPI_KEY = process.env.SERPAPI_KEY;
 
+const SAFE_SEED_DISCOVERIES = {
+  'Wood County Court of Common Pleas': [
+    {
+      sourceUrl: 'https://clerkofcourt.co.wood.oh.us/wp-content/uploads/2024/02/Application-for-Sealing-2953.32.pdf',
+      formTitle: 'Application for Sealing 2953.32 (Conviction)',
+      discoveryMethod: 'safeSeed'
+    }
+  ],
+  'Franklin County Court of Common Pleas': [
+    {
+      sourceUrl: 'https://clerk.franklincountyohio.gov/CLCT-website/media/docs/general/Application-to-Seal-Record-of-Conviction-2953-32-B1a.pdf',
+      formTitle: 'Application to Seal Record of Conviction (R.C. 2953.32)',
+      discoveryMethod: 'safeSeed'
+    }
+  ]
+};
+
 async function readJson(filePath, fallback) {
   try {
     const content = await fs.readFile(filePath, 'utf8');
@@ -180,8 +197,21 @@ async function main() {
     console.log(`Scanning ${court.courtName}...`);
 
     try {
-      const html = await fetchHtml(court.formsPage);
-      let found = discoverPdfLinks(html, court.formsPage);
+      let found = [];
+      try {
+        const html = await fetchHtml(court.formsPage);
+        found = discoverPdfLinks(html, court.formsPage);
+      } catch (error) {
+        console.warn(`Unable to fetch forms page for ${court.courtName}: ${error.message}`);
+      }
+
+      if (!found.length) {
+        const seeded = SAFE_SEED_DISCOVERIES[court.courtName] || [];
+        if (seeded.length) {
+          console.log(`Using safe seed discovery for ${court.courtName}.`);
+          found = seeded;
+        }
+      }
 
       if (!found.length) {
         console.log(`No form PDFs found on forms page for ${court.courtName}; trying SerpAPI fallback.`);
