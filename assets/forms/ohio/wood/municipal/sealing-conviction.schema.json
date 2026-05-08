@@ -1,0 +1,42 @@
+{
+  "state": "OH",
+  "county": "Wood",
+  "courtType": "municipal",
+  "courtName": "Bowling Green Municipal Court",
+  "formType": "sealing-conviction",
+  "title": "Application for Sealing of Record",
+  "notaryRequired": true,
+  "requiredFields": [
+    "petitioner.full_name",
+    "petitioner.address.line1",
+    "petitioner.address.city",
+    "petitioner.address.state",
+    "petitioner.address.zip",
+    "petitioner.phone",
+    "petitioner.ssn",
+    "petitioner.date_of_birth",
+    "court.case_number",
+    "court.judge_name",
+    "charges.0.charge_code",
+    "charges.0.charge_name",
+    "charges.0.offense_date",
+    "generated.current_date"
+  ],
+  "optionalFields": [
+    "petitioner.address.line2",
+    "attorney.name",
+    "attorney.phone",
+    "attorney.address"
+  ],
+  "warnings": [
+    "This form requires notarization.",
+    "Do not sign notarized sections until you are in front of a notary unless the court instructs otherwise.",
+    "The court may set this matter for hearing after completion of a record check."
+  ],
+  "filingInstructions": [
+    "Complete all required fields.",
+    "Review the application for accuracy.",
+    "Sign notarized affidavit sections only before a notary.",
+    "File with the Bowling Green Municipal Court Clerk."
+  ]
+}
