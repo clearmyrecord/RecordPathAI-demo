@@ -11,8 +11,8 @@
   "pdfAccess": "downloaded",
   "status": "pending_review",
   "requiresMapping": true,
-  "mapped": false,
-  "active": false,
+  "mapped": true,
+  "active": true,
   "discoveredAt": "2026-05-04T16:26:43.345Z",
   "lastVerified": "2026-05-04T16:26:43.345Z",
   "score": 80,
@@ -24,5 +24,7 @@
     "keyword:application to seal",
     "keyword:2953.32",
     "keyword:conviction"
-  ]
+  ],
+  "schemaPath": "assets/forms/ohio/wood/municipal/sealing-conviction.schema.json",
+  "mappingPath": "assets/forms/ohio/wood/municipal/sealing-conviction.json"
 }
