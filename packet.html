@@ -976,19 +976,19 @@ document.addEventListener("DOMContentLoaded", function () {
   const TEMPLATE_REGISTRY_STORAGE_KEY = "recordpathai-active-template-registry";
 
   // 💳 Payment completion tracking
-      const PAYMENT_STORAGE_KEY = "recordPathPaymentComplete";
-      const DEFAULT_REQUIRED_FIELDS = [
-        "petitioner.full_name",
-        "court.state",
-        "court.county",
-        "court.name",
-        "court.case_number",
-        "charges.0.disposition",
-        "charges.0.disposition_date"
-      ];
+  const PAYMENT_STORAGE_KEY = "recordPathPaymentComplete";
+  const DEFAULT_REQUIRED_FIELDS = [
+    "petitioner.full_name",
+    "court.state",
+    "court.county",
+    "court.name",
+    "court.case_number",
+    "charges.0.disposition",
+    "charges.0.disposition_date"
+  ];
 
-      // ✍️ Signature storage (typed or drawn)
-      let signatureImageBytes = null;
+  // ✍️ Signature storage (typed or drawn)
+  let signatureImageBytes = null;
 
       function setStatus(message, mode = "normal") {
         const el = document.getElementById("statusText");
