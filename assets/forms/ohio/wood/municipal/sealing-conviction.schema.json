@@ -1,0 +1,32 @@
+{
+  "requiredFields": [
+    "petitioner.full_name",
+    "petitioner.ssn_full",
+    "petitioner.dob",
+    "charges.0.offense_date",
+    "charges.0.charge_code",
+    "charges.0.charge_name",
+    "court.case_number",
+    "court.judge_name",
+    "court.county"
+  ],
+  "optionalFields": [
+    "signatures.affidavit_signed_day",
+    "signatures.affidavit_signed_month",
+    "signatures.affidavit_signed_year"
+  ],
+  "notaryRequired": true,
+  "warnings": [
+    "Do not sign any notarized sections before appearing before a notary."
+  ],
+  "filingInstructions": [
+    "Bring a valid photo ID when executing notarized affidavit sections.",
+    "Confirm current filing fees and accepted payment methods with the clerk before filing."
+  ],
+  "formSpecificQuestions": [
+    {
+      "path": "court.county",
+      "label": "Affidavit county"
+    }
+  ]
+}

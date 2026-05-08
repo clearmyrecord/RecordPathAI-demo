@@ -392,6 +392,29 @@
       border-left-color: #258344;
       border-color: #cfe8d6;
     }
+    .missing-info-panel {
+      display: none;
+      border: 1px solid #f1ddac;
+      background: #fff8e8;
+      border-radius: 18px;
+      padding: 18px;
+      margin: 0 0 18px;
+    }
+    .missing-info-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+    }
+    .missing-info-grid label { font-size: 13px; color: #4b5f82; font-weight: 700; }
+    .missing-info-grid input {
+      width: 100%;
+      margin-top: 6px;
+      min-height: 42px;
+      border-radius: 10px;
+      border: 1px solid #d6dfef;
+      padding: 10px 12px;
+    }
 
     .record-list {
       display: grid;
@@ -834,6 +857,14 @@
             <div id="stateConflictCallout" class="callout warning" style="display:none;">
               Your residence state and case state are different. That is okay. The packet will follow the <strong>case state</strong>, not your home address.
             </div>
+            <div id="notaryWarningBanner" class="callout warning" style="display:none;">
+              This form requires notarization. Do not sign notarized sections until you are in front of a notary unless the court instructs otherwise.
+            </div>
+            <div id="missingInfoPanel" class="missing-info-panel">
+              <h3 style="margin:0;">Missing Information</h3>
+              <p style="margin:8px 0 0; color:#5f6e88;">Please provide the required fields below so your form can be generated.</p>
+              <div id="missingInfoFields" class="missing-info-grid"></div>
+            </div>
 
             <div class="sig-row">
               <input id="typedSignature" class="sig-input" type="text" placeholder="Typed signature name" />
@@ -945,7 +976,16 @@ document.addEventListener("DOMContentLoaded", function () {
   const TEMPLATE_REGISTRY_STORAGE_KEY = "recordpathai-active-template-registry";
 
   // 💳 Payment completion tracking
-  const PAYMENT_STORAGE_KEY = "recordPathPaymentComplete";
+      const PAYMENT_STORAGE_KEY = "recordPathPaymentComplete";
+      const DEFAULT_REQUIRED_FIELDS = [
+        "petitioner.full_name",
+        "court.state",
+        "court.county",
+        "court.name",
+        "court.case_number",
+        "charges.0.disposition",
+        "charges.0.disposition_date"
+      ];
 
   // ✍️ Signature storage (typed or drawn)
   let signatureImageBytes = null;
@@ -1095,8 +1135,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
       function getByPath(obj, path, fallback = "") {
         if (!obj || !path) return fallback;
+        const resolvedPath = pathAliases[path] || path;
 
-        const value = path.split(".").reduce((current, key) => {
+        const value = resolvedPath.split(".").reduce((current, key) => {
           if (current == null) return undefined;
           if (/^\d+$/.test(key)) return current[Number(key)];
           return current[key];
@@ -1104,6 +1145,91 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (value === undefined || value === null || value === "") return fallback;
         return value;
+      }
+      function setByPath(obj, path, value) {
+        if (!obj || !path) return;
+        const resolvedPath = pathAliases[path] || path;
+        const keys = resolvedPath.split(".");
+        let cursor = obj;
+        for (let i = 0; i < keys.length - 1; i += 1) {
+          const key = keys[i];
+          const nextKey = keys[i + 1];
+          const isNextIndex = /^\d+$/.test(nextKey);
+          if (/^\d+$/.test(key)) {
+            const idx = Number(key);
+            if (!Array.isArray(cursor)) return;
+            if (cursor[idx] == null) cursor[idx] = isNextIndex ? [] : {};
+            cursor = cursor[idx];
+          } else {
+            if (cursor[key] == null) cursor[key] = isNextIndex ? [] : {};
+            cursor = cursor[key];
+          }
+        }
+        const leaf = keys[keys.length - 1];
+        if (/^\d+$/.test(leaf)) {
+          if (Array.isArray(cursor)) cursor[Number(leaf)] = value;
+        } else {
+          cursor[leaf] = value;
+        }
+      }
+      const pathAliases = {
+        "petitioner.ssn": "petitioner.ssn_full",
+        "petitioner.date_of_birth": "petitioner.dob"
+      };
+      function persistPacketData(raw) {
+        const bridge = window.RecordPathDataBridge;
+        if (bridge && typeof bridge.savePacketData === "function") {
+          bridge.savePacketData(raw);
+          return;
+        }
+        localStorage.setItem("recordPathPacketData", JSON.stringify(raw));
+      }
+      async function loadFormSchema(selected, data) {
+        if (!selected) return null;
+        const state = normalizeState(data?.court?.state || selected.state).toLowerCase();
+        const county = safe(data?.court?.county || selected.county).replace(/ county$/i, "").toLowerCase();
+        const courtType = safe(selected.courtType || deriveCourtType(data?.court?.name));
+        const formType = safe(selected.formType || dispositionToFormType(data?.charges?.[0]?.disposition));
+        const candidates = [
+          `./assets/forms/${state}/${county}/${courtType}/${formType}.schema.json`,
+          `./assets/forms/${state}/${county}/${courtType}/schema.json`
+        ];
+        for (const url of candidates) {
+          try {
+            const response = await fetch(`${url}?v=${Date.now()}`, { cache: "no-store" });
+            if (!response.ok) continue;
+            return await response.json();
+          } catch {}
+        }
+        return null;
+      }
+      function getMissingRequiredFields(data, schema) {
+        const requiredFields = Array.isArray(schema?.requiredFields) && schema.requiredFields.length
+          ? schema.requiredFields
+          : DEFAULT_REQUIRED_FIELDS;
+        return requiredFields.filter((path) => safe(getByPath(data, path)) === "");
+      }
+      function renderMissingInfoPanel(paths, rawData, normalizedData) {
+        const panel = document.getElementById("missingInfoPanel");
+        const container = document.getElementById("missingInfoFields");
+        if (!panel || !container) return;
+        if (!paths.length) {
+          panel.style.display = "none";
+          container.innerHTML = "";
+          return;
+        }
+        container.innerHTML = paths.map((path) => {
+          const current = escapeHtml(getByPath(normalizedData, path, ""));
+          return `<label>${escapeHtml(path)}<input data-path="${escapeHtml(path)}" value="${current}" /></label>`;
+        }).join("");
+        container.querySelectorAll("input[data-path]").forEach((input) => {
+          input.addEventListener("input", (event) => {
+            const p = event.target.getAttribute("data-path");
+            setByPath(rawData, p, event.target.value);
+            persistPacketData(rawData);
+          });
+        });
+        panel.style.display = "block";
       }
 
       function readPacketData() {
@@ -1853,6 +1979,9 @@ document.addEventListener("DOMContentLoaded", function () {
           }
 
           const selected = await loadActiveTemplateForPacket(data);
+          const schema = await loadFormSchema(selected, data);
+          const notaryBanner = document.getElementById("notaryWarningBanner");
+          if (notaryBanner) notaryBanner.style.display = schema?.notaryRequired ? "block" : "none";
           if (!selected) {
             await exportManualFilingSummaryPdf(data);
             setStatus("No active template is available for this court yet. You can still export a data-only packet summary.", "error");
@@ -1860,6 +1989,13 @@ document.addEventListener("DOMContentLoaded", function () {
           }
 
           const templateMapping = await loadTemplateMapping(selected);
+          const missingFields = getMissingRequiredFields(data, schema);
+          const rawMutable = readPacketData();
+          renderMissingInfoPanel(missingFields, rawMutable, data);
+          if (missingFields.length) {
+            setStatus("Missing required information. Please complete the highlighted fields.", "error");
+            return;
+          }
           const fields = normalizeFields(templateMapping);
           const pdfBytes = await loadTemplatePdf(selected);
 
