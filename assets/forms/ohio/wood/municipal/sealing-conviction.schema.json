@@ -25,6 +25,38 @@
   ],
   "formSpecificQuestions": [
     {
+      "path": "petitioner.full_name",
+      "label": "Petitioner full legal name"
+    },
+    {
+      "path": "petitioner.ssn_full",
+      "label": "Petitioner Social Security Number"
+    },
+    {
+      "path": "petitioner.dob",
+      "label": "Petitioner date of birth"
+    },
+    {
+      "path": "charges.0.offense_date",
+      "label": "Offense date"
+    },
+    {
+      "path": "charges.0.charge_code",
+      "label": "Charge code"
+    },
+    {
+      "path": "charges.0.charge_name",
+      "label": "Charge name"
+    },
+    {
+      "path": "court.case_number",
+      "label": "Case number"
+    },
+    {
+      "path": "court.judge_name",
+      "label": "Judge name"
+    },
+    {
       "path": "court.county",
       "label": "Affidavit county"
     }
