@@ -1209,9 +1209,14 @@ document.addEventListener("DOMContentLoaded", function () {
           : DEFAULT_REQUIRED_FIELDS;
         return requiredFields.filter((path) => safe(getByPath(data, path)) === "");
       }
-      function renderMissingInfoPanel(paths, rawData, normalizedData) {
+      function renderMissingInfoPanel(paths, rawData, normalizedData, schema) {
         const panel = document.getElementById("missingInfoPanel");
         const container = document.getElementById("missingInfoFields");
+        const labelMap = Object.fromEntries(
+          (Array.isArray(schema?.formSpecificQuestions) ? schema.formSpecificQuestions : [])
+            .filter((q) => q && q.path && q.label)
+            .map((q) => [String(q.path), String(q.label)])
+        );
         if (!panel || !container) return;
         if (!paths.length) {
           panel.style.display = "none";
@@ -1220,7 +1225,8 @@ document.addEventListener("DOMContentLoaded", function () {
         }
         container.innerHTML = paths.map((path) => {
           const current = escapeHtml(getByPath(normalizedData, path, ""));
-          return `<label>${escapeHtml(path)}<input data-path="${escapeHtml(path)}" value="${current}" /></label>`;
+          const label = labelMap[path] || path;
+          return `<label>${escapeHtml(label)}<input data-path="${escapeHtml(path)}" value="${current}" /></label>`;
         }).join("");
         container.querySelectorAll("input[data-path]").forEach((input) => {
           input.addEventListener("input", (event) => {
@@ -1979,19 +1985,19 @@ document.addEventListener("DOMContentLoaded", function () {
           }
 
           const selected = await loadActiveTemplateForPacket(data);
-          const schema = await loadFormSchema(selected, data);
-          const notaryBanner = document.getElementById("notaryWarningBanner");
-          if (notaryBanner) notaryBanner.style.display = schema?.notaryRequired ? "block" : "none";
           if (!selected) {
             await exportManualFilingSummaryPdf(data);
             setStatus("No active template is available for this court yet. You can still export a data-only packet summary.", "error");
             return;
           }
+          const schema = await loadFormSchema(selected, data);
+          const notaryBanner = document.getElementById("notaryWarningBanner");
+          if (notaryBanner) notaryBanner.style.display = schema?.notaryRequired ? "block" : "none";
 
           const templateMapping = await loadTemplateMapping(selected);
           const missingFields = getMissingRequiredFields(data, schema);
           const rawMutable = readPacketData();
-          renderMissingInfoPanel(missingFields, rawMutable, data);
+          renderMissingInfoPanel(missingFields, rawMutable, data, schema);
           if (missingFields.length) {
             setStatus("Missing required information. Please complete the highlighted fields.", "error");
             return;
