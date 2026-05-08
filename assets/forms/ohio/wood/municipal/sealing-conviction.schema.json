@@ -1,27 +1,47 @@
 {
+  "state": "OH",
+  "county": "Wood",
+  "courtType": "municipal",
+  "courtName": "Bowling Green Municipal Court",
+  "formType": "sealing-conviction",
+  "title": "Application for Sealing of Record",
+  "notaryRequired": true,
   "requiredFields": [
     "petitioner.full_name",
     "petitioner.ssn_full",
     "petitioner.dob",
+    "petitioner.address.line1",
+    "petitioner.address.city",
+    "petitioner.address.state",
+    "petitioner.address.zip",
+    "petitioner.phone",
     "charges.0.offense_date",
     "charges.0.charge_code",
     "charges.0.charge_name",
     "court.case_number",
     "court.judge_name",
-    "court.county"
+    "court.county",
+    "generated.current_date"
   ],
   "optionalFields": [
+    "petitioner.address.line2",
+    "attorney.name",
+    "attorney.phone",
+    "attorney.address",
     "signatures.affidavit_signed_day",
     "signatures.affidavit_signed_month",
     "signatures.affidavit_signed_year"
   ],
-  "notaryRequired": true,
   "warnings": [
-    "Do not sign any notarized sections before appearing before a notary."
+    "This form requires notarization.",
+    "Do not sign notarized sections until you are in front of a notary unless the court instructs otherwise.",
+    "The court may set this matter for hearing after completion of a record check."
   ],
   "filingInstructions": [
-    "Bring a valid photo ID when executing notarized affidavit sections.",
-    "Confirm current filing fees and accepted payment methods with the clerk before filing."
+    "Complete all required fields.",
+    "Review the application for accuracy.",
+    "Sign notarized affidavit sections only before a notary.",
+    "File with the Bowling Green Municipal Court Clerk."
   ],
   "formSpecificQuestions": [
     {
@@ -35,6 +55,26 @@
     {
       "path": "petitioner.dob",
       "label": "Petitioner date of birth"
+    },
+    {
+      "path": "petitioner.address.line1",
+      "label": "Street address"
+    },
+    {
+      "path": "petitioner.address.city",
+      "label": "City"
+    },
+    {
+      "path": "petitioner.address.state",
+      "label": "State"
+    },
+    {
+      "path": "petitioner.address.zip",
+      "label": "ZIP code"
+    },
+    {
+      "path": "petitioner.phone",
+      "label": "Phone number"
     },
     {
       "path": "charges.0.offense_date",
