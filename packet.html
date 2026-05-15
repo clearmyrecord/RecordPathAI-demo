@@ -781,9 +781,9 @@
             <h2 class="section-title" data-i18n="packet.eligibilityStatus">Eligibility Status</h2>
 
             <div class="status-banner">
-              <div id="statusPill" class="status-pill pending">Eligibility Needs Review</div>
-              <h3 id="eligibilityHeadline" class="status-headline">Checking your eligibility...</h3>
-              <p id="eligibilitySummary" class="status-copy">We are reviewing the case-state data you entered.</p>
+              <div id="statusPill" class="status-pill pending" data-i18n="packet.eligibilityNeedsReview">Eligibility Needs Review</div>
+              <h3 id="eligibilityHeadline" class="status-headline" data-i18n="packet.checkingEligibility">Checking your eligibility...</h3>
+              <p id="eligibilitySummary" class="status-copy" data-i18n="packet.reviewingCaseStateData">We are reviewing the case-state data you entered.</p>
               <ul id="eligibilityReasons" class="reason-list"></ul>
             </div>
 
@@ -811,32 +811,32 @@
           </section>
 
           <section class="packet-card">
-            <h2 class="section-title">Intake Summary</h2>
+            <h2 class="section-title" data-i18n="packet.intakeSummary">Intake Summary</h2>
 
             <div class="summary-grid">
               <div class="summary-box">
-                <h3>Person</h3>
+                <h3 data-i18n="packet.person">Person</h3>
                 <div class="summary-list">
-                  <div class="summary-row"><strong>Name</strong><span id="summaryName">—</span></div>
-                  <div class="summary-row"><strong>Email</strong><span id="summaryEmail">—</span></div>
-                  <div class="summary-row"><strong>Phone</strong><span id="summaryPhone">—</span></div>
-                  <div class="summary-row"><strong>Address</strong><span id="summaryAddress">—</span></div>
-                  <div class="summary-row"><strong>Residence State</strong><span id="summaryResidenceState">—</span></div>
+                  <div class="summary-row"><strong data-i18n="packet.name">Name</strong><span id="summaryName">—</span></div>
+                  <div class="summary-row"><strong data-i18n="packet.email">Email</strong><span id="summaryEmail">—</span></div>
+                  <div class="summary-row"><strong data-i18n="packet.phone">Phone</strong><span id="summaryPhone">—</span></div>
+                  <div class="summary-row"><strong data-i18n="packet.address">Address</strong><span id="summaryAddress">—</span></div>
+                  <div class="summary-row"><strong data-i18n="packet.residenceState">Residence State</strong><span id="summaryResidenceState">—</span></div>
                 </div>
               </div>
 
               <div class="summary-box">
-                <h3>Selected Record</h3>
+                <h3 data-i18n="packet.selectedRecord">Selected Record</h3>
                 <div class="summary-list">
-                  <div class="summary-row"><strong>Case State</strong><span id="summaryCaseState">—</span></div>
-                  <div class="summary-row"><strong>Charge</strong><span id="summaryCharge">—</span></div>
-                  <div class="summary-row"><strong>Offense Code</strong><span id="summaryOffenseCode">—</span></div>
-                  <div class="summary-row"><strong>Level</strong><span id="summaryLevel">—</span></div>
-                  <div class="summary-row"><strong>Case Number</strong><span id="summaryCaseNumber">—</span></div>
-                  <div class="summary-row"><strong>Court</strong><span id="summaryCourt">—</span></div>
-                  <div class="summary-row" id="summaryJudgeRow" style="display:none;"><strong>Judge</strong><span id="summaryJudge">—</span></div>
-                  <div class="summary-row"><strong>County</strong><span id="summaryCounty">—</span></div>
-                  <div class="summary-row"><strong>Disposition</strong><span id="summaryDisposition">—</span></div>
+                  <div class="summary-row"><strong data-i18n="packet.caseState">Case State</strong><span id="summaryCaseState">—</span></div>
+                  <div class="summary-row"><strong data-i18n="packet.charge">Charge</strong><span id="summaryCharge">—</span></div>
+                  <div class="summary-row"><strong data-i18n="packet.offenseCode">Offense Code</strong><span id="summaryOffenseCode">—</span></div>
+                  <div class="summary-row"><strong data-i18n="packet.level">Level</strong><span id="summaryLevel">—</span></div>
+                  <div class="summary-row"><strong data-i18n="record.caseNumber">Case Number</strong><span id="summaryCaseNumber">—</span></div>
+                  <div class="summary-row"><strong data-i18n="packet.court">Court</strong><span id="summaryCourt">—</span></div>
+                  <div class="summary-row" id="summaryJudgeRow" style="display:none;"><strong data-i18n="record.judgeName">Judge</strong><span id="summaryJudge">—</span></div>
+                  <div class="summary-row"><strong data-i18n="packet.county">County</strong><span id="summaryCounty">—</span></div>
+                  <div class="summary-row"><strong data-i18n="packet.outcome">Disposition</strong><span id="summaryDisposition">—</span></div>
                 </div>
               </div>
             </div>
@@ -853,11 +853,11 @@
           <section class="packet-card">
             <h2 class="section-title" data-i18n="packet.generate">Generate Packet</h2>
 
-            <div id="templateCallout" class="callout">
+            <div id="templateCallout" class="callout" data-i18n="packet.reviewingTemplate">
               Reviewing which packet template should be used for this case.
             </div>
 
-            <div id="paymentCallout" class="callout warning">
+            <div id="paymentCallout" class="callout warning" data-i18n="packet.lockedWarning">
               Packet is locked until payment is complete. Your eligibility summary and filing checklist remain visible.
             </div>
 
@@ -874,7 +874,7 @@
             </div>
 
             <div class="sig-row">
-              <input id="typedSignature" class="sig-input" type="text" placeholder="Typed signature name" />
+              <input id="typedSignature" class="sig-input" type="text" data-i18n-placeholder="packet.typedSignaturePlaceholder" placeholder="Typed signature name" />
               <div class="sig-actions">
                 <button type="button" class="sig-small-btn" id="useTypedSigBtn" data-i18n="packet.useTyped">Use Typed Signature</button>
                 <button type="button" class="sig-small-btn" id="clearSigBtn" data-i18n="packet.clearSignature">Clear Signature</button>
@@ -919,7 +919,7 @@
 
             <div class="status-text" id="statusText" data-i18n="packet.ready">Ready.</div>
             <div class="efiling-checklist" id="efilingChecklist">
-              <h3>E-Filing Readiness Checklist (Franklin County)</h3>
+              <h3 data-i18n="packet.efilingChecklistTitle">E-Filing Readiness Checklist (Franklin County)</h3>
               <ul id="efilingChecklistItems"></ul>
             </div>
 
@@ -977,6 +977,10 @@
 
  <script>
 document.addEventListener("DOMContentLoaded", function () {
+      function t(key, vars = {}) {
+        const template = (window.RecordPathI18n?.t?.(key) || key);
+        return template.replace(/\{(\w+)\}/g, (_, k) => (vars[k] ?? `{${k}}`));
+      }
 
   // 🔥 Initialize data bridge FIRST (critical for loading saved data)
  
@@ -1421,7 +1425,7 @@ document.addEventListener("DOMContentLoaded", function () {
             filing_type: "Application for Sealing of Record of Conviction",
             is_eligible: true,
             eligibility_status: "Likely Eligible",
-            eligibility_reason: "Waiting period appears satisfied based on saved case data.",
+            eligibility_reason: t("packet.waitingPeriodSatisfiedSavedData"),
             estimated_eligible_on: "",
             waiting_period_complete: true,
             has_pending_cases: false,
@@ -1707,8 +1711,8 @@ document.addEventListener("DOMContentLoaded", function () {
         if (!records.length) {
           container.innerHTML = `
             <div class="record-item">
-              <div class="record-title">No saved offenses found.</div>
-              <div class="record-line">Go back to Record Details and add at least one offense.</div>
+              <div class="record-title">${t("packet.noSavedOffensesFound")}</div>
+              <div class="record-line">${t("packet.addAtLeastOneOffense")}</div>
             </div>
           `;
           return;
@@ -1718,18 +1722,18 @@ document.addEventListener("DOMContentLoaded", function () {
           return `
             <div class="record-item${index === 0 ? " is-current" : ""}">
               <div class="record-head">
-                <h3 class="record-title">Offense ${index + 1}: ${escapeHtml(safe(record.charge_name, "Unnamed offense"))}</h3>
-                <span class="record-tag">${index === 0 ? "Current packet record" : "Saved record"}</span>
+                <h3 class="record-title">${t("record.offense")} ${index + 1}: ${escapeHtml(safe(record.charge_name, t("packet.unnamedOffense")))}</h3>
+                <span class="record-tag">${index === 0 ? t("packet.currentRecord") : t("packet.savedRecord")}</span>
               </div>
               <div class="record-grid">
-                <div class="record-line"><strong>Case Number:</strong> ${escapeHtml(safe(record.case_number, "—"))}</div>
-                <div class="record-line"><strong>Statute:</strong> ${escapeHtml(safe(record.charge_code, "—"))}</div>
-                <div class="record-line"><strong>Degree:</strong> ${escapeHtml(safe(record.level || record.degree, "—"))}</div>
-                <div class="record-line"><strong>Outcome:</strong> ${escapeHtml(safe(record.final_disposition || record.disposition, "—"))}</div>
-                <div class="record-line"><strong>Disposition Date:</strong> ${escapeHtml(formatDateForDisplay(record.disposition_date))}</div>
-                <div class="record-line"><strong>Discharge Date:</strong> ${escapeHtml(formatDateForDisplay(record.probation_end_date || record.discharge_date))}</div>
-                <div class="record-line"><strong>Court:</strong> ${escapeHtml(safe(record.court_name, "—"))}</div>
-                <div class="record-line"><strong>County:</strong> ${escapeHtml(safe(record.court_county, "—"))}</div>
+                <div class="record-line"><strong>${t("record.caseNumber")}:</strong> ${escapeHtml(safe(record.case_number, "—"))}</div>
+                <div class="record-line"><strong>${t("packet.statute")}:</strong> ${escapeHtml(safe(record.charge_code, "—"))}</div>
+                <div class="record-line"><strong>${t("packet.degree")}:</strong> ${escapeHtml(safe(record.level || record.degree, "—"))}</div>
+                <div class="record-line"><strong>${t("packet.outcome")}:</strong> ${escapeHtml(safe(record.final_disposition || record.disposition, "—"))}</div>
+                <div class="record-line"><strong>${t("packet.dispositionDate")}:</strong> ${escapeHtml(formatDateForDisplay(record.disposition_date))}</div>
+                <div class="record-line"><strong>${t("packet.dischargeDate")}:</strong> ${escapeHtml(formatDateForDisplay(record.probation_end_date || record.discharge_date))}</div>
+                <div class="record-line"><strong>${t("packet.court")}:</strong> ${escapeHtml(safe(record.court_name, "—"))}</div>
+                <div class="record-line"><strong>${t("packet.county")}:</strong> ${escapeHtml(safe(record.court_county, "—"))}</div>
               </div>
             </div>
           `;
@@ -1764,12 +1768,12 @@ document.addEventListener("DOMContentLoaded", function () {
           if (!finalDischarge) {
             flags.push("Missing discharge date");
             return {
-              relief_type: "Ohio record sealing",
+              relief_type: t("packet.ohioRecordSealing"),
               required_waiting_period: "",
               estimated_eligible_on: "",
               is_eligible: false,
               eligibility_status: "Needs Review",
-              eligibility_reason: "Final discharge date is missing.",
+              eligibility_reason: t("packet.finalDischargeMissing"),
               flags
             };
           }
@@ -1777,12 +1781,12 @@ document.addEventListener("DOMContentLoaded", function () {
           if (/\bF1\b|\bF2\b/.test(levelRaw) || /felony\s*(1|2|first|second)/i.test(levelRaw)) {
             flags.push("F1/F2 disqualifying level");
             return {
-              relief_type: "Ohio record sealing",
+              relief_type: t("packet.ohioRecordSealing"),
               required_waiting_period: "",
               estimated_eligible_on: "",
               is_eligible: false,
               eligibility_status: "Needs Review",
-              eligibility_reason: "F1/F2 convictions require manual review and may be disqualifying.",
+              eligibility_reason: t("packet.f1f2ManualReview"),
               flags
             };
           }
@@ -1794,7 +1798,7 @@ document.addEventListener("DOMContentLoaded", function () {
             requiredPeriod = "7 years";
           } else if (/\bF3\b/.test(levelRaw)) {
             waitYears = 3;
-            requiredPeriod = "3 years";
+            requiredPeriod = t("packet.threeYears");
           }
 
           const estimatedEligible = addYearsIso(finalDischarge, waitYears);
@@ -1802,12 +1806,12 @@ document.addEventListener("DOMContentLoaded", function () {
           const waitingSatisfied = Boolean(eligibleDateObj) && !Number.isNaN(eligibleDateObj.getTime()) && today >= eligibleDateObj;
 
           return {
-            relief_type: "Ohio record sealing",
+            relief_type: t("packet.ohioRecordSealing"),
             required_waiting_period: requiredPeriod,
             estimated_eligible_on: estimatedEligible,
             is_eligible: Boolean(estimatedEligible) && waitingSatisfied,
             eligibility_status: waitingSatisfied ? "Likely Eligible" : "Not Eligible",
-            eligibility_reason: waitingSatisfied ? "Waiting period appears satisfied." : "Waiting period is not yet satisfied.",
+            eligibility_reason: waitingSatisfied ? t("packet.waitingPeriodAppearsSatisfied") : t("packet.waitingPeriodNotSatisfied"),
             flags
           };
         }
@@ -1828,10 +1832,10 @@ document.addEventListener("DOMContentLoaded", function () {
         const eligibleRaw = merged.estimated_eligible_on || charge.waiting_period_end_date || "";
         const reliefRaw = safe(merged.relief_type || merged.filing_type || "").toLowerCase();
         const reliefType = reliefRaw.includes("expung")
-          ? "Ohio expungement"
+          ? t("packet.ohioExpungement")
           : reliefRaw.includes("seal")
-            ? "Ohio record sealing"
-            : "Needs review";
+            ? t("packet.ohioRecordSealing")
+            : t("packet.needsReview");
 
         const waitingPeriodText = (() => {
           if (safe(merged.required_waiting_period)) return merged.required_waiting_period;
@@ -1840,10 +1844,10 @@ document.addEventListener("DOMContentLoaded", function () {
             const end = new Date(String(eligibleRaw).includes('/') ? eligibleRaw : eligibleRaw + 'T12:00:00');
             if (!Number.isNaN(start.getTime()) && !Number.isNaN(end.getTime()) && end >= start) {
               const years = Math.round(((end - start) / (1000 * 60 * 60 * 24 * 365.25)) * 10) / 10;
-              return years >= 1 ? `${years} year${years === 1 ? '' : 's'}` : 'Less than 1 year';
+              return years >= 1 ? t("packet.yearsLabel", { years }) : t("packet.lessThanOneYear");
             }
           }
-          return "Needs review";
+          return t("packet.needsReview");
         })();
 
         document.getElementById("reliefTypeValue").textContent = reliefType;
@@ -1854,7 +1858,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const nowEl = document.getElementById("eligibilityNowValue");
         const eligibleDateObj = eligibleRaw ? new Date(String(eligibleRaw).includes('/') ? eligibleRaw : eligibleRaw + 'T12:00:00') : null;
         nowEl.textContent = eligibleDateObj && !Number.isNaN(eligibleDateObj.getTime()) && today >= eligibleDateObj
-          ? "Eligible now"
+          ? t("packet.eligibleNow")
           : "";
 
         const pill = document.getElementById("statusPill");
@@ -1864,16 +1868,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const computedFlagSet = new Set(Array.isArray(merged.flags) ? merged.flags : []);
         const flags = [
-          ["Missing discharge date", computedFlagSet.has("Missing discharge date")],
-          ["F1/F2 disqualifying level", computedFlagSet.has("F1/F2 disqualifying level")],
-          ["Pending charges", Boolean(eligibility.has_pending_cases || charge.pending_charges)],
-          ["Traffic offense", /traffic/i.test(safe(charge.charge_name) + " " + safe(charge.charge_code))],
-          ["1st/2nd degree felony", /f[12]\b|felony\s*(1|2|first|second)/i.test(safe(charge.level || charge.offense_classification))],
-          ["3+ F3 felonies", Number(charge.f3_felony_count || eligibility.f3_felony_count || 0) >= 3],
-          ["domestic violence", /domestic\s+violence/i.test(safe(charge.charge_name))],
-          ["sex offense registry", Boolean(charge.sex_offense_registry || eligibility.sex_offense_registry)],
-          ["victim under 13", Boolean(charge.victim_under_13 || eligibility.victim_under_13)],
-          ["felony violence offense", Boolean(charge.felony_violence_offense || eligibility.felony_violence_offense)]
+          [t("packet.flag.missingDischargeDate"), computedFlagSet.has("Missing discharge date")],
+          [t("packet.flag.f1f2"), computedFlagSet.has("F1/F2 disqualifying level")],
+          [t("packet.flag.pendingCharges"), Boolean(eligibility.has_pending_cases || charge.pending_charges)],
+          [t("packet.flag.trafficOffense"), /traffic/i.test(safe(charge.charge_name) + " " + safe(charge.charge_code))],
+          [t("packet.flag.firstSecondDegreeFelony"), /f[12]\b|felony\s*(1|2|first|second)/i.test(safe(charge.level || charge.offense_classification))],
+          [t("packet.flag.threePlusF3"), Number(charge.f3_felony_count || eligibility.f3_felony_count || 0) >= 3],
+          [t("packet.flag.domesticViolence"), /domestic\s+violence/i.test(safe(charge.charge_name))],
+          [t("packet.flag.sexRegistry"), Boolean(charge.sex_offense_registry || eligibility.sex_offense_registry)],
+          [t("packet.flag.victimUnder13"), Boolean(charge.victim_under_13 || eligibility.victim_under_13)],
+          [t("packet.flag.felonyViolence"), Boolean(charge.felony_violence_offense || eligibility.felony_violence_offense)]
         ];
 
         const hasComputedNeedsReviewFlag = computedFlagSet.has("Missing discharge date") || computedFlagSet.has("F1/F2 disqualifying level");
@@ -1883,29 +1887,29 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (hasComputedNeedsReviewFlag) {
           pill.className = "status-pill review";
-          pill.textContent = "Needs Review";
-          headline.textContent = "Screening needs review";
+          pill.textContent = t("packet.needsReview");
+          headline.textContent = t("packet.screeningNeedsReview");
           summary.textContent = computedFlagSet.has("Missing discharge date")
-            ? "Needs review: missing final discharge date, so an estimated eligibility date cannot be calculated."
-            : "Needs review: F1/F2 disqualifying level detected for this Ohio case.";
+            ? t("packet.needsReviewMissingDischarge")
+            : t("packet.needsReviewF1F2Detected");
         } else if (waitingPeriodSatisfied && hasDisqualifyingFlag) {
           pill.className = "status-pill review";
-          pill.textContent = "Needs Review";
-          headline.textContent = "Screening needs review";
-          summary.textContent = merged.eligibility_reason || "Waiting period appears satisfied, but one or more screening flags may affect eligibility.";
+          pill.textContent = t("packet.needsReview");
+          headline.textContent = t("packet.screeningNeedsReview");
+          summary.textContent = merged.eligibility_reason || t("packet.waitingPeriodSatisfiedFlagsMayAffect");
         } else if (isEligible) {
           pill.className = "status-pill eligible";
-          pill.textContent = "Likely Eligible";
-          headline.textContent = `Screening result for ${data.court.state || "this"} case`;
-          summary.textContent = merged.eligibility_reason || "The waiting period appears satisfied with no disqualifying screening flags.";
+          pill.textContent = t("packet.likelyEligible");
+          headline.textContent = t("packet.screeningResultForCase", { state: data.court.state || t("packet.thisCase") });
+          summary.textContent = merged.eligibility_reason || t("packet.waitingSatisfiedNoFlags");
         } else {
           pill.className = "status-pill review";
-          pill.textContent = "Eligibility Needs Review";
-          headline.textContent = "Screening needs review";
-          summary.textContent = merged.eligibility_reason || "Review the checklist below before filing.";
+          pill.textContent = t("packet.eligibilityNeedsReview");
+          headline.textContent = t("packet.screeningNeedsReview");
+          summary.textContent = merged.eligibility_reason || t("packet.reviewChecklistBeforeFiling");
         }
 
-        reasonList.innerHTML = flags.map(([label, flagged]) => `<li>${escapeHtml(label)}: <strong>${flagged ? "Yes" : "No"}</strong></li>`).join("");
+        reasonList.innerHTML = flags.map(([label, flagged]) => `<li>${escapeHtml(label)}: <strong>${flagged ? t("common.yes") : t("common.no")}</strong></li>`).join("");
       }
 
       async function updateTemplateCallout() {
@@ -1921,12 +1925,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
           el.className = "callout success";
           el.innerHTML = `
-            PDF mapper loaded.<br />
-            Template: <strong>${escapeHtml(activeMapping.document || activeMapping.templateId || selected.formType)}</strong><br />
-            Mapping JSON: <code>${escapeHtml(selected.mappingPath)}</code><br />
-            Source PDF: <code>${escapeHtml(selected.pdfPath)}</code><br />
+            ${t("packet.pdfMapperLoaded")}<br />
+            ${t("packet.templateLabel")}: <strong>${escapeHtml(activeMapping.document || activeMapping.templateId || selected.formType)}</strong><br />
+            ${t("packet.mappingJsonLabel")}: <code>${escapeHtml(selected.mappingPath)}</code><br />
+            ${t("packet.sourcePdfLabel")}: <code>${escapeHtml(selected.pdfPath)}</code><br />
 
-            Mapped fields: <strong>${fields.length}</strong>
+            ${t("packet.mappedFieldsLabel")}: <strong>${fields.length}</strong>
           `;
         } catch (error) {
           el.className = "callout warning";
@@ -2331,14 +2335,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
       if (paymentSuccess) {
         localStorage.setItem(PAYMENT_STORAGE_KEY, "true");
-        setPacketLockState(true, "Payment received. Packet unlocked.");
-        setStatus("Packet unlocked. You can now generate your court-ready packet.");
+        setPacketLockState(true, t("packet.paymentReceivedUnlocked"));
+        setStatus(t("packet.unlockedReadyGenerate"));
       } else if (paymentCancelled) {
-        setPacketLockState(false, "Payment cancelled. Your data is saved.");
-        setStatus("Payment cancelled. Your packet remains locked.");
+        setPacketLockState(false, t("packet.paymentCancelledSaved"));
+        setStatus(t("packet.paymentCancelledLocked"));
       } else {
-        setPacketLockState(false, "Packet is locked until payment is complete. Your eligibility summary and filing checklist remain visible.");
-        setStatus("Packet locked until payment is complete.");
+        setPacketLockState(false, t("packet.lockedWarning"));
+        setStatus(t("packet.lockedUntilPayment"));
       }
 
       setTypedSignature();
