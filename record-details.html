@@ -594,9 +594,9 @@
     <section class="page-hero">
       <div class="container">
         <div class="hero-card">
-          <span class="eyebrow">Step 2 of the workflow</span>
-          <h1 class="page-title">Enter Your Record Details</h1>
-          <p class="page-subtitle">
+          <span class="eyebrow" data-i18n="record.eyebrow">Step 2 of the workflow</span>
+          <h1 class="page-title" data-i18n="record.pageTitle">Enter Your Record Details</h1>
+          <p class="page-subtitle" data-i18n="record.pageSubtitle">
             Add each offense with the exact charge, statute, court, dates, and case state. RecordPathAI will use this information later on the packet page to determine packet logic, court output, and eligibility handling.
           </p>
         </div>
@@ -606,7 +606,7 @@
     <section class="page-section">
       <div class="container">
         <section class="page-card">
-          <div class="case-banner">
+          <div class="case-banner" data-i18n="record.notice">
             <strong>Important:</strong> The <strong>case state</strong> is the state where the case was filed. If you live in Nevada but the case is in Ohio, choose <strong>Ohio</strong> for that offense.
           </div>
 
@@ -622,7 +622,7 @@
             <button type="button" id="continueBtn" class="btn btn-primary">Save &amp; Continue</button>
           </div>
 
-          <p class="note">
+          <p class="note" data-i18n="record.note">
             This page stores case data only. Eligibility results should be shown on <code>packet.html</code>, not here.
           </p>
         </section>
@@ -747,7 +747,7 @@
             <div class="field">
               <label>Discharge / Case Closed Date</label>
               <input type="date" data-field="discharge_date" />
-              <div class="helper">Use the final discharge, release, or probation completion date when applicable.</div>
+              <div class="helper" data-i18n="record.helper.dischargeDate">Use the final discharge, release, or probation completion date when applicable.</div>
             </div>
 
             <div class="field">
