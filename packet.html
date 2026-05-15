@@ -767,7 +767,7 @@
         <div class="hero-card">
           <span class="eyebrow" data-i18n="packet.eyebrow">Step 3 of the workflow</span>
           <h1 class="packet-title" data-i18n="packet.title">Your Filing Packet</h1>
-          <p class="packet-subtitle">
+          <p class="packet-subtitle" data-i18n="packet.subtitle">
             Review your saved intake and record details, see the eligibility screening result, and generate the packet tied to the court where the case was actually filed.
           </p>
         </div>
@@ -807,9 +807,7 @@
             </div>
 
             <p class="meta-note" id="eligibilityNowValue"></p>
-            <p class="meta-note">
-              This is a screening result, not legal advice. Final approval depends on the court.
-            </p>
+            <p class="meta-note" data-i18n="packet.screeningNote">This is a screening result, not legal advice. Final approval depends on the court.</p>
           </section>
 
           <section class="packet-card">
@@ -846,7 +844,7 @@
 
           <section class="packet-card">
             <h2 class="section-title">All Saved Offenses</h2>
-            <p class="packet-subtitle" style="font-size:16px; margin-bottom:0;">
+            <p class="packet-subtitle" style="font-size:16px; margin-bottom:0;" data-i18n="packet.offensesSubtitle">
               The packet and eligibility banner above use the current selected record. This section shows every saved offense currently in your flow.
             </p>
             <div id="recordList" class="record-list"></div>
@@ -871,7 +869,7 @@
             </div>
             <div id="missingInfoPanel" class="missing-info-panel">
               <h3 style="margin:0;">Missing Information</h3>
-              <p style="margin:8px 0 0; color:#5f6e88;">Please provide the required fields below so your form can be generated.</p>
+              <p style="margin:8px 0 0; color:#5f6e88;" data-i18n="packet.missingInfoHelp">Please provide the required fields below so your form can be generated.</p>
               <div id="missingInfoFields" class="missing-info-grid"></div>
             </div>
 
@@ -884,7 +882,7 @@
             </div>
 
             <div class="sig-pad-wrap">
-              <p class="sig-pad-label">Or draw your signature below</p>
+              <p class="sig-pad-label" data-i18n="packet.signatureDraw">Or draw your signature below</p>
               <canvas id="signaturePad"></canvas>
               <div class="sig-actions" style="margin-top: 10px;">
                 <button type="button" class="sig-small-btn" id="useDrawnSigBtn">Use Drawn Signature</button>
@@ -900,7 +898,7 @@
             <div id="courtInstructionsCard" class="status-banner" style="margin-top:18px; display:none;">
               <h3 style="margin:0 0 14px; font-size:22px; letter-spacing:-0.01em;">Next Step: File Your Packet</h3>
               <div id="courtInstructionsContent" class="instructions-grid">
-                <p class="status-copy" style="margin:0; font-size:16px;">Loading filing instructions...</p>
+                <p class="status-copy" style="margin:0; font-size:16px;" data-i18n="packet.loadingFiling">Loading filing instructions...</p>
               </div>
             </div>
 
@@ -925,9 +923,7 @@
               <ul id="efilingChecklistItems"></ul>
             </div>
 
-            <p class="meta-note">
-              RecordPathAI prepares court-ready documents. It does not file directly with the court and is not a law firm. You can use an e-filing-ready packet with your court integration partner.
-            </p>
+            <p class="meta-note" data-i18n="packet.footerNote">RecordPathAI prepares court-ready documents. It does not file directly with the court and is not a law firm. You can use an e-filing-ready packet with your court integration partner.</p>
           </section>
 
           <section class="packet-card">
