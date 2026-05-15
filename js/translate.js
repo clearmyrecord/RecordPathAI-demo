@@ -154,11 +154,123 @@
       'packet.unlock': 'Unlock Packet — $50',
       'packet.unlocked': 'Packet unlocked',
       'common.back': 'Back',
+      'common.select': 'Select',
+      'common.yes': 'Yes',
+      'common.no': 'No',
+      'common.notes': 'Notes',
       'common.finish': 'Finish',
+      'record.chargeNamePlaceholder': 'Charge name',
+      'record.statuteCodePlaceholder': 'Statute code',
+      'record.caseNumberPlaceholder': 'Case number',
+      'record.arrestOffenseDate': 'Arrest / Offense Date',
+      'record.judgeName': 'Judge Name',
+      'record.judgeNamePlaceholder': 'Judge name',
+      'record.caseState': 'Case State',
+      'record.arrestingAgency': 'Arresting Agency',
+      'record.arrestingAgencyPlaceholder': 'Arresting agency',
+      'record.prosecutorAgency': 'Prosecutor / Filing Agency',
+      'record.prosecutorAgencyPlaceholder': 'Prosecutor or filing agency',
+      'record.dispositionFlags': 'Disposition Flags',
+      'record.pendingChargesOpenCase': 'Pending charges or open case',
+      'record.trafficOffense': 'Traffic offense',
+      'record.flaggedOffenseQuestions': 'Flagged Offense Questions',
+      'record.flag.theftInOffice': 'Theft in office',
+      'record.flag.firstSecondDegreeFelony': '1st or 2nd degree felony',
+      'record.flag.sexOffenseRegistryRelated': 'Sex offense registry related',
+      'record.flag.victimUnder13': 'Victim under 13',
+      'record.flag.felonyViolenceNonSex': 'Felony violence offense (non-sex)',
+      'record.flag.domesticViolenceConviction': 'Domestic violence conviction',
+      'record.flag.dvMisdemeanorSealable': 'Domestic violence misdemeanor sealable',
+      'record.flag.crimeAgainstChild': 'Crime against child',
+      'record.flag.sexOffense': 'Sex offense',
+      'record.flag.felonyDui': 'Felony DUI',
+      'record.flag.homeInvasionDeadlyWeapon': 'Home invasion with deadly weapon',
+      'record.totalFeloniesOnRecord': 'Total Felonies on Record',
+      'record.totalF3Felonies': 'Total F3 Felonies',
+      'record.numberPlaceholder': '0',
+      'record.nevadaCategory': 'Nevada Category',
+      'record.nv.standardMisdemeanor': 'Standard misdemeanor',
+      'record.nv.listedMisdemeanor': 'Listed misdemeanor',
+      'record.nv.duiOrDv': 'DUI or domestic violence',
+      'record.nv.felony': 'Felony',
+      'record.nv.violentCategoryA': 'Violent or Category A',
+      'record.arizonaClass': 'Arizona Class',
+      'record.az.class2Felony': 'Class 2 felony',
+      'record.az.class3Felony': 'Class 3 felony',
+      'record.az.class4Felony': 'Class 4 felony',
+      'record.az.class5Felony': 'Class 5 felony',
+      'record.az.class6Felony': 'Class 6 felony',
+      'record.az.class1Misdemeanor': 'Class 1 misdemeanor',
+      'record.az.class2Misdemeanor': 'Class 2 misdemeanor',
+      'record.az.class3Misdemeanor': 'Class 3 misdemeanor',
+      'record.californiaReliefTrack': 'California Relief Track',
+      'record.californiaNoProbation': 'California No Probation',
+      'record.notesPlaceholder': 'Add anything important about this offense, filing track, or special facts.',
+      'record.disposition.convicted': 'Convicted',
+      'record.disposition.dismissed': 'Dismissed',
+      'record.disposition.notGuilty': 'Not Guilty',
+      'record.disposition.acquitted': 'Acquitted',
+      'record.disposition.noBill': 'No Bill',
+      'record.disposition.pardon': 'Pardon',
+      'record.disposition.interventionInLieu': 'Intervention in Lieu',
       'packet.disclaimerPurchase': 'By purchasing, you agree that RecordPathAI provides document preparation services only and does not offer legal advice. All sales are final.',
       'packet.nextStep': 'Next Step: File Your Packet',
       'packet.missingInfo': 'Missing Information',
       'packet.ready': 'Ready.'
+      ,'packet.eligibilityNeedsReview': 'Eligibility Needs Review'
+      ,'packet.checkingEligibility': 'Checking your eligibility...'
+      ,'packet.reviewingCaseStateData': 'We are reviewing the case-state data you entered.'
+      ,'packet.reviewingTemplate': 'Reviewing which packet template should be used for this case.'
+      ,'packet.lockedWarning': 'Packet is locked until payment is complete. Your eligibility summary and filing checklist remain visible.'
+      ,'packet.typedSignaturePlaceholder': 'Typed signature name'
+      ,'packet.efilingChecklistTitle': 'E-Filing Readiness Checklist (Franklin County)'
+      ,'packet.noSavedOffensesFound': 'No saved offenses found.'
+      ,'packet.addAtLeastOneOffense': 'Go back to Record Details and add at least one offense.'
+      ,'packet.unnamedOffense': 'Unnamed offense'
+      ,'packet.savedRecord': 'Saved record'
+      ,'packet.statute': 'Statute'
+      ,'packet.degree': 'Degree'
+      ,'packet.ohioExpungement': 'Ohio expungement'
+      ,'packet.ohioRecordSealing': 'Ohio record sealing'
+      ,'packet.needsReview': 'Needs review'
+      ,'packet.yearsLabel': '{years} years'
+      ,'packet.lessThanOneYear': 'Less than 1 year'
+      ,'packet.eligibleNow': 'Eligible now'
+      ,'packet.screeningNeedsReview': 'Screening needs review'
+      ,'packet.likelyEligible': 'Likely Eligible'
+      ,'packet.screeningResultForCase': 'Screening result for {state} case'
+      ,'packet.thisCase': 'this'
+      ,'packet.pdfMapperLoaded': 'PDF mapper loaded.'
+      ,'packet.templateLabel': 'Template'
+      ,'packet.mappingJsonLabel': 'Mapping JSON'
+      ,'packet.sourcePdfLabel': 'Source PDF'
+      ,'packet.mappedFieldsLabel': 'Mapped fields'
+      ,'packet.paymentReceivedUnlocked': 'Payment received. Packet unlocked.'
+      ,'packet.unlockedReadyGenerate': 'Packet unlocked. You can now generate your court-ready packet.'
+      ,'packet.paymentCancelledSaved': 'Payment cancelled. Your data is saved.'
+      ,'packet.paymentCancelledLocked': 'Payment cancelled. Your packet remains locked.'
+      ,'packet.lockedUntilPayment': 'Packet locked until payment is complete.'
+      ,'packet.flag.missingDischargeDate': 'Missing discharge date'
+      ,'packet.flag.f1f2': 'F1/F2 disqualifying level'
+      ,'packet.flag.pendingCharges': 'Pending charges'
+      ,'packet.flag.trafficOffense': 'Traffic offense'
+      ,'packet.flag.firstSecondDegreeFelony': '1st/2nd degree felony'
+      ,'packet.flag.threePlusF3': '3+ F3 felonies'
+      ,'packet.flag.domesticViolence': 'domestic violence'
+      ,'packet.flag.sexRegistry': 'sex offense registry'
+      ,'packet.flag.victimUnder13': 'victim under 13'
+      ,'packet.flag.felonyViolence': 'felony violence offense'
+      ,'packet.waitingPeriodSatisfiedSavedData': 'Waiting period appears satisfied based on saved case data.'
+      ,'packet.finalDischargeMissing': 'Final discharge date is missing.'
+      ,'packet.f1f2ManualReview': 'F1/F2 convictions require manual review and may be disqualifying.'
+      ,'packet.threeYears': '3 years'
+      ,'packet.waitingPeriodAppearsSatisfied': 'Waiting period appears satisfied.'
+      ,'packet.waitingPeriodNotSatisfied': 'Waiting period is not yet satisfied.'
+      ,'packet.needsReviewMissingDischarge': 'Needs review: missing final discharge date, so an estimated eligibility date cannot be calculated.'
+      ,'packet.needsReviewF1F2Detected': 'Needs review: F1/F2 disqualifying level detected for this Ohio case.'
+      ,'packet.waitingPeriodSatisfiedFlagsMayAffect': 'Waiting period appears satisfied, but one or more screening flags may affect eligibility.'
+      ,'packet.waitingSatisfiedNoFlags': 'The waiting period appears satisfied with no disqualifying screening flags.'
+      ,'packet.reviewChecklistBeforeFiling': 'Review the checklist below before filing.'
 
     },
     es: {
@@ -312,11 +424,123 @@
       'packet.unlock': 'Desbloquear paquete — $50',
       'packet.unlocked': 'Paquete desbloqueado',
       'common.back': 'Atrás',
+      'common.select': 'Seleccionar',
+      'common.yes': 'Sí',
+      'common.no': 'No',
+      'common.notes': 'Notas',
       'common.finish': 'Finalizar',
+      'record.chargeNamePlaceholder': 'Nombre del cargo',
+      'record.statuteCodePlaceholder': 'Código del estatuto',
+      'record.caseNumberPlaceholder': 'Número de caso',
+      'record.arrestOffenseDate': 'Fecha de arresto / delito',
+      'record.judgeName': 'Nombre del juez',
+      'record.judgeNamePlaceholder': 'Nombre del juez',
+      'record.caseState': 'Estado del caso',
+      'record.arrestingAgency': 'Agencia de arresto',
+      'record.arrestingAgencyPlaceholder': 'Agencia de arresto',
+      'record.prosecutorAgency': 'Fiscal / agencia que presentó',
+      'record.prosecutorAgencyPlaceholder': 'Fiscal o agencia que presentó',
+      'record.dispositionFlags': 'Indicadores de resolución',
+      'record.pendingChargesOpenCase': 'Cargos pendientes o caso abierto',
+      'record.trafficOffense': 'Delito de tránsito',
+      'record.flaggedOffenseQuestions': 'Preguntas de delitos señalados',
+      'record.flag.theftInOffice': 'Robo en cargo público',
+      'record.flag.firstSecondDegreeFelony': 'Delito grave de 1.º o 2.º grado',
+      'record.flag.sexOffenseRegistryRelated': 'Relacionado con registro de delitos sexuales',
+      'record.flag.victimUnder13': 'Víctima menor de 13 años',
+      'record.flag.felonyViolenceNonSex': 'Delito grave violento (no sexual)',
+      'record.flag.domesticViolenceConviction': 'Condena por violencia doméstica',
+      'record.flag.dvMisdemeanorSealable': 'Delito menor de violencia doméstica sellable',
+      'record.flag.crimeAgainstChild': 'Delito contra un menor',
+      'record.flag.sexOffense': 'Delito sexual',
+      'record.flag.felonyDui': 'DUI grave',
+      'record.flag.homeInvasionDeadlyWeapon': 'Allanamiento de morada con arma mortal',
+      'record.totalFeloniesOnRecord': 'Total de delitos graves en el expediente',
+      'record.totalF3Felonies': 'Total de delitos graves F3',
+      'record.numberPlaceholder': '0',
+      'record.nevadaCategory': 'Categoría de Nevada',
+      'record.nv.standardMisdemeanor': 'Delito menor estándar',
+      'record.nv.listedMisdemeanor': 'Delito menor listado',
+      'record.nv.duiOrDv': 'DUI o violencia doméstica',
+      'record.nv.felony': 'Delito grave',
+      'record.nv.violentCategoryA': 'Violento o categoría A',
+      'record.arizonaClass': 'Clase de Arizona',
+      'record.az.class2Felony': 'Delito grave de clase 2',
+      'record.az.class3Felony': 'Delito grave de clase 3',
+      'record.az.class4Felony': 'Delito grave de clase 4',
+      'record.az.class5Felony': 'Delito grave de clase 5',
+      'record.az.class6Felony': 'Delito grave de clase 6',
+      'record.az.class1Misdemeanor': 'Delito menor de clase 1',
+      'record.az.class2Misdemeanor': 'Delito menor de clase 2',
+      'record.az.class3Misdemeanor': 'Delito menor de clase 3',
+      'record.californiaReliefTrack': 'Ruta de alivio de California',
+      'record.californiaNoProbation': 'California sin libertad condicional',
+      'record.notesPlaceholder': 'Agregue cualquier dato importante sobre este delito, la vía de presentación o hechos especiales.',
+      'record.disposition.convicted': 'Condenado',
+      'record.disposition.dismissed': 'Desestimado',
+      'record.disposition.notGuilty': 'No culpable',
+      'record.disposition.acquitted': 'Absuelto',
+      'record.disposition.noBill': 'No procede',
+      'record.disposition.pardon': 'Indulto',
+      'record.disposition.interventionInLieu': 'Intervención en lugar de condena',
       'packet.disclaimerPurchase': 'Al comprar, usted acepta que RecordPathAI solo brinda servicios de preparación de documentos y no ofrece asesoría legal. Todas las ventas son finales.',
       'packet.nextStep': 'Siguiente paso: presente su paquete',
       'packet.missingInfo': 'Información faltante',
       'packet.ready': 'Listo.'
+      ,'packet.eligibilityNeedsReview': 'La elegibilidad necesita revisión'
+      ,'packet.checkingEligibility': 'Verificando su elegibilidad...'
+      ,'packet.reviewingCaseStateData': 'Estamos revisando los datos del estado del caso que ingresó.'
+      ,'packet.reviewingTemplate': 'Revisando qué plantilla de paquete debe usarse para este caso.'
+      ,'packet.lockedWarning': 'El paquete está bloqueado hasta que se complete el pago. Su resumen de elegibilidad y la lista de verificación siguen visibles.'
+      ,'packet.typedSignaturePlaceholder': 'Nombre de firma escrita'
+      ,'packet.efilingChecklistTitle': 'Lista de preparación para presentación electrónica (Condado de Franklin)'
+      ,'packet.noSavedOffensesFound': 'No se encontraron delitos guardados.'
+      ,'packet.addAtLeastOneOffense': 'Regrese a Detalles del registro y agregue al menos un delito.'
+      ,'packet.unnamedOffense': 'Delito sin nombre'
+      ,'packet.savedRecord': 'Registro guardado'
+      ,'packet.statute': 'Estatuto'
+      ,'packet.degree': 'Grado'
+      ,'packet.ohioExpungement': 'Eliminación de antecedentes de Ohio'
+      ,'packet.ohioRecordSealing': 'Sellado de antecedentes de Ohio'
+      ,'packet.needsReview': 'Necesita revisión'
+      ,'packet.yearsLabel': '{years} años'
+      ,'packet.lessThanOneYear': 'Menos de 1 año'
+      ,'packet.eligibleNow': 'Elegible ahora'
+      ,'packet.screeningNeedsReview': 'La evaluación necesita revisión'
+      ,'packet.likelyEligible': 'Probablemente elegible'
+      ,'packet.screeningResultForCase': 'Resultado de evaluación para caso de {state}'
+      ,'packet.thisCase': 'este'
+      ,'packet.pdfMapperLoaded': 'Mapeador PDF cargado.'
+      ,'packet.templateLabel': 'Plantilla'
+      ,'packet.mappingJsonLabel': 'JSON de mapeo'
+      ,'packet.sourcePdfLabel': 'PDF fuente'
+      ,'packet.mappedFieldsLabel': 'Campos mapeados'
+      ,'packet.paymentReceivedUnlocked': 'Pago recibido. Paquete desbloqueado.'
+      ,'packet.unlockedReadyGenerate': 'Paquete desbloqueado. Ahora puede generar su paquete listo para la corte.'
+      ,'packet.paymentCancelledSaved': 'Pago cancelado. Sus datos están guardados.'
+      ,'packet.paymentCancelledLocked': 'Pago cancelado. Su paquete permanece bloqueado.'
+      ,'packet.lockedUntilPayment': 'Paquete bloqueado hasta que se complete el pago.'
+      ,'packet.flag.missingDischargeDate': 'Falta la fecha de finalización'
+      ,'packet.flag.f1f2': 'Nivel descalificante F1/F2'
+      ,'packet.flag.pendingCharges': 'Cargos pendientes'
+      ,'packet.flag.trafficOffense': 'Delito de tránsito'
+      ,'packet.flag.firstSecondDegreeFelony': 'Delito grave de 1.º/2.º grado'
+      ,'packet.flag.threePlusF3': '3+ delitos graves F3'
+      ,'packet.flag.domesticViolence': 'violencia doméstica'
+      ,'packet.flag.sexRegistry': 'registro de delitos sexuales'
+      ,'packet.flag.victimUnder13': 'víctima menor de 13'
+      ,'packet.flag.felonyViolence': 'delito grave violento'
+      ,'packet.waitingPeriodSatisfiedSavedData': 'El período de espera parece cumplido según los datos guardados del caso.'
+      ,'packet.finalDischargeMissing': 'Falta la fecha final de cumplimiento.'
+      ,'packet.f1f2ManualReview': 'Las condenas F1/F2 requieren revisión manual y pueden ser descalificantes.'
+      ,'packet.threeYears': '3 años'
+      ,'packet.waitingPeriodAppearsSatisfied': 'El período de espera parece cumplido.'
+      ,'packet.waitingPeriodNotSatisfied': 'El período de espera aún no se cumple.'
+      ,'packet.needsReviewMissingDischarge': 'Necesita revisión: falta la fecha final de cumplimiento, por lo que no se puede calcular una fecha estimada de elegibilidad.'
+      ,'packet.needsReviewF1F2Detected': 'Necesita revisión: se detectó nivel descalificante F1/F2 para este caso de Ohio.'
+      ,'packet.waitingPeriodSatisfiedFlagsMayAffect': 'El período de espera parece cumplido, pero una o más señales de evaluación pueden afectar la elegibilidad.'
+      ,'packet.waitingSatisfiedNoFlags': 'El período de espera parece cumplido sin señales descalificantes en la evaluación.'
+      ,'packet.reviewChecklistBeforeFiling': 'Revise la lista de verificación antes de presentar.'
 
     }
   };
@@ -332,9 +556,9 @@
     applyLanguage(next);
   }
 
-  function translateNode(node, lang) {
-    const key = node.getAttribute('data-i18n');
-    const attr = node.getAttribute('data-i18n-attr');
+  function translateNode(node, lang, keyAttr = 'data-i18n', targetAttr = null) {
+    const key = node.getAttribute(keyAttr);
+    const attr = targetAttr || node.getAttribute('data-i18n-attr');
     const value = dictionary[lang] && dictionary[lang][key];
     if (!value) return;
     if (attr) node.setAttribute(attr, value);
@@ -344,6 +568,8 @@
   function applyLanguage(lang) {
     document.documentElement.lang = lang;
     document.querySelectorAll('[data-i18n]').forEach((node) => translateNode(node, lang));
+    document.querySelectorAll('[data-i18n-placeholder]').forEach((node) => translateNode(node, lang, 'data-i18n-placeholder', 'placeholder'));
+    document.querySelectorAll('[data-i18n-aria-label]').forEach((node) => translateNode(node, lang, 'data-i18n-aria-label', 'aria-label'));
     const selector = document.querySelector('[data-language-selector]');
     if (selector) selector.value = lang;
   }

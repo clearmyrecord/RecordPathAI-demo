@@ -701,32 +701,32 @@
           <div class="record-grid">
             <div class="field">
               <label data-i18n="packet.charge">Charge Name</label>
-              <input data-field="charge_name" list="chargeNameSuggestions" placeholder="Charge name" />
+              <input data-field="charge_name" list="chargeNameSuggestions" data-i18n-placeholder="record.chargeNamePlaceholder" placeholder="Charge name" />
             </div>
 
             <div class="field">
               <label data-i18n="packet.offenseCode">Statute / Offense Code</label>
-              <input data-field="charge_code" list="offenseCodeSuggestions" placeholder="Statute code" />
+              <input data-field="charge_code" list="offenseCodeSuggestions" data-i18n-placeholder="record.statuteCodePlaceholder" placeholder="Statute code" />
             </div>
 
             <div class="field">
               <label data-i18n="packet.outcome">Outcome</label>
               <select data-field="final_disposition">
-                <option value="">Select</option>
-                <option value="Convicted">Convicted</option>
-                <option value="Dismissed">Dismissed</option>
-                <option value="Not Guilty">Not Guilty</option>
-                <option value="Acquitted">Acquitted</option>
-                <option value="No Bill">No Bill</option>
-                <option value="Pardon">Pardon</option>
-                <option value="Intervention in Lieu">Intervention in Lieu</option>
+                <option value="" data-i18n="common.select">Select</option>
+                <option value="Convicted" data-i18n="record.disposition.convicted">Convicted</option>
+                <option value="Dismissed" data-i18n="record.disposition.dismissed">Dismissed</option>
+                <option value="Not Guilty" data-i18n="record.disposition.notGuilty">Not Guilty</option>
+                <option value="Acquitted" data-i18n="record.disposition.acquitted">Acquitted</option>
+                <option value="No Bill" data-i18n="record.disposition.noBill">No Bill</option>
+                <option value="Pardon" data-i18n="record.disposition.pardon">Pardon</option>
+                <option value="Intervention in Lieu" data-i18n="record.disposition.interventionInLieu">Intervention in Lieu</option>
               </select>
             </div>
 
             <div class="field">
               <label data-i18n="packet.level">Level / Degree</label>
               <select data-field="level">
-                <option value="">Select</option>
+                <option value="" data-i18n="common.select">Select</option>
                 <option value="MM">Minor Misdemeanor</option>
                 <option value="M">Misdemeanor</option>
                 <option value="F5">Felony 5</option>
@@ -739,7 +739,7 @@
 
             <div class="field">
               <label data-i18n="record.caseNumber">Case Number</label>
-              <input data-field="case_number" placeholder="Case number" />
+              <input data-field="case_number" data-i18n-placeholder="record.caseNumberPlaceholder" placeholder="Case number" />
             </div>
 
             <div class="field">
@@ -754,7 +754,7 @@
             </div>
 
             <div class="field">
-              <label>Arrest / Offense Date</label>
+              <label data-i18n="record.arrestOffenseDate">Arrest / Offense Date</label>
               <input type="date" data-field="offense_date" />
             </div>
 
@@ -764,8 +764,8 @@
             </div>
 
             <div class="field">
-              <label>Judge Name</label>
-              <input data-field="judge_name" placeholder="Judge name" />
+              <label data-i18n="record.judgeName">Judge Name</label>
+              <input data-field="judge_name" data-i18n-placeholder="record.judgeNamePlaceholder" placeholder="Judge name" />
             </div>
 
             <div class="field">
@@ -774,9 +774,9 @@
             </div>
 
             <div class="field">
-              <label>Case State</label>
+              <label data-i18n="record.caseState">Case State</label>
               <select data-field="case_state">
-                <option value="">Select</option>
+                <option value="" data-i18n="common.select">Select</option>
                 <option value="OH">Ohio</option>
                 <option value="NV">Nevada</option>
                 <option value="CA">California</option>
@@ -787,145 +787,145 @@
             </div>
 
             <div class="field">
-              <label>Arresting Agency</label>
-              <input data-field="arresting_agency" placeholder="Arresting agency" />
+              <label data-i18n="record.arrestingAgency">Arresting Agency</label>
+              <input data-field="arresting_agency" data-i18n-placeholder="record.arrestingAgencyPlaceholder" placeholder="Arresting agency" />
             </div>
 
             <div class="field">
-              <label>Prosecutor / Filing Agency</label>
-              <input data-field="prosecutor_agency" placeholder="Prosecutor or filing agency" />
+              <label data-i18n="record.prosecutorAgency">Prosecutor / Filing Agency</label>
+              <input data-field="prosecutor_agency" data-i18n-placeholder="record.prosecutorAgencyPlaceholder" placeholder="Prosecutor or filing agency" />
             </div>
 
             <div class="flag-box">
-              <h3 class="flag-title">Disposition Flags</h3>
+              <h3 class="flag-title" data-i18n="record.dispositionFlags">Disposition Flags</h3>
               <div class="check-grid">
                 <label class="check">
                   <input type="checkbox" data-field="is_dismissed" />
-                  <span>Dismissed</span>
+                  <span data-i18n="record.disposition.dismissed">Dismissed</span>
                 </label>
                 <label class="check">
                   <input type="checkbox" data-field="is_convicted" />
-                  <span>Convicted</span>
+                  <span data-i18n="record.disposition.convicted">Convicted</span>
                 </label>
                 <label class="check">
                   <input type="checkbox" data-field="pendingCharges" />
-                  <span>Pending charges or open case</span>
+                  <span data-i18n="record.pendingChargesOpenCase">Pending charges or open case</span>
                 </label>
                 <label class="check">
                   <input type="checkbox" data-field="isTraffic" />
-                  <span>Traffic offense</span>
+                  <span data-i18n="record.trafficOffense">Traffic offense</span>
                 </label>
               </div>
             </div>
 
             <div class="flag-box">
-              <h3 class="flag-title">Flagged Offense Questions</h3>
+              <h3 class="flag-title" data-i18n="record.flaggedOffenseQuestions">Flagged Offense Questions</h3>
               <div class="check-grid">
                 <label class="check">
                   <input type="checkbox" data-field="isTheftInOffice" />
-                  <span>Theft in office</span>
+                  <span data-i18n="record.flag.theftInOffice">Theft in office</span>
                 </label>
                 <label class="check">
                   <input type="checkbox" data-field="isFirstOrSecondDegreeFelony" />
-                  <span>1st or 2nd degree felony</span>
+                  <span data-i18n="record.flag.firstSecondDegreeFelony">1st or 2nd degree felony</span>
                 </label>
                 <label class="check">
                   <input type="checkbox" data-field="isSexOffenseRegistry" />
-                  <span>Sex offense registry related</span>
+                  <span data-i18n="record.flag.sexOffenseRegistryRelated">Sex offense registry related</span>
                 </label>
                 <label class="check">
                   <input type="checkbox" data-field="victimUnder13" />
-                  <span>Victim under 13</span>
+                  <span data-i18n="record.flag.victimUnder13">Victim under 13</span>
                 </label>
                 <label class="check">
                   <input type="checkbox" data-field="isFelonyViolenceNonSex" />
-                  <span>Felony violence offense (non-sex)</span>
+                  <span data-i18n="record.flag.felonyViolenceNonSex">Felony violence offense (non-sex)</span>
                 </label>
                 <label class="check">
                   <input type="checkbox" data-field="isDomesticViolenceConviction" />
-                  <span>Domestic violence conviction</span>
+                  <span data-i18n="record.flag.domesticViolenceConviction">Domestic violence conviction</span>
                 </label>
                 <label class="check">
                   <input type="checkbox" data-field="dvMisdemeanorSealable" />
-                  <span>Domestic violence misdemeanor sealable</span>
+                  <span data-i18n="record.flag.dvMisdemeanorSealable">Domestic violence misdemeanor sealable</span>
                 </label>
                 <label class="check">
                   <input type="checkbox" data-field="isCrimeAgainstChild" />
-                  <span>Crime against child</span>
+                  <span data-i18n="record.flag.crimeAgainstChild">Crime against child</span>
                 </label>
                 <label class="check">
                   <input type="checkbox" data-field="isSexOffense" />
-                  <span>Sex offense</span>
+                  <span data-i18n="record.flag.sexOffense">Sex offense</span>
                 </label>
                 <label class="check">
                   <input type="checkbox" data-field="isFelonyDUI" />
-                  <span>Felony DUI</span>
+                  <span data-i18n="record.flag.felonyDui">Felony DUI</span>
                 </label>
                 <label class="check">
                   <input type="checkbox" data-field="isHomeInvasionDeadlyWeapon" />
-                  <span>Home invasion with deadly weapon</span>
+                  <span data-i18n="record.flag.homeInvasionDeadlyWeapon">Home invasion with deadly weapon</span>
                 </label>
               </div>
             </div>
 
             <div class="field">
-              <label>Total Felonies on Record</label>
-              <input type="number" min="0" data-field="totalFelonies" placeholder="0" />
+              <label data-i18n="record.totalFeloniesOnRecord">Total Felonies on Record</label>
+              <input type="number" min="0" data-field="totalFelonies" data-i18n-placeholder="record.numberPlaceholder" placeholder="0" />
             </div>
 
             <div class="field">
-              <label>Total F3 Felonies</label>
-              <input type="number" min="0" data-field="totalF3" placeholder="0" />
+              <label data-i18n="record.totalF3Felonies">Total F3 Felonies</label>
+              <input type="number" min="0" data-field="totalF3" data-i18n-placeholder="record.numberPlaceholder" placeholder="0" />
             </div>
 
             <div class="field">
-              <label>Nevada Category</label>
+              <label data-i18n="record.nevadaCategory">Nevada Category</label>
               <select data-field="nvCategory">
-                <option value="">Select</option>
-                <option value="standard_misdemeanor">Standard misdemeanor</option>
-                <option value="listed_misdemeanor">Listed misdemeanor</option>
-                <option value="dui_or_dv">DUI or domestic violence</option>
-                <option value="felony">Felony</option>
-                <option value="violent_or_category_a">Violent or Category A</option>
+                <option value="" data-i18n="common.select">Select</option>
+                <option value="standard_misdemeanor" data-i18n="record.nv.standardMisdemeanor">Standard misdemeanor</option>
+                <option value="listed_misdemeanor" data-i18n="record.nv.listedMisdemeanor">Listed misdemeanor</option>
+                <option value="dui_or_dv" data-i18n="record.nv.duiOrDv">DUI or domestic violence</option>
+                <option value="felony" data-i18n="record.nv.felony">Felony</option>
+                <option value="violent_or_category_a" data-i18n="record.nv.violentCategoryA">Violent or Category A</option>
               </select>
             </div>
 
             <div class="field">
-              <label>Arizona Class</label>
+              <label data-i18n="record.arizonaClass">Arizona Class</label>
               <select data-field="azClass">
-                <option value="">Select</option>
-                <option value="AZ_F2">Class 2 felony</option>
-                <option value="AZ_F3">Class 3 felony</option>
-                <option value="AZ_F4">Class 4 felony</option>
-                <option value="AZ_F5">Class 5 felony</option>
-                <option value="AZ_F6">Class 6 felony</option>
-                <option value="AZ_M1">Class 1 misdemeanor</option>
-                <option value="AZ_M2">Class 2 misdemeanor</option>
-                <option value="AZ_M3">Class 3 misdemeanor</option>
+                <option value="" data-i18n="common.select">Select</option>
+                <option value="AZ_F2" data-i18n="record.az.class2Felony">Class 2 felony</option>
+                <option value="AZ_F3" data-i18n="record.az.class3Felony">Class 3 felony</option>
+                <option value="AZ_F4" data-i18n="record.az.class4Felony">Class 4 felony</option>
+                <option value="AZ_F5" data-i18n="record.az.class5Felony">Class 5 felony</option>
+                <option value="AZ_F6" data-i18n="record.az.class6Felony">Class 6 felony</option>
+                <option value="AZ_M1" data-i18n="record.az.class1Misdemeanor">Class 1 misdemeanor</option>
+                <option value="AZ_M2" data-i18n="record.az.class2Misdemeanor">Class 2 misdemeanor</option>
+                <option value="AZ_M3" data-i18n="record.az.class3Misdemeanor">Class 3 misdemeanor</option>
               </select>
             </div>
 
             <div class="field">
-              <label>California Relief Track</label>
+              <label data-i18n="record.californiaReliefTrack">California Relief Track</label>
               <select data-field="caReliefTrack">
-                <option value="">Select</option>
+                <option value="" data-i18n="common.select">Select</option>
                 <option value="1203.4">1203.4</option>
                 <option value="1203.42">1203.42</option>
               </select>
             </div>
 
             <div class="field">
-              <label>California No Probation</label>
+              <label data-i18n="record.californiaNoProbation">California No Probation</label>
               <select data-field="caNoProbation">
-                <option value="">Select</option>
-                <option value="true">Yes</option>
-                <option value="false">No</option>
+                <option value="" data-i18n="common.select">Select</option>
+                <option value="true" data-i18n="common.yes">Yes</option>
+                <option value="false" data-i18n="common.no">No</option>
               </select>
             </div>
 
             <div class="field field-full">
-              <label>Notes</label>
-              <textarea data-field="notes" placeholder="Add anything important about this offense, filing track, or special facts."></textarea>
+              <label data-i18n="common.notes">Notes</label>
+              <textarea data-field="notes" data-i18n-placeholder="record.notesPlaceholder" placeholder="Add anything important about this offense, filing track, or special facts."></textarea>
             </div>
           </div>
         `;
