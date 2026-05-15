@@ -611,7 +611,7 @@
           </div>
 
           <div class="toolbar">
-            <button type="button" class="btn btn-soft" id="addOffenseBtn">+ Add Offense</button>
+            <button type="button" class="btn btn-soft" id="addOffenseBtn" data-i18n="record.addOffense">+ Add Offense</button>
             <div class="record-status" id="recordStatus">1 offense added</div>
           </div>
 
@@ -619,7 +619,7 @@
 
           <div class="actions">
             <a href="eligibility.html" class="btn btn-secondary">Back</a>
-            <button type="button" id="continueBtn" class="btn btn-primary">Save &amp; Continue</button>
+            <button type="button" id="continueBtn" data-i18n="record.continue" class="btn btn-primary">Save &amp; Continue</button>
           </div>
 
           <p class="note" data-i18n="record.note">
@@ -664,6 +664,7 @@
   </footer>
 
   <script src="js/packet-data-bridge.js"></script>
+  <script src="js/translate.js"></script>
   <script>
     (function () {
       const offenseList = document.getElementById("offenseList");
@@ -675,13 +676,15 @@
 
       function updateStatus() {
         const count = offenseList.querySelectorAll(".record-card").length;
-        recordStatus.textContent = count === 1 ? "1 offense added" : `${count} offenses added`;
+        const lang=(window.RecordPathI18n&&window.RecordPathI18n.getLanguage?window.RecordPathI18n.getLanguage():"en");
+        if(lang==="es") recordStatus.textContent = count===1?"1 delito agregado":`${count} delitos agregados`;
+        else recordStatus.textContent = count===1?"1 offense added":`${count} offenses added`;
       }
 
       function renumberOffenses() {
         offenseList.querySelectorAll(".record-card").forEach((card, index) => {
           const heading = card.querySelector("h2");
-          if (heading) heading.textContent = `Offense ${index + 1}`;
+          if (heading) heading.textContent = `${(window.RecordPathI18n&&window.RecordPathI18n.t?window.RecordPathI18n.t("record.offense"):"Offense")} ${index + 1}`;
         });
       }
 
@@ -691,23 +694,23 @@
 
         card.innerHTML = `
           <div class="record-card-head">
-            <h2>Offense ${index + 1}</h2>
-            <button type="button" class="btn btn-secondary remove-offense-btn">Remove</button>
+            <h2>${(window.RecordPathI18n&&window.RecordPathI18n.t?window.RecordPathI18n.t("record.offense"):"Offense")} ${index + 1}</h2>
+            <button type="button" class="btn btn-secondary remove-offense-btn" data-i18n="record.remove">Remove</button>
           </div>
 
           <div class="record-grid">
             <div class="field">
-              <label>Charge Name</label>
+              <label data-i18n="packet.charge">Charge Name</label>
               <input data-field="charge_name" list="chargeNameSuggestions" placeholder="Charge name" />
             </div>
 
             <div class="field">
-              <label>Statute / Offense Code</label>
+              <label data-i18n="packet.offenseCode">Statute / Offense Code</label>
               <input data-field="charge_code" list="offenseCodeSuggestions" placeholder="Statute code" />
             </div>
 
             <div class="field">
-              <label>Outcome</label>
+              <label data-i18n="packet.outcome">Outcome</label>
               <select data-field="final_disposition">
                 <option value="">Select</option>
                 <option value="Convicted">Convicted</option>
@@ -721,7 +724,7 @@
             </div>
 
             <div class="field">
-              <label>Level / Degree</label>
+              <label data-i18n="packet.level">Level / Degree</label>
               <select data-field="level">
                 <option value="">Select</option>
                 <option value="MM">Minor Misdemeanor</option>
@@ -735,17 +738,17 @@
             </div>
 
             <div class="field">
-              <label>Case Number</label>
+              <label data-i18n="record.caseNumber">Case Number</label>
               <input data-field="case_number" placeholder="Case number" />
             </div>
 
             <div class="field">
-              <label>Disposition Date</label>
+              <label data-i18n="packet.dispositionDate">Disposition Date</label>
               <input type="date" data-field="disposition_date" />
             </div>
 
             <div class="field">
-              <label>Discharge / Case Closed Date</label>
+              <label data-i18n="record.dischargeClosed">Discharge / Case Closed Date</label>
               <input type="date" data-field="discharge_date" />
               <div class="helper" data-i18n="record.helper.dischargeDate">Use the final discharge, release, or probation completion date when applicable.</div>
             </div>
@@ -756,7 +759,7 @@
             </div>
 
             <div class="field">
-              <label>Court</label>
+              <label data-i18n="packet.court">Court</label>
               <input data-field="court_name" list="courtSuggestions" />
             </div>
 
@@ -766,7 +769,7 @@
             </div>
 
             <div class="field">
-              <label>County</label>
+              <label data-i18n="packet.county">County</label>
               <input data-field="court_county" list="countySuggestions" />
             </div>
 
