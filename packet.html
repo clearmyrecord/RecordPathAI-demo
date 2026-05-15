@@ -728,6 +728,7 @@
       .footer-links a { text-align: center; }
     }
   </style>
+  <link rel="stylesheet" href="css/styles.css" />
 </head>
 
 <body>
@@ -741,12 +742,20 @@
           </a>
 
           <nav class="nav">
-            <a href="index.html">Home</a>
-            <a href="how-it-works.html">How It Works</a>
-            <a href="eligibility.html">Eligibility</a>
-            <a href="record-details.html">Record Details</a>
-            <a href="packet.html" class="nav-cta">Packet</a>
+            <a href="index.html" data-i18n="nav.home">Home</a>
+            <a href="how-it-works.html" data-i18n="nav.how">How It Works</a>
+            <a href="eligibility.html" data-i18n="nav.eligibility">Eligibility</a>
+            <a href="record-details.html" data-i18n="nav.recordDetails">Record Details</a>
+            <a href="packet.html" class="nav-cta" data-i18n="nav.packet">Packet</a>
           </nav>
+
+          <div class="language-access">
+            <label for="language-selector" data-i18n="lang.label">Language Access</label>
+            <select id="language-selector" data-language-selector>
+              <option value="en" data-i18n="lang.english">English</option>
+              <option value="es" data-i18n="lang.spanish">Español</option>
+            </select>
+          </div>
         </div>
       </div>
     </div>
@@ -757,7 +766,7 @@
       <div class="container">
         <div class="hero-card">
           <span class="eyebrow">Step 3 of the workflow</span>
-          <h1 class="packet-title">Your Filing Packet</h1>
+          <h1 class="packet-title" data-i18n="packet.title">Your Filing Packet</h1>
           <p class="packet-subtitle">
             Review your saved intake and record details, see the eligibility screening result, and generate the packet tied to the court where the case was actually filed.
           </p>
@@ -951,9 +960,9 @@
 
       <!-- 🔗 NAV + LEGAL LINKS -->
       <div class="footer-links">
-        <a href="index.html">Home</a>
-        <a href="how-it-works.html">How It Works</a>
-        <a href="eligibility.html">Eligibility</a>
+        <a href="index.html" data-i18n="nav.home">Home</a>
+        <a href="how-it-works.html" data-i18n="nav.how">How It Works</a>
+        <a href="eligibility.html" data-i18n="nav.eligibility">Eligibility</a>
         <a href="terms.html">Terms</a>
         <a href="privacy.html">Privacy</a>
         <a href="disclaimer.html">Disclaimer</a>
@@ -961,7 +970,10 @@
 
     </div>
   </div>
-</footer>
+  <div class="container">
+    <p class="translation-disclaimer" data-i18n="translation.disclaimer">Translation is provided for convenience and may not replace official court translation services.</p>
+  </div>
+  </footer>
 
   <script src="js/packet-data-bridge.js"></script>
   <script src="js/rules.js"></script>
@@ -2339,5 +2351,6 @@ document.addEventListener("DOMContentLoaded", function () {
   RecordPathDataBridge.initPage(document);
 }
   </script>
+  <script src="js/i18n.js"></script>
 </body>
 </html>

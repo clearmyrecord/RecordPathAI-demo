@@ -1187,3 +1187,46 @@ footer {
   background: #97a4bb;
   box-shadow: 0 6px 0 #97a4bb, 0 12px 0 #97a4bb;
 }
+
+.language-access {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.language-access label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #233d70;
+}
+
+.language-access select {
+  border: 1px solid #dbe3f0;
+  border-radius: 10px;
+  background: #fff;
+  color: #233d70;
+  padding: 8px 10px;
+  font-size: 14px;
+}
+
+.translation-disclaimer {
+  margin: 8px auto 18px;
+  color: #667796;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+@media (max-width: 768px) {
+  .header-inner {
+    align-items: flex-start;
+  }
+
+  .language-access {
+    width: 100%;
+  }
+
+  .language-access select {
+    width: 100%;
+  }
+}
