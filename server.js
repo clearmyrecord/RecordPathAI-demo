@@ -2,6 +2,7 @@ import express from "express";
 import Stripe from "stripe";
 import cors from "cors";
 import path from "path";
+import { runJurisdictionSearch } from "./tools/court-search-core.js";
 
 const app = express();
 const port = process.env.PORT || 8080;
@@ -43,6 +44,21 @@ const OFFICIAL_DOMAIN_HINTS = [
   "co."
 ];
 
+
+function slugify(v) {
+  return String(v || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
+
+function suggestCourtType(text) {
+  const t = String(text || '').toLowerCase();
+  if (t.includes('municipal')) return 'municipal';
+  if (t.includes('common pleas') || t.includes('common-pleas')) return 'common-pleas';
+  if (t.includes('district')) return 'district';
+  if (t.includes('superior')) return 'superior';
+  if (t.includes('circuit')) return 'circuit';
+  if (t.includes('county')) return 'county';
+  return 'other';
+}
 function safe(value, fallback = "") {
   return (value ?? "").toString().trim() || fallback;
 }
@@ -162,6 +178,19 @@ function woodCountyShortcut(court) {
     confidence: 0.99
   };
 }
+
+
+
+
+app.post('/api/jurisdiction-search', async (req, res) => {
+  try {
+    const payload = req.body || {};
+    const result = await runJurisdictionSearch(payload);
+    return res.json({ ...result, generatedAt: new Date().toISOString() });
+  } catch (error) {
+    return res.status(500).json({ backendConfigured: false, queries: [], results: [], errors: [error.message], generatedAt: new Date().toISOString() });
+  }
+});
 
 app.get("/health", (req, res) => {
   res.status(200).json({
