@@ -163,6 +163,17 @@ function woodCountyShortcut(court) {
   };
 }
 
+
+app.post('/api/jurisdiction-search', async (req, res) => {
+  const payload = req.body || {};
+  const queries = [
+    `site:.gov "${payload.county || ''}" "${payload.state || ''}" "${payload.courtType || 'court'}" "sealing record" filetype:pdf`,
+    `site:.gov "${payload.county || ''}" "${payload.state || ''}" "expungement" filetype:pdf`,
+    `site:.gov "${payload.city || ''}" "${payload.state || ''}" "record sealing" "${payload.courtType || ''}" filetype:pdf`,
+    `site:.gov "${payload.courtName || ''}" "application for sealing" filetype:pdf`
+  ];
+  return res.json({ queries, results: [], errors: ['Search provider not configured in this environment.'], generatedAt: new Date().toISOString() });
+});
 app.get("/health", (req, res) => {
   res.status(200).json({
     status: "ok",
