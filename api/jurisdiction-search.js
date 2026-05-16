@@ -1,1 +1,12 @@
-export default async function handler(req,res){if(req.method!=='POST')return res.status(405).json({error:'Method not allowed'});const p=req.body||{};const queries=[`site:.gov "${p.county||''}" "${p.state||''}" "${p.courtType||'court'}" "sealing record" filetype:pdf`,`site:.gov "${p.county||''}" "${p.state||''}" "expungement" filetype:pdf`,`site:.gov "${p.city||''}" "${p.state||''}" "record sealing" "${p.courtType||''}" filetype:pdf`,`site:.gov "${p.courtName||''}" "application for sealing" filetype:pdf`].map(q=>q.replace(/\s+/g,' ').trim());return res.json({backendConfigured:false,queries,results:[],errors:['Search backend not configured'],generatedAt:new Date().toISOString()});}
+import { runJurisdictionSearch } from '../tools/court-search-core.js';
+
+export default async function handler(req,res){
+  if(req.method!=='POST') return res.status(405).json({error:'Method not allowed'});
+  try{
+    const payload=req.body||{};
+    const data=await runJurisdictionSearch(payload);
+    return res.json({...data,generatedAt:new Date().toISOString()});
+  }catch(e){
+    return res.status(500).json({backendConfigured:false,queries:[],results:[],errors:[e.message],generatedAt:new Date().toISOString()});
+  }
+}

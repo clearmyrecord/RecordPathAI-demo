@@ -2,6 +2,7 @@ import express from "express";
 import Stripe from "stripe";
 import cors from "cors";
 import path from "path";
+import { runJurisdictionSearch } from "./tools/court-search-core.js";
 
 const app = express();
 const port = process.env.PORT || 8080;
@@ -180,82 +181,14 @@ function woodCountyShortcut(court) {
 
 
 
-function stripTracking(url) {
-  try {
-    const u = new URL(url);
-    ["utm_source","utm_medium","utm_campaign","gclid"].forEach((k) => u.searchParams.delete(k));
-    return u.toString();
-  } catch {
-    return url;
-  }
-}
-
-function detectFileType(url) {
-  const u = (url || "").toLowerCase();
-  if (u.includes('.pdf')) return 'pdf';
-  if (u.includes('.doc') || u.includes('.docx')) return 'doc';
-  return 'html';
-}
-
-function buildJurisdictionQueries(payload) {
-  return [
-    `site:.gov "${payload.county || ''}" "${payload.state || ''}" "${payload.courtType || 'court'}" "sealing record" filetype:pdf`,
-    `site:.gov "${payload.county || ''}" "${payload.state || ''}" "expungement" filetype:pdf`,
-    `site:.gov "${payload.city || ''}" "${payload.state || ''}" "record sealing" "${payload.courtType || ''}" filetype:pdf`,
-    `site:.gov "${payload.courtName || ''}" "application for sealing" filetype:pdf`
-  ].map((q) => q.replace(/\s+/g, ' ').trim());
-}
-
-async function runJurisdictionBackendSearch(payload) {
-  const queries = buildJurisdictionQueries(payload);
-  const backendConfigured = Boolean(process.env.SERPAPI_KEY);
-  if (!backendConfigured) {
-    return {
-      backendConfigured: false,
-      queries,
-      results: [],
-      errors: ["Search backend not configured"],
-      fallbackCommand: `node tools/crawl-court-site.js --url="${payload.startUrl || 'https://examplecourt.gov/forms'}" --state=${payload.state || 'ohio'} --county=${payload.county || 'wood-county'} --courtType=${payload.courtType || 'municipal'} --formCategory=${payload.formCategory || 'sealing-conviction'} --depth=${payload.depth || 2}`
-    };
-  }
-  const bucket = new Map();
-  for (const q of queries) {
-    try {
-      const found = await searchWeb(q);
-      for (const f of found) {
-        const clean = stripTracking(f.url);
-        if (!clean || bucket.has(clean)) continue;
-        const fileType = detectFileType(clean);
-        const courtType = payload.courtType || suggestCourtType(`${f.title} ${clean}`);
-        const formCategory = payload.formCategory || 'unknown';
-        bucket.set(clean, {
-          id: `jur-${Buffer.from(clean).toString('base64').slice(0, 12)}`,
-          title: f.title || clean.split('/').pop(),
-          url: clean,
-          fileType,
-          matchedKeywords: (payload.searchTerms || []).filter((k) => (`${f.title} ${clean}`).toLowerCase().includes((k||'').toLowerCase())),
-          relevanceScore: scoreResult({ title: f.title, url: clean }, payload.courtName || payload.county || payload.state),
-          state: payload.state,
-          county: payload.county,
-          courtType,
-          formCategory,
-          localAssetPath: `assets/${payload.state}/${payload.county}/${courtType}/${formCategory}/${slugify(f.title || clean.split('/').pop())}.${fileType === 'doc' ? 'docx' : fileType}`,
-          mappingPath: `templates/${payload.state}/${payload.county}/${courtType}/${formCategory}.json`,
-          status: 'Found'
-        });
-      }
-    } catch (e) {}
-  }
-  return { backendConfigured: true, queries, results: [...bucket.values()].sort((a,b)=>b.relevanceScore-a.relevanceScore).slice(0, Number(payload.maxResults||25)), errors: [] };
-}
 
 app.post('/api/jurisdiction-search', async (req, res) => {
   try {
     const payload = req.body || {};
-    const result = await runJurisdictionBackendSearch(payload);
+    const result = await runJurisdictionSearch(payload);
     return res.json({ ...result, generatedAt: new Date().toISOString() });
   } catch (error) {
-    return res.status(500).json({ backendConfigured: Boolean(process.env.SERPAPI_KEY), queries: [], results: [], errors: [error.message], generatedAt: new Date().toISOString() });
+    return res.status(500).json({ backendConfigured: false, queries: [], results: [], errors: [error.message], generatedAt: new Date().toISOString() });
   }
 });
 
